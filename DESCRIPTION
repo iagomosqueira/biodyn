@@ -1,0 +1,43 @@
+Package: biodyn
+Title: Biomass Dynamic Model
+Version: 0.0.1
+Author: Laurence Kell
+Description: implements a biomass dynamic model class
+Depends:
+    R(>= 2.15.0),
+    ggplot2,
+    kobe,
+    diags,
+    FLCore(>= 2.2),
+    FLash,
+    FLAdvice,
+    ggplotFL
+Maintainer: Laurence Kell <laurie.kell@iccat.int>
+Collate:
+    'biodyn-class.R'
+    'biodyn-accessors.R'
+    'biodyn-generic.R'
+    'biodyn-methods.R'
+    'biodyn-control.R'
+    'biodyn-constructors.R'
+    'biodyn-coerce.R'
+    'biodyn-pella.R'
+    'biodyn-diags.R'
+    'biodyn-plots.R'
+    'biodyn-profile.R'
+    'biodyn-kobe.R'
+    'biodyn-fwd.R'
+    'biodyn-msy.R'
+    'biodyn-hcr.R'
+    'biodyn-mng.R'
+    'biodyn-mse.R'
+    'biodyn-OEM.R'
+    'biodyns.R'
+    'biodyn-admb.R'
+    'biodyn-cpp.R'
+    'biodyn-psuedo.R'
+    'biodyn-calcLogLik.R'
+    'biodyn-combine.R'
+License: GPL-2
+LazyLoad: Yes
+LazyData: No

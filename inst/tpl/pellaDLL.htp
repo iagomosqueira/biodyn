@@ -1,0 +1,145 @@
+#if !defined(_pella_)
+#  define _pella_
+
+class dll_args;
+class model_data : public ad_comm{
+  data_int nc;
+  data_matrix Cdata;
+  data_int ni;
+  data_int nIdx;
+  data_matrix Idata;
+  ivector Cyear;
+  dvector C;
+  ivector Iyear;
+  ivector Idx;
+  dvector I;
+  ivector X;
+  dvector logI;
+  double halfnlog2pi;
+  double nReg;
+  data_vector logr_plui;
+  data_vector logk_plui;
+  data_vector logp_plui;
+  data_vector loga_plui;
+  data_ivector qPh;
+  data_vector qLo;
+  data_vector qHi;
+  data_vector qPr;
+  data_ivector sPh;
+  data_vector sLo;
+  data_vector sHi;
+  data_vector sPr;
+  data_vector r_prior;
+  data_vector k_prior;
+  data_vector p_prior;
+  data_vector a_prior;
+  data_vector q_prior;
+  data_vector s_prior;
+  ~model_data();
+  model_data(int argc,char * argv[],dll_args&);
+  friend class model_parameters;
+};
+
+class model_parameters : public model_data ,
+  public function_minimizer
+{
+public:
+  ~model_parameters();
+  void preliminary_calculations(void);
+  void set_runtime(void);
+  virtual void * mycast(void) {return (void*)this;}
+  static int mc_phase(void)
+  {
+    return initial_params::mc_phase;
+  }
+  static int mceval_phase(void)
+  {
+    return initial_params::mceval_phase;
+  }
+  static int sd_phase(void)
+  {
+    return initial_params::sd_phase;
+  }
+  static int current_phase(void)
+  {
+    return initial_params::current_phase;
+  }
+  static int last_phase(void)
+  {
+    return (initial_params::current_phase
+      >=initial_params::max_number_phases);
+  }
+  static prevariable current_feval(void)
+  {
+    return *objective_function_value::pobjfun;
+  }
+private:
+  ivector integer_control_flags;
+  dvector double_control_flags;
+  param_init_bounded_number logr;
+  param_init_bounded_number logk;
+  param_init_bounded_number loga;
+  param_init_bounded_number logp;
+  param_init_bounded_number_vector logq;
+  param_init_bounded_number_vector logs;
+  param_stddev_number r;
+  param_stddev_number k;
+  param_stddev_number a;
+  param_stddev_number p;
+  param_stddev_vector q;
+  param_stddev_vector s;
+  param_stddev_number Ynow;
+  param_stddev_number Bnow;
+  param_stddev_number Hnow;
+  param_stddev_number MSY;
+  param_stddev_number BMSY;
+  param_stddev_number HMSY;
+  param_stddev_number YMSY;
+  param_stddev_number BBMSY;
+  param_stddev_number HHMSY;
+  param_stddev_number Bk;
+  param_stddev_number Hr;
+  param_stddev_number BRatio;
+  param_stddev_number HRatio;
+  param_stddev_number slopeB;
+  param_stddev_number slopeH;
+  param_number SS;
+  param_number s_;
+  param_vector nii;
+  param_number _BRatio;
+  param_number _HRatio;
+  param_number xy;
+  param_number x;
+  param_number y;
+  param_number xx;
+  param_vector B;
+  param_vector Bfit;
+  param_vector Ifit;
+  param_vector RSS;
+  param_matrix summary;
+  param_likeprof_number lpr;
+  param_number prior_function_value;
+  param_number likelihood_function_value;
+  objective_function_value neglogL;
+public:
+  virtual void userfunction(void);
+  virtual void report(void);
+  virtual void final_calcs(void);
+  model_parameters(int sz,int argc, char * argv[], dll_args& ad_dll);
+  virtual void initializationfunction(void){}
+  void get_fit(void);
+  void get_neglogL(void);
+  void get_summary(void);
+  void write_mcmc(void);
+  void write_priors(void);
+  void write_bounds(void);
+};
+
+class dll_args
+{
+public:
+
+ dll_args()  {}
+
+};
+#endif

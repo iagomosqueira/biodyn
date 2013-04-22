@@ -1,0 +1,198 @@
+% aspic.Rnw --
+%
+% Author: laurence kell <lauriekell@gmail.com>
+
+%\VignetteIndexEntry{aspic}
+%\VignetteIndexEntry{An R Package for read/wrting aspic files and plotting data from a variety of fish stock assessment programs}
+%\VignetteKeyword{aspic, diagnostics, IO, read, write}
+
+
+\documentclass[shortnames,nojss,article]{jss}
+
+\usepackage[onehalfspacing]{setspace}
+\usepackage{natbib} \bibliographystyle{plain}
+\usepackage{graphicx, psfrag, Sweave}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{mathtools}
+
+\usepackage{booktabs,flafter} %,thumbpdf}
+\usepackage{hyperref}
+
+%\newcommand{\code}[1]{\texttt{#1}}
+%\newcommand{\proglang}[1]{\textsf{#1}}
+%\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}}
+
+\author{Laurence Kell\\ICCAT}
+\Plainauthor{Laurence Kell}
+
+\title{\pkg{ASPIC}: Biomass Dynamic Stock Assessment Model}
+\Plaintitle{ASPIC: Biomass Dynamic Stock Assessment Model}
+
+\Abstract{The \pkg{biodyn} package is an implenentation of the ASPIC biomass dynamic stock assessment model in 
+R using the original \pkg{FORTRA} executable. The package provides tools for checking of diagnostics, projections, running Monte Carlo simulation and conducting Management Strategy Evaluation.}
+
+\Keywords{\proglang{R}, aspic, stock assessment}
+\Plainkeywords{R, aspic, stock assessment}
+
+\Address{
+  Laurence Kell \\
+  ICCAT Secretariat\\ 
+  C/Coraz\'{o}n de Mar\'{\i}a, 8. \\
+  28002 Madrid\\
+  Spain\\ 
+  
+  E-mail: \email{Laurie.Kell@iccat.int}
+}
+
+%% need no \usepackage{Sweave.sty}
+
+
+<<prelim,echo=FALSE,print=FALSE>>=
+library(cpue)
+library(kobe)
+library(aspic)
+
+stampIt=function(...){
+   require(plyr)
+
+   args=list(...)
+   
+   ldply(args, function(x) { res=packageDescription(x)
+                            c(Package=x,
+                              Version=packageDescription("aspic")$Version,
+                              Date   =packageDescription("aspic")$Date)})}
+
+smry=stampIt("kobe","aspic")
+
+theme_ms <- function(base_size = 12, base_family = "",...) { 
+  # Starts with theme_grey and then modify some parts 
+  res=theme_grey(base_size = base_size, base_family   = base_family) %+replace% 
+    theme(axis.text         = element_text(                                     size   = rel(0.8)), 
+          axis.ticks        = element_line(                 colour = "black"), 
+          legend.key        = element_rect(                 colour = "grey80"), 
+          panel.background  = element_rect(fill = "white",  colour = NA), 
+          panel.border      = element_rect(fill = NA,       colour = "grey50"), 
+          panel.grid.major  = element_line(                 colour = "grey90",  size = 0.2), 
+          panel.grid.minor  = element_line(                 colour = "grey98",  size = 0.5), 
+          strip.background  = element_rect(fill = "grey80", colour = "grey50"), 
+          strip.background  = element_rect(fill = "grey80", colour = "grey50")) 
+  
+  modifyList(res, list(...))
+} 
+@
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+
+
+\section{Introduction}
+
+%\textbf{Table}~\ref{tab:3}
+
+% <<label=Fig1,fig=TRUE, echo=TRUE, include=FALSE>>=
+% ggplot(aes(year,index),data=ddply(cpue, .(name,age), transform, index=minMax(index,na.rm=T))) +
+%   geom_point()                    +
+%   stat_smooth(,method="lm",se=F)  +
+%   facet_grid(age~name)           
+% @ 
+% \begin{figure}[h]\centering\includegraphics[width=1.0\textwidth]
+% {aspic-fig1}\caption{An example plot.}\label{fig:1}\end{figure}
+
+\section{Data}
+
+The example is based upon North Atlantic swordfish, which includes example time series of catch and a CPUE index, e.g.
+<<data,quiet=TRUE,print=FALSE>>=
+library(biodyn)
+data(swonCatch)
+data(swonIndex)
+
+swon=biodyn("pellat",catch=swonCatch)
+plot(catch(swon))
+@
+
+\section{Parameters}
+
+The parameters to be estimated in the Pella-Tomlinson biomass dynamic model are $r$, the population growth rate, $k$ the
+virgin biomass, $b_0$ the ratio of the initial biomass in the time series to $k$ and $p$ the shape parameter that determines
+whether the surplus production curve is skewed to the left or the right. In addition catchability $q_i$ and $\sigma_i$ the standard deviation of the residuals have to be estimated for each index. These are nuisance parameters since they are not of primary interest and  once the other parameters are known they can be derived analytically.
+
+\section{Starting Values}
+
+Starting values have to be chosen by the user, preferably these should be as close as possible to the final solution. Since poor starting values can result in slow convergence, failure to converge, convergence to a local rather than a global solution or to one that is physically impossible.
+
+$r$ is the relative change in a population "per unit time", a starting value can be chosen based on estimates from similar stocks. However, $k$  is stock dependent, a starting guess can be derived based on the time series of catch, for example if it is assumed that the average catch has been half of MSY, then $k$ can be calculated if $r$ and $p$ are known e.g assuming that the production function is symetric by setting Setting $p$ to 1.0 and $r$ to 0.6 then $k$ can be estimated by assuming that the average catches have been half of $MSY$, where  $k=\frac{4MSY}{r}$
+
+<<>>=
+swon@params[c("r","p")]<-c(.6,1)
+swon@params["k"]<-4/params(swon)["r"]*mean(catch(swon))*2
+@
+
+Once the parameters have been set the stock biomass can be projected forward for the observed catches e.g.
+
+
+\begin{figure}\begin{center}
+<<echo=TRUE,fig=TRUE,width=6,height=8>>=
+swon=fwd(swon,catch=catch(swon))
+
+plot(swon)
+@
+\end{center}\end{figure}
+
+
+All this is done by default for \code{pellat} e.g.
+
+<<echo=TRUE>>=
+swon=biodyn("pellat",FLPar(r=0.6),msy=mean(swonCatch)*1.5,catch=swonCatch)
+swon=fwd(swon,catch=catch(swon))
+params(swon)<-swonIndex
+@
+
+This sets uo the default parameters 
+<<echo=TRUE>>=
+params(swon)
+@
+
+However the \code{params} slot holds the results not the starting parameters, the \code{pella} method fits the data and estimates the parameters using  ADMB. 
+<<echo=TRUE>>=
+control(swon)=params(swon)
+@
+
+
+\subsection{Fitting}
+
+For fiiting CPUE data are required
+\begin{figure}\begin{center}
+<<echo=TRUE,fig=TRUE,width=6,height=6>>=
+ggplot(model.frame(mcf(FLQuants(stock=log(stock(swon)),index=log(swonIndex))))) +
+      geom_point(aes(stock,index)) +
+      geom_smooth(aes(stock,index),method="lm") 
+@
+\end{center}\end{figure}
+
+<<echo=TRUE>>=
+res=model.frame(mcf(FLQuants(stock=log(stock(swon)),index=log(swonIndex))),drop=T)
+
+with(res,lm(index~stock-1))
+
+#with(res,calcQ(stock,index))
+#with(res,calcSigma(stock,index))
+@
+
+
+\section{Assessment}
+
+
+\section{Reference Points}
+
+\section{Monte Carlo Simulation}
+\subsection{Bootstrapping}
+\subsection{Jack knife}
+\subsection{MCMC}
+
+\section{Projection}
+
+\section{MSE}
+
+\end{document}
