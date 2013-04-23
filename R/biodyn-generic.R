@@ -1,4 +1,4 @@
-#' Creates a list of biodyn
+  #' Creates a list of biodyn
 #'
 #' @description Creates a list of biodyn biomass dynamic model classes.
 #' @return list of biodyn objects
@@ -16,7 +16,7 @@ setGeneric('refptSE',  function(object,params,...) standardGeneric('refptSE'))
 
 if (!isGeneric("harvest")) setGeneric('harvest',  function(object,params,...) standardGeneric('harvest'))
 
-if (!isGeneric("fwd"))      setGeneric("fwd",      function(object, ctrl, ...)    standardGeneric("fwd"))
+  setGeneric("fwd",      function(object, ctrl, ...)    standardGeneric("fwd"))
 if (!isGeneric("hcr"))      setGeneric("hcr",      function(object, ...)          standardGeneric("hcr"))
 if (!isGeneric("hcrPlot"))  setGeneric("hcrPlot",  function(object, ...)          standardGeneric("hcrPlot"))
 if (!isGeneric("tac"))      setGeneric("tac",      function(object, harvest, ...) standardGeneric("tac"))
@@ -36,6 +36,9 @@ if (!isGeneric("control"))
 if (!isGeneric("control<-"))  
   setGeneric('control<-',   function(object,value)      standardGeneric('control<-'))
 
+if (!isGeneric("plot"))  
+  setGeneric('plot',   function(x,y)      standardGeneric('plot'))
+          
 
 
 

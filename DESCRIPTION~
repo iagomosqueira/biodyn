@@ -8,22 +8,21 @@ Depends:
     ggplot2,
     kobe,
     diags,
-    FLCore(>= 2.2),
-    ggplotFL
+    FLCore(>= 2.2)
+    FLBRP
 Maintainer: Laurence Kell <laurie.kell@iccat.int>
 Collate:
-    'biodyn-generic.R'
     'biodyn-class.R'
     'biodyn-accessors.R'
+    'biodyn-generic.R'
     'biodyn-methods.R'
+    'biodyn-control.R'
     'biodyn-constructors.R'
     'biodyn-coerce.R'
-    'biodyn-control.R'
-    'biodyns.R'
     'biodyn-pella.R'
-    'biodyn-profile.R'
-    'biodyn-plots.R'
     'biodyn-diags.R'
+    'biodyn-plots.R'
+    'biodyn-profile.R'
     'biodyn-kobe.R'
     'biodyn-fwd.R'
     'biodyn-msy.R'
@@ -31,6 +30,7 @@ Collate:
     'biodyn-mng.R'
     'biodyn-mse.R'
     'biodyn-OEM.R'
+    'biodyns.R'
     'biodyn-admb.R'
     'biodyn-cpp.R'
     'biodyn-psuedo.R'
