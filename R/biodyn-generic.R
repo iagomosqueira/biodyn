@@ -39,10 +39,9 @@ if (!isGeneric("control<-"))
 if (!isGeneric("plot"))  
   setGeneric('plot',   function(x,y)      standardGeneric('plot'))
   
-  setGeneric('kobe',       function(object,method,...)    standardGeneric('kobe'))
-setGeneric('kobePhase',  function(object,...)         standardGeneric('kobePhase'))
-setGeneric('refpts', function(object,params,...)
-  standardGeneric('refpts'))
+setGeneric('kobe',       function(object,method,...)    standardGeneric('kobe'))
+setGeneric('kobePhase',  function(object,...)           standardGeneric('kobePhase'))
+setGeneric('refpts',     function(object,params,...)    standardGeneric('refpts'))
 
           
 
