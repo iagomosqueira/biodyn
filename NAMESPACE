@@ -1,4 +1,4 @@
-import("FLCore","kobe","diags")
+import("kobe","diags","FLCore","ggplotFL")
 export(calcK)
 exportClasses(biodyn)
 export(hcrParams)
