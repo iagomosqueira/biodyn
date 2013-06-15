@@ -36,6 +36,9 @@ Collate:
     'biodyn-psuedo.R'
     'biodyn-calcLogLik.R'
     'biodyn-combine.R'
+    'biodyn-delta.R'
+    'biodyn-mcmc.R'
+    'biodyn-mvn.R'
 License: GPL-2
 LazyLoad: Yes
 LazyData: No

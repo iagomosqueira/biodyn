@@ -32,7 +32,7 @@ setMethod('power',  signature(object='biodyn',ref="missing"),
   names(dimnames(res))="param"
   res=as(res,"FLPar")
   
-  if (its==1) res=iter(object,1)
+  if (its==1) res=FLCore:::iter(object,1)
   
   return(res)})
 
@@ -74,7 +74,7 @@ setMethod('power',  signature(object='biodyn',ref="biodyn"),
   res=as(res,"FLPar")
   
   if (its==1){
-    object=iter(object,1)
-    ref   =iter(ref,   1)}
+    object=FLCore:::iter(object,1)
+    ref   =FLCore:::iter(ref,   1)}
     
   return(res)})

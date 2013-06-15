@@ -16,19 +16,19 @@
 #' library(aspic)
 #' library(biodyn)
 #' data(asp)
-#' cpue=FLQuant(asp@index$index,dimnames=list(year=asp@index$year))
+#' index=FLQuant(asp@index$index,dimnames=list(year=asp@index$year))
 #' bd=as(asp,"biodyn")
-#' setParams(bd)  =cpue
+#' setParams(bd)  =index
 #' setControl(bd,.01,100) =params(bd)
-#' res=profile(bd,cpue,which="r",fixed=c("b0","p"),range=c(.95,1.1),maxstep=51)
+#' res=profile(bd,index,which="r",fixed=c("b0","p"),range=c(.95,1.1),maxstep=51)
 #' ggplot(res)+geom_line(aes(r,ll))
 #' }
 
 # ### debugging stuff
 # data(bd)
 # fitted=biodyn(factor("pellat"),params(bd),catch=catch(bd))
-# cpue=rlnorm(1,log(stock(bd)),.2)[,-60]
-# setParams(fitted)     =cpue
+# index=rlnorm(1,log(stock(bd)),.2)[,-60]
+# setParams(fitted)     =index
 # 
 # 
 # attach(list(maxsteps=11, range=0.5, ci=c(0.25, 0.5, 0.75, 0.95),
@@ -36,37 +36,42 @@
 # which="r"
 # fixed=c("p","b0")
 # ###
-# res=profile(bd,which="r",fixed=c("b0","p"),cpue,range=c(1.2,3.0))
+# res=profile(bd,which="r",fixed=c("b0","p"),index,range=c(1.2,3.0))
 # ggplot(res)+geom_line(aes(r,ll))
 # v <- ggplot(res, aes(r, k, z = ll))
 # v <- ggplot(res, aes(r, k, z = ll))+ stat_contour(aes(colour = ..level..), size = 1)
 setMethod("profile", signature(fitted="biodyn"),
-      function(fitted,cpue,which,fixed=c(),
+      function(fitted,index,which,fixed=c(),
                    maxsteps=11, range=0.5,
-                   fn   =function(x) cbind(model.frame(params(x)),model.frame(x@objFn)[,-3],model.frame(refpts(x))[,-4]),
+                   fn   =function(x) cbind(model.frame(params(x)),ll=model.frame(x@ll)[,1],model.frame(refpts(x))[,-4],
+                                           stock  =c(stock(  x)[,ac(range(x)["maxyear"])]%/%bmsy(x)),
+                                           harvest=c(harvest(x)[,ac(range(x)["maxyear"])]%/%fmsy(x))),
                    run  =TRUE,...){
   
-        if (dims(cpue)$maxyear>=dims(stock(fitted))$maxyear) stop("cpue years greater in length than stock")
+        if (dims(index)$maxyear>=dims(stock(fitted))$maxyear) stop("index years greater in length than stock")
         if (dims(fitted)$iter>1) stop("can only be done for a single iter")
                  
-        #setControl(fitted)=params(fitted)
-        control(fitted)=propagate(control(fitted),maxsteps^length(which))
+        if (dim(fitted@control)[3]==1){
+           fitted@control=propagate(fitted@control,maxsteps^length(which))
           
-        if (length(range)==1) range=c(range,2-range)
+           if (length(range)==1) range=c(range,2-range)
         
-        sq=list(seq(range[1],range[2],length.out=maxsteps))
-        sq=do.call("expand.grid",sq[rep(1,length(which))])
+           sq=list(seq(range[1],range[2],length.out=maxsteps))
+           sq=do.call("expand.grid",sq[rep(1,length(which))])
        
-        for (i in seq(length(which))){
-            control(fitted)[which[i],"val"]=     params(fitted)[which[i]]*sq[,i]
-            control(fitted)[which[i],"min"]=min(control(fitted)[which[i],"val"])*range[1]
-            control(fitted)[which[i],"max"]=max(control(fitted)[which[i],"val"])*range[2]}
+           for (i in seq(length(which))){
+               fitted@control[which[i],"val"]=     params(fitted)[which[i]]*sq[,i]
+               fitted@control[which[i],"min"]=min(fitted@control[which[i],"val"])*range[1]
+               fitted@control[which[i],"max"]=max(fitted@control[which[i],"val"])*range[2]}
 
-        control(fitted)[c(fixed,which),"phase"]=-1
-        
+           fitted@control[c(fixed,which),"phase"]=-1
+           }
+        else
+          fitted@control=profileGrid(fitted@control,which,range)
+          
         if (!run) return(fitted)
         
-        res=fit(fitted,cpue)
+        res=fit(fitted,index)
         
         rtn=fn(res)
         
@@ -78,4 +83,20 @@ setMethod("profile", signature(fitted="biodyn"),
 # do.call('contour', list(x=sort(profiled[[1]]), y=sort(profiled[[2]]), z=surface,
 #                             levels=cis, add=TRUE, labcex=0.8, labels=ci))
 # 
+  
+profileGrid=function(object,which,range=seq(0.95,1.05,length.out=11)){
+    
+    res=maply(range,function(x,which,ctl) {
+      ctl[which,"val"]=ctl[which,"val"]*x
+      ctl}, which=which, ctl=object)
+    
+    res=aperm(res,c(2:4,1))
+    
+    dmns=dimnames(object)
+    dmns$iter=seq(dim(object)[3]*length(range))
+    
+    object=FLPar(array(c(res),unlist(lapply(dmns,length)),dmns))
+    
+    return(object)}
+  
   

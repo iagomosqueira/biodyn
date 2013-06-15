@@ -332,7 +332,7 @@ relVar=function(bd,year=range(bd)["maxyear"]){
   
   res.=as.data.frame(res)
   
-  iter(cov,1)[lower.tri(iter(cov,1)[drop=T])] =NA
+  FLCore:::iter(cov,1)[lower.tri(iter(cov,1)[drop=T])] =NA
   cov.=as.data.frame(cov)
   cov.=cov.[!is.na(cov.$data),]
   

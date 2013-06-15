@@ -1,6 +1,10 @@
 setMethod('harvest', signature(object='biodyn',catch="missing"),
-          function(object) {
-            res <- catch(object)/stock(object)[,dimnames(catch(object))$year]
+          function(object,when=.5) {
+            
+            yrs=c(dimnames(catch(object))$year[-1],as.numeric(max(dimnames(catch(object))$year))+1)
+            
+            res <- catch(object)/(stock(object)[,dimnames(catch(object))$year]*(1-when)+
+                                  stock(object)[,yrs]*when)
             units(res) <- "hr"
             return(res)
           })

@@ -58,7 +58,6 @@ setPella=function(obj, exeNm="pella", dir=tempdir()) {
   else  
     nmIdx=c("q","sigma")
 
-  
   # ctl file
   ctl        = bd.@control[nms,]
   ctl[,2:4]  = ctl[,c(2,4,3)]
@@ -66,14 +65,15 @@ setPella=function(obj, exeNm="pella", dir=tempdir()) {
   names(ctl) = nms
 
   biodyn:::writeADMB(ctl, paste(dir, "/", exeNm, ".ctl", sep=""),FALSE)
-
+  
   cat("# q ####################\n", file=paste(dir, "/", exeNm, ".ctl", sep=""),append=TRUE)
 
   ctl           = bd.@control[nmIdx[grep("q",nmIdx)],]
+
   ctl[,2:4]     = ctl[,c(2,4,3)]
   ctl           = alply(t(matrix(ctl,dim(ctl))),1)
   names(ctl)    = c("phase","lower","upper","guess")
-
+  
   biodyn:::writeADMB(ctl, paste(dir, "/", exeNm, ".ctl", sep=""),TRUE)
   
   cat("# sigma ################\n", file=paste(dir, "/", exeNm, ".ctl", sep=""),append=TRUE)
@@ -81,8 +81,9 @@ setPella=function(obj, exeNm="pella", dir=tempdir()) {
   ctl[,2:4]     = ctl[,c(2,4,3)]
   ctl           = alply(t(matrix(ctl,dim(ctl))),1)
   names(ctl)    = c("phase","lower","upper","guess")
+
   biodyn:::writeADMB(ctl, paste(dir, "/", exeNm, ".ctl", sep=""),TRUE)
-   
+  
   # prr file
   prr = bd.@priors[c(nms,nmIdx),] 
   prr = alply(prr,1)
@@ -94,6 +95,8 @@ setPella=function(obj, exeNm="pella", dir=tempdir()) {
   ctc = c(nYrs=length(ctc[[1]]), ctc)
   res = c(ctc, c(nIdxYrs=dim(idx)[1], nIdx=length(unique(idx$name)), idx))
   
+
+  
   writeADMB(res, paste(dir, "/", exeNm, ".dat", sep=""))
   
 #   # propagate as required
@@ -104,6 +107,7 @@ setPella=function(obj, exeNm="pella", dir=tempdir()) {
 #   # stock
 #   stock(bd)  = FLQuant(dimnames=dimnames(stock(bd))[1:5], iter=its)
 #   
+
   # vcov
   vcov(bd.)=FLPar(array(NA, dim     =c(dim(params(bd.))[1],dim(params(bd.))[1],1), 
                            dimnames=list(params=dimnames(params(bd.))[[1]],
@@ -142,7 +146,7 @@ getPella=function(obj, exeNm="pella") {
 #FLParBug sim@control["r","val",1]=c(.5,.6)
 #exe(object, exeNm="biodyn", dir=tempdir(), set=biodyn:::set, get=biodyn:::set, cmdOps=paste("-maxfn 500"))
   
-activeParams=function(obj) dimnames(control(obj))$params[c(control(obj)[,"phase"]>-1)]
+activeParams=function(obj) dimnames(obj@control)$params[c(obj@control[,"phase"]>-1)]
 
 ## runs exe
 
@@ -169,20 +173,39 @@ setMethod("fit",signature(object='biodyn',index="FLQuant"),
                    dir=tempdir(),
                    set=setPella,
                    get=getPella,cmdOps=paste("-maxfn 500 -iprint 0"))
-   fitPella(object,index=index,exeNm="pella",package="biodyn", 
-            dir=tempdir(),
-            set=setPella,
-            get=getPella,cmdOps=paste("-maxfn 500 -iprint 0")))
+   fitPella(object,index=index,exeNm=exeNm,package=package, 
+            dir=dir,
+            set=set,
+            get=get,cmdOps=cmdOps))
 
 setMethod("fit",signature(object='biodyn',index="FLQuants"),
           function(object,index=index,exeNm="pella",package="biodyn", 
                    dir=tempdir(),
                    set=setPella,
                    get=getPella,cmdOps=paste("-maxfn 500 -iprint 0"))
-            fitPella(object,index=index,exeNm="pella",package="biodyn", 
-                     dir=tempdir(),
-                     set=setPella,
-                     get=getPella,cmdOps=paste("-maxfn 500 -iprint 0")))
+            fitPella(object,index,exeNm,package, 
+                     dir=dir,
+                     set=set,
+                     get=get,cmdOps=cmdOps))
+
+setMethod("fit",signature(object='biodyn',index="FLQuantJK"),
+          function(object,index=index,exeNm="pella",package="biodyn", 
+                   dir=tempdir(),
+                   set=setPella,
+                   get=getPella,cmdOps=paste("-maxfn 500 -iprint 0")){
+
+            object=propagate(object,dims(index)$iter)
+            index =as.FLQuant(index)
+            
+            object=fitPella(object,index=index,exeNm=exeNm,package=package, 
+                     dir=dir,
+                     set=set,
+                     get=get,cmdOps=cmdOps)
+            
+            attributes(object)["jk"]=TRUE
+            
+            object})
+
 
 fitPella=function(object,index=index,exeNm="pella",package="biodyn", 
                   dir=tempdir(),
@@ -192,13 +215,14 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
   first=TRUE          
   if (dims(object)$iter==1 &  1<ifelse(is(index)[1]=="FLQuant",dims(index)$iter>1,max(laply(index,function(x) dims(x)$iter))))
     catch(object)=propagate(catch(object),dims(index)$iter)
-  
+ 
   max=min(dims(catch(object))$maxyear,ifelse(is(index)[1]=="FLQuant",dims(index)$maxyear,max(laply(index,function(x) dims(x)$maxyear))))
   if (!is.na(range(object)["maxyear"])) max=min(max,range(object)["maxyear"])
   min=min(dims(catch(object))$minyear,ifelse(is(index)[1]=="FLQuant",dims(index)$minyear,max(laply(index,function(x) dims(x)$minyear))))
   if (!is.na(range(object)["minyear"])) min=max(min,range(object)["minyear"])
 
   object=window(object,start=min,end=max)
+  
   if ("FLQuant" %in% is(index)){ 
     index =window(index,start=min,end=max)
   }else if ("FLQuants" %in% is(index)){
@@ -224,12 +248,12 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
 
   if (its>1){
       ## these are all results, so doesnt loose anything
-      bd@stock  =iter(bd@stock,  1)
-      bd@params =iter(bd@params, 1)
-      bd@objFn  =iter(bd@objFn,  1)
-      bd@vcov   =iter(bd@vcov,   1)
-      bd@ll     =iter(bd@ll,     1)
-      bd@hessian=iter(bd@hessian,1)
+      bd@stock  =FLCore:::iter(bd@stock,  1)
+      bd@params =FLCore:::iter(bd@params, 1)
+      bd@objFn  =FLCore:::iter(bd@objFn,  1)
+      bd@vcov   =FLCore:::iter(bd@vcov,   1)
+      bd@ll     =FLCore:::iter(bd@ll,     1)
+      bd@hessian=FLCore:::iter(bd@hessian,1)
       bd@mng    =FLPar(a=1)
       
       bd=propagate(bd,its)
@@ -237,10 +261,10 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
    
   cpue=object[[2]]
   for (i in seq(its)){     
-     object[[2]] = iter(cpue,i) 
+     object[[2]] = FLCore:::iter(cpue,i) 
     
      for (s in names(slts)[-(7:8)]){      
-        slot(object[[1]],s) = iter(slot(bd,s),i) 
+        slot(object[[1]],s) = FLCore:::iter(slot(bd,s),i) 
         }  
      
      object[[1]]=set(object,exeNm,dir)
@@ -253,7 +277,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
      object[[1]]=getPella(object[[1]], exeNm)
      
      for (s in names(slts)[slts=="FLQuant"]){
-         iter(slot(bd,s),i) = slot(object[[1]],s)
+         FLCore:::iter(slot(bd,s),i) = slot(object[[1]],s)
          } 
      
      if (its<=1){
@@ -265,6 +289,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
        close(x)
      
        ## vcov
+       print("vcov")
        if (file.exists(paste(dir,"admodel.cov",sep="/")))
          try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- cv(), silent=TRUE) 
        #if (file.exists(paste(dir,"admodel.cov",sep="/"))){
@@ -274,7 +299,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
        #   try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- H, silent=TRUE)
        #close(x)}
        }
-   
+  
      bd@params@.Data[  ,i] = object[[1]]@params
      bd@control@.Data[,,i] = object[[1]]@control
      #bd@objFn@.Data[   ,i] = object[[1]]@objFn
@@ -283,7 +308,6 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
      bd@ll@.Data[,i][] = unlist(c(object[[1]]@ll))
      
      if (file.exists("pella.std")){
-     
      err=try(mng.<-read.table("pella.std",header=T)[,-1])
              
      ## FLPar hack
@@ -298,23 +322,41 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
   units(bd@mng)="NA"
   
   bd=fwd(bd,catch=catch(bd)[,rev(dimnames(catch(bd))$year)[1]])
-  
+   
   if (length(grep("-mcmc",cmdOps))>0 & length(grep("-mcsave",cmdOps))>0){
     #"-mcmc 100000 -mcsave 100"
-    setMCMC=function(obj,dir){
-      ps=exp(read.psv(paste(dir,"pella.psv",sep="/")))
-      ps=FLPar(t(ps))
-      dimnames(ps)$params=activeParams(bd)
-      units(ps)=NA
-      ps}
-    
+     setMCMC=function(obj,dir){
+       ps=biodyn:::read.psv(paste(dir,"pella.psv",sep="/"))
+
+       dmns=list(params=activeParams(obj),iter=seq(dim(ps)[1]))
+
+       ps=array(t(ps),dim=unlist(llply(dmns,length)),dimnames=dmns)
+       ps=FLPar(ps)
+       
+       units(ps)=NA
+       ps}
+
     par=setMCMC(bd,dir)
+   
+    cmd=strsplit(cmdOps,",")
+    grp=unlist(gregexpr("-mcmc",cmd[[1]])) 
+    mcmc =sub(" +", "", cmd[[1]][grp>0]) 
+    mcmc =as.numeric(substr(mcmc,6,nchar(mcmc)))
+    grp=unlist(gregexpr("-mcsave",cmd[[1]])) 
+    mcsave=sub(" +", "", cmd[[1]][grp>0])
+    mcsave=sub(" +", "", mcsave)
+    mcsave=as.numeric(substr(mcsave,8,nchar(mcsave)))
+     
     bd@params=propagate(bd@params[,1],dims(par)$iter)
     bd@params[dims(par)$params,]=par
     bd@stock=propagate(bd@stock,dim(params(bd))[2])
-    bd=fwd(bd,catch=catch(t.))
+    bd=fwd(bd,catch=catch(bd))  
+   
+     
+     attributes(bd@params)[["mcmc"]]  =mcmc
+     attributes(bd@params)[["mcsave"]]=mcsave 
     }
-  
+    
   if (its<=1) bd@diags=getDiags()
   
   setwd(oldwd)
@@ -371,7 +413,7 @@ getDiags=function(fl="pella.rep"){
   
   res=read.table(fl,skip=skip,header=TRUE)
   res=transform(res,residual=log(index/hat))
-  res=cpue:::diagsFn(res)
+  res=diags:::diagsFn(res)
   
   res$harvest=res$catch/res$stock
   res$stock  =res$stock.

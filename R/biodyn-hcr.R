@@ -137,8 +137,8 @@ setMethod('hcr', signature(object='biodyn'),
   fmin=as(params["fmin"],"FLQuant")
   ftar=as(params["ftar"],"FLQuant")
   for (i in seq(dims(object)$iter)){
-    iter(rtn,i)[]=max(iter(rtn,i),iter(fmin,i))
-    iter(rtn,i)[]=min(iter(rtn,i),iter(ftar,i))} 
+    FLCore:::iter(rtn,i)[]=max(FLCore:::iter(rtn,i),FLCore:::iter(fmin,i))
+    FLCore:::iter(rtn,i)[]=min(FLCore:::iter(rtn,i),FLCore:::iter(ftar,i))} 
   
   dimnames(rtn)$year=min(yrs)  
   if (length(yrs)>1){
