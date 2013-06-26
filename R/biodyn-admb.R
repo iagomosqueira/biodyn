@@ -151,9 +151,18 @@ getADMBHessian <- function(hess="admodel.hes"){
   return(result)
 }
 
-cv=function(){
-  cov         <- solve(getADMBHessian()$hes)
-  scale       <- getADMBHessian()$scale
+cv=function(hess){
+  res         <- getADMBHessian(hess)
+  cov         <- solve(res$hes[-1570,-1570])
+  scale       <- res$scale
+  cov.bounded <- cov*(scale %o% scale)
+  se          <- sqrt(diag(cov.bounded))
+  
+  cov.bounded}
+
+cv2=function(obj){
+  cov         <- obj$hes
+  scale       <- obj$scale
   cov.bounded <- cov*(scale %o% scale)
   se          <- sqrt(diag(cov.bounded))
   

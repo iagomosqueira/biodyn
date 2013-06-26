@@ -83,7 +83,7 @@ maxFn=function(val,bnd){
   val[is.na(val)]=0
   
   res=val
-  res[val>bnd]=val[val>bnd]
+  res[val>bnd]=bnd[val>bnd]
  
   return(res)}
 
@@ -213,13 +213,13 @@ setMethod("fwd", signature(object="biodyn",ctrl="missing"),
 #           object@catch[,y]=iavFn(window(object@catch,end=y),bnd,lag=1)
 #           object@stock[,ac(y+1)] = object@stock[,ac(y)] - object@catch[,ac(y)] + sp.
 #           }
-
+    
       ### min/max
       harvest[,ac(y)]       =maxFn(minFn(harvest(object)[,ac(y)],minF),maxF)
       object@catch[,ac(y)]  =object@stock[,ac(y)]*harvest[,ac(y)]
       object@stock[,ac(y+1)]=object@stock[,ac(y)] - object@catch[,ac(y)] + sp.
       }
-    
+  
     object@stock[stock(object) < 0] = 0.001
     object@catch[catch(object) < 0] = 0.0000001
 

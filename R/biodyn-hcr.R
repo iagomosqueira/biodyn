@@ -118,7 +118,6 @@ setMethod('hcr', signature(object='biodyn'),
            bndTac=NULL, #c(1,Inf),
            maxF  =2,
            ...) {
-
   ## HCR
   params=as(params,"FLQuant")  
   #if (blim>=btrig) stop("btrig must be greater than blim")
@@ -163,8 +162,9 @@ setMethod('hcr', signature(object='biodyn'),
      
       object=window(object, end=max(as.numeric(yrs)))
       object=fwd(object,harvest=harvest(object)[,ac(min(as.numeric(yrs)-1))])
-       
-      rtn   =catch(fwd(object, harvest=rtn))[,yrs]
+
+      
+      rtn   =catch(fwd(object, harvest=rtn))[,ac(yrs)]
       
       if (!is.null(bndTac)){  
         rtn[,ac(min(yrs))]=qmax(rtn[,ac(min(yrs))],catch(object)[,ac(min(yrs)-1)]*bndTac[1])
@@ -195,22 +195,22 @@ setMethod('hcr', signature(object='biodyn'),
 #'
 #' @examples
 #' hcrPlot(object)
-setMethod('hcrPlot', signature(object='biodyn'),
-  function(object,params=FLPar(ftar=0.7, btrig=0.7, fmin=0.025, blim=0.20) ,maxB=1){
-  
-  pts=rbind(cbind(refpt="Target",model.frame(rbind(bmsy(object)*c(params["btrig"]),
-                                                   fmsy(object)*c(params["ftar"])))),
-            cbind(refpt="Limit", model.frame(rbind(bmsy(object)*c(params["blim"]),
-                                                   fmsy(object)*c(params["fmin"])))))
-  pts.=pts
-  pts.[1,"bmsy"]=params(object)["k"]*maxB
-  pts.[2,"bmsy"]=0
-  pts.[,1]=c("")
-  
-  pts=rbind(pts.[1,],pts[1:2,],pts.[2,])
-  
-  names(pts)[2:3]=c("biomass","harvest")
-  pts[,"biomass"]=pts[,"biomass"]/bmsy(object)
-  pts[,"harvest"]=pts[,"harvest"]/fmsy(object)
-  
-  pts})
+# setMethod('hcrPlot', signature(object='biodyn'),
+#   function(object,params=FLPar(ftar=0.7, btrig=0.7, fmin=0.025, blim=0.20) ,maxB=1){
+#   
+#   pts=rbind(cbind(refpt="Target",model.frame(rbind(bmsy(object)*c(params["btrig"]),
+#                                                    fmsy(object)*c(params["ftar"])))),
+#             cbind(refpt="Limit", model.frame(rbind(bmsy(object)*c(params["blim"]),
+#                                                    fmsy(object)*c(params["fmin"])))))
+#   pts.=pts
+#   pts.[1,"bmsy"]=params(object)["k"]*maxB
+#   pts.[2,"bmsy"]=0
+#   pts.[,1]=c("")
+#   
+#   pts=rbind(pts.[1,],pts[1:2,],pts.[2,])
+#   
+#   names(pts)[2:3]=c("biomass","harvest")
+#   pts[,"biomass"]=pts[,"biomass"]/bmsy(object)
+#   pts[,"harvest"]=pts[,"harvest"]/fmsy(object)
+#   
+#   pts})
