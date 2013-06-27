@@ -13,6 +13,18 @@ setMethod('harvest', signature(object='biodyn',catch="missing"),
             return(res)
           })
 
+setMethod('stock', signature(object='biodyn'),
+          function(object,when=0) {
+            
+            when=max(min(when,1),0)
+            if (when<=0) return(object@stock)
+            
+            yrs =  dimnames(stock(object))$year
+            yrs1=  rev(rev(yrs)[-1])
+            yrs2=  yrs[-1]
+             
+            (1-when)*stock(object)[,yrs1]+when*stock(object)[,yrs2]})
+
 ##############################################################
 #' Calculates surplus production
 #'

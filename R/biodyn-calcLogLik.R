@@ -1,4 +1,3 @@
-
 # calcSigma
 calcSigma=function(obs,hat=rep(0,length(obs)),error="log"){
   SS   <-sum((obs-hat)^2,na.rm=T)
