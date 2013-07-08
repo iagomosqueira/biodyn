@@ -43,7 +43,7 @@ createFLAccesors <- function(class, exclude=character(1), include=missing) {
 			{slot(object, s) <- value; if(validObject(object)) object else stop("")}),
       list(x=xr, y=class, s=x, v=unname(slots[x])))
 		)
-    if(any(unname(slots[x]) %in% c('FLArray', 'FLQuant', 'FLCohort', 'refpts', 'FLPar')))
+    if(any(unname(slots[x]) %in% c('FLArray', 'FLQuant', 'FLCohort', 'FLPar')))
     eval(
 		substitute(setMethod(x, signature(object=y, value="numeric"), function(object, value)
 			{slot(object, s)[] <- value; object}), list(x=xr, y=object, s=x))
@@ -57,4 +57,4 @@ createFLAccesors <- function(class, exclude=character(1), include=missing) {
 	return(defined)
 }	# }}}
 
-invisible(createFLAccesors("biodyn", exclude=c("desc","range","priors","objFn","mng","diags","stock"))) #,"priors","diags","objFn","control","mng")))
+invisible(createFLAccesors("biodyn", exclude=c("desc","range","priors","objFn","mng","diags","stock","refpts"))) #,"priors","diags","objFn","control","mng")))
