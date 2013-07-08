@@ -98,21 +98,21 @@ utils::globalVariables(c("ddply",".","year","pctl","cast","kobeP","sims"))
 #'     data(asp)
 #'     kobePhase(asp)+geom_path( aes(stock,harvest)) +
 #'     geom_point(aes(stock,harvest))
-setMethod('kobePhase', signature(object='biodyn'),
-          function(object,xlim=c(0,2),ylim=xlim){
+setMethod('kobe', signature(object='biodyn'),
+          function(object,what=c("sims","trks","pts","smry","wrms")[1],prob=c(0.75,0.5,.25),year=NULL,nwrms=10){
             
-            res=model.frame(mcf(FLQuants(stock  =stock(  object)%/%bmsy(object),
+            res=model.frame(mcf(FLQuants(stock   =stock(  object)%/%bmsy(object),
                                           harvest=harvest(object)%/%fmsy(object))))
                     
-            invisible(kobe:::kobePhaseFn(res,xlim,ylim))})
+            kobeFn(res,what,prob,year,nwrms)})
 
-setMethod('kobePhase', signature(object='biodyns'),
-          function(object,xlim=c(0,2),ylim=xlim){
+setMethod('kobe', signature(object='biodyns'),
+          function(object,what=c("sims","trks","pts","smry","wrms")[1],prob=c(0.75,0.5,.25),year=NULL,nwrms=10){
             
           res=ldply(object,  function(x) model.frame(mcf(FLQuants(stock  =stock(  x)%/%bmsy(x),
                                                                   harvest=harvest(x)%/%fmsy(x)))))
           
-          invisible(kobe:::kobePhaseFn(res,xlim,ylim))})
+          kobeFn(res,what,prob,year,nwrms)})
 
 
 kobeMar=function(x,ds=seq(0,4,.001)){
@@ -124,3 +124,4 @@ kobeMar=function(x,ds=seq(0,4,.001)){
                   data.frame(value  =ds,
                              density=dnorm(ds,x@mng["ffmsy","hat"],x@mng["ffmsy","sd"]))))
   return(mar)}
+

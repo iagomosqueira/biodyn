@@ -195,8 +195,9 @@ setMethod("fit",signature(object='biodyn',index="FLQuantJK"),
                    get=getPella,cmdOps=paste("-maxfn 500 -iprint 0")){
 
             object=propagate(object,dims(index)$iter)
-            index =as.FLQuant(index)
             
+            index =as.FLQuant(index)
+
             object=fitPella(object,index=index,exeNm=exeNm,package=package, 
                      dir=dir,
                      set=set,
@@ -212,6 +213,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
                   set=setPella,
                   get=getPella,cmdOps=paste("-maxfn 500 -iprint 0"))          
   {
+   
   first=TRUE          
   if (dims(object)$iter==1 &  1<ifelse(is(index)[1]=="FLQuant",dims(index)$iter>1,max(laply(index,function(x) dims(x)$iter))))
     catch(object)=propagate(catch(object),dims(index)$iter)
@@ -222,7 +224,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
   if (!is.na(range(object)["minyear"])) min=max(min,range(object)["minyear"])
 
   object=window(object,start=min,end=max)
-  
+
   if ("FLQuant" %in% is(index)){ 
     index =window(index,start=min,end=max)
   }else if ("FLQuants" %in% is(index)){
@@ -255,6 +257,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
       bd@ll     =FLCore:::iter(bd@ll,     1)
       bd@hessian=FLCore:::iter(bd@hessian,1)
       bd@mng    =FLPar(a=1)
+      bd@mngVcov=FLPar(a=1,a=1)
       
       bd=propagate(bd,its)
       }
@@ -289,15 +292,17 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
        close(x)
      
        ## vcov
-       print("vcov")
        if (file.exists(paste(dir,"admodel.cov",sep="/")))
-         try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- cv(), silent=TRUE) 
+         try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- biodyn:::cv(paste(dir,"admodel.hes",sep="/")), silent=TRUE) 
        #if (file.exists(paste(dir,"admodel.cov",sep="/"))){
        #   x<-file(paste(dir,"admodel.cov",sep="/"),'rb')
        #   nopar<-readBin(x,"integer",1)
        #   H<-matrix(readBin(x,"numeric",nopar*nopar),nopar)
        #   try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- H, silent=TRUE)
        #close(x)}
+       
+       if (file.exists(paste(dir,"pella.hst",sep="/")))
+         try(bd@profile<-admbProfile(paste(dir,"pella.hst",sep="/"))$profile)
        }
   
      bd@params@.Data[  ,i] = object[[1]]@params
@@ -306,16 +311,26 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
 
      #FLParBug
      bd@ll@.Data[,i][] = unlist(c(object[[1]]@ll))
-     
+    
      if (file.exists("pella.std")){
-     err=try(mng.<-read.table("pella.std",header=T)[,-1])
-             
+       err1=try(mng.<-read.table("pella.std",header=T)[,-1])
+    
+       err2=try(mngVcov.<-fitFn(paste(dir,"pella",sep="/"))$vcov)
+         
      ## FLPar hack
-     if (first & any(is(err)!="try-error")) {
-       bd@mng   =FLPar(array(unlist(c(mng.[,-1])),dim=c(dim(mng.)[1],2,its),dimnames=list(param=mng.[,1],var=c("hat","sd"),iter=seq(its))))
-       first=!first
+     if (first) {
+       if (any(is(err1)!="try-error")) 
+         bd@mng=FLPar(array(unlist(c(mng.[   ,-1])), dim     =c(dim(mng.)[1],2,its),
+                                                     dimnames=list(param=mng.[,1],var=c("hat","sd"),iter=seq(its))))
+       
+       if (any(is(err2)!="try-error")) 
+         bd@mngVcov<-FLPar(array(unlist(c(mngVcov.)),dim     =c(dim(mng.)[1],dim(mng.)[1],its),
+                                                     dimnames=list(param=dimnames(mngVcov.)[[1]],
+                                                                   param=dimnames(mngVcov.)[[1]],iter=seq(its))))
+       first=!first  
     }else{
-       if (is(err)!="try-error") bd@mng@.Data[,,i][]=unlist(c(mng.[,-1]))
+       if (is(err1)!="try-error") bd@mng@.Data[,,i][]=unlist(c(mng.[,-1]))
+       if (is(err2)!="try-error") bd@mngVcov@.Data[,,i][]=unlist(c(mngVcov.))
        }}
   }
   
@@ -496,4 +511,36 @@ calcSS=function(x) daply(x@diags, .(name),
 #tst=FLPar(NA,dimnames=list(params=c("a","b"),col=c("x","y"),iter=1:2))
 #tst["a","x",2]=3
 
+fitFn=function(file){
 
+  res=admbFit(file)
+
+  #est        
+  hat =FLPar(array(c(res$est),dim     =c(length(res$names),1),
+                              dimnames=list(params=res$names,iter=1)))
+  units(hat)=NA  
+    
+  #std        
+  std =FLPar(array(c(res$std),dim     =c(length(res$names),1),
+                              dimnames=list(params=res$names,iter=1)))
+  units(std)=NA  
+    
+  #cor 
+  cor =FLPar(array(c(res$cor),dim     =c(length(res$names),length(res$names),1),
+                              dimnames=list(params=res$names,params=res$names,iter=1)))
+  units(cor)=NA  
+    
+  #cov
+  vcov=FLPar(array(c(res$cov),dim     =c(length(res$names),length(res$names),1),
+                              dimnames=list(params=res$names,params=res$names,iter=1)))
+    
+  units(vcov)=NA  
+    
+  return(list(std       =std,hat=hat,cor=cor,vcov=vcov,  
+              nlogl     =res$nlogl,      
+              maxgrad   =res$maxgrad,    
+              npar      =res$npar,       
+              logDetHess=res$logDetHess))}
+
+#file="/tmp/Rtmp6dBbkc/pella"
+#fitFn(file)

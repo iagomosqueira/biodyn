@@ -101,6 +101,7 @@ setMethod('bmsy',  signature(object='biodyn',    params="numeric"), function(obj
 #' @examples
 #' refpts("logistic",FLPar(msy=100,k=500))
 #'  
+
 setMethod('refpts', signature(object='character', params="FLPar"),   function(object=factor(object), params=params)          refptsFn(object, params))
 setMethod('refpts', signature(object='factor',    params="FLPar"),   function(object=       object,  params=params)          refptsFn(object, params))
 setMethod('refpts', signature(object='biodyn',    params="missing"), function(object)  {  model=model(object)

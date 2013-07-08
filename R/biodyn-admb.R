@@ -50,7 +50,7 @@ function(ifile)
 	return(A)
 }
 
-read.fit <-
+admbFit <-
 function(ifile)
 {
 	# __Example:             
@@ -167,3 +167,62 @@ cv2=function(obj){
   se          <- sqrt(diag(cov.bounded))
   
   cov.bounded}
+
+#file="/home/laurie/Desktop/gcode/mse4mfcl/ALB/papers/SCRS/SCRS2013-117/Inputs/pella.hst"
+
+admbProfile=function(file) {
+  
+  dat =scan(file, what = "", sep = "\n", skip = 1)
+  nms =c("",unlist(lapply(grep("#", dat, value = T), function(x) str_trim(substr(x,2, nchar(x))))))
+  
+  brks=seq(length(dat))[substr(dat,1,1)=="#"]
+  brks=data.frame("from"=c(1,brks+1),"to"=c(1,brks[-1]-1,length(dat)))
+  
+  vals=mlply(brks, function(from,to,dat) as.numeric(unlist(strsplit(unlist(dat[from:to])," "))),dat=dat)
+  names(vals)=nms
+  
+  # when do profiles start?
+  flag=seq(length(nms))[substr(nms,1,4)=="rand"]
+  
+  prf=ldply(vals[-(1:(flag))], function(x) t(array(x,c(2,length(x)/2))))
+  names(prf)=c("param","value","p")
+  
+  vals=vals[1:flag]
+  vals[["profile"]]=prf
+  
+  return(vals)}
+
+
+admbCor<-function(ifile)
+  {
+    # __Example:             
+    #	file <-("~/admb/simple")
+    #	A <- reptoRlist(file)
+    #	Note there is no extension on the file name.
+    
+    ## The following is a contribution from:
+    ## Anders Nielsen that reads the par & cor files.
+    ret<-list() 
+    parfile<-as.numeric(scan(paste(ifile,'.par', sep=''),   
+                             what='', n=16, quiet=TRUE)[c(6,11,16)]) 
+    ret$nopar<-as.integer(parfile[1]) 
+    ret$nlogl<-parfile[2] 
+    ret$maxgrad<-parfile[3] 
+    file<-paste(ifile,'.cor', sep='') 
+    lin<-readLines(file) 
+    ret$npar<-length(lin)-2 
+    ret$logDetHess<-as.numeric(strsplit(lin[1], '=')[[1]][2]) 
+    sublin<-lapply(strsplit(lin[1:ret$npar+2], ' '),function(x)x[x!='']) 
+    ret$names<-unlist(lapply(sublin,function(x)x[2])) 
+    ret$est<-as.numeric(unlist(lapply(sublin,function(x)x[3]))) 
+    ret$std<-as.numeric(unlist(lapply(sublin,function(x)x[4]))) 
+    ret$cor<-matrix(NA, ret$npar, ret$npar) 
+    corvec<-unlist(sapply(1:length(sublin), function(i)sublin[[i]][5:(4+i)])) 
+    ret$cor[upper.tri(ret$cor, diag=TRUE)]<-as.numeric(corvec) 
+    ret$cor[lower.tri(ret$cor)] <- t(ret$cor)[lower.tri(ret$cor)] 
+    ret$cov<-ret$cor*(ret$std%o%ret$std)
+    
+    class(ret) <-"admb"
+    return(ret)}
+
+

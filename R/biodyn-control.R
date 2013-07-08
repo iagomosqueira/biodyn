@@ -21,7 +21,7 @@ setMethod('setParams<-', signature(object='biodyn',value="data.frame"), function
   nms=c(biodyn:::modelParams(as.character(object@model)),"b0")
   object@params=object@params[nms]
 
-  #object@params =setQ(FLCore:::iter(object,1),value=apply(value,2,mean,na.rm=T))
+  object@params =setQ(object,value)
   
   return(object)})
 
@@ -80,7 +80,7 @@ setGeneric('setControl<-', function(object,value,...)  standardGeneric('setContr
 setMethod('setControl<-', signature(object='biodyn',value="FLPar"), function(object,value,min=0.1,max=10.0) {
    
   if (dims(value)$iter>1 & dims(object@control)$iter==1)
-    control(object)=propagate(control(object),dims(value)$iter)
+    object@control=propagate(control(object),dims(value)$iter)
 
   nms=dimnames(object@params)$params
   object@control=FLPar(array(rep(c(1,NA,NA,NA),each=length(nms)), dim=c(length(nms),4,dims(value)$iter), dimnames=list(params=nms,option=c("phase","min","val","max"),iter=seq(dims(value)$iter))))
@@ -168,17 +168,18 @@ setQ=function(object,index,error="log"){
   res=as(res.,"FLPar")[,1]
   #res=FLCore:::iter(res,seq(its))
   units(res)="NA"
-  res[]=res.[with(res.,order(iter,params)),"data"]
+  res=res.[with(res.,order(iter,params)),]
   
   if (dims(object@params)$iter==1)
     object@params=propagate(object@params,its)
 
-  t.<-FLCore:::rbind(FLPar(object@params),FLPar(res))
+  t.=rbind(object@params,FLPar(as.FLQuant(res)[drop=T]))
   dmns=dimnames(t.)
   names(dmns)=c("params","iter")
-  t.<-array(t.,dim=unlist(lapply(dmns,length)),dimnames=dmns)
+  t.=FLPar(array(t.,dim=unlist(lapply(dmns,length)),dimnames=dmns))
+  units(t.)=NA
   
-  object@params=FLPar(t.)
+  object@params=t.
   #object@params=FLPar(rbind(FLPar(object@params),FLPar(res)))
   
   object@params}

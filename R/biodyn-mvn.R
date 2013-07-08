@@ -25,7 +25,7 @@ mvn=function(object,n,nms=dimnames(object@control[object@control[,"phase",]>0,])
   units(res)="NA"
   
   params(object)=propagate(params(object),n)
-  stock(object) =propagate(stock( object),n)
+  object@stock  =propagate(stock( object),n)
   
   params(object)[nms]=res
   

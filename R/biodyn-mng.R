@@ -1,4 +1,3 @@
-
 ##############################################################
 #' power
 #'
@@ -14,7 +13,7 @@
 #' @rdname power
 #'
 setMethod('power',  signature(object='biodyn',ref="missing"), 
-          function(object,ref=ref,test=data.frame(param =c("Bbmsy","Bk","BRatio","HHmsy", "Hr","HRatio","slopeB","slopeH"),
+          function(object,ref=ref,test=data.frame(param =c("bbmsy","bk","bratio","ffmsy", "fr","fratio","slopeb","slopef"),
                                               q         =c(     1,    0,       1,      0,    1,       0,       1,      0),
                                               lower.tail=c( FALSE, TRUE,   FALSE,   TRUE,FALSE,    TRUE,   FALSE,    TRUE))){
   
@@ -37,8 +36,8 @@ setMethod('power',  signature(object='biodyn',ref="missing"),
   return(res)})
 
 setMethod('power',  signature(object='biodyn',ref="biodyn"), 
-          function(object,ref,test=data.frame(param     =c("bnow","hnow","bnow","hnow"),
-                                              ref       =c("bmsy","fmsy","bnow","hnow"),
+          function(object,ref,test=data.frame(param     =c("bnow","fnow","bnow","fnow"),
+                                              ref       =c("bmsy","fmsy","bnow","fnow"),
                                               q         =c(     1,    0,      1,    0),
                                               lower.tail=c( FALSE, TRUE, FALSE, TRUE))){
   

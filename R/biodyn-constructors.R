@@ -8,7 +8,7 @@
 #' @examples bd=biodyn("pellat",FLPar(r=0.6,k=50000,p=1,b0=1))
 setGeneric('biodyn',   function(model,params,...)  standardGeneric('biodyn'))
 setMethod('biodyn', signature(model='factor',params="FLPar"),
-          function(model,params,min=0.1,max=10,msy=NULL,catch=NULL,stock=NULL,...){
+          function(model,params,min=0.1,max=10,catch=NULL,stock=NULL,...){
      
             args = list(...)
           

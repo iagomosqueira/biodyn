@@ -1,3 +1,3 @@
 par2mcmc=function (x)
-  mcmc(t(params(x)[drop=T]), start = 1, thin = attributes(params(x))$mcsave)
+  mcmc(t(x[drop=T]), start = 1, thin = attributes(x)$mcsave)
   

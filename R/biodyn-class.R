@@ -95,7 +95,10 @@ validity<-function(object) {
     hessian       ="FLPar",
     objFn         ="FLPar",
     ll            ="FLPar",
-    mng           ="FLPar"),
+    mng           ="FLPar",
+    mngVcov       ="FLPar",
+    profile       ="data.frame"
+    ),
   prototype(
     range       =unlist(list(minyear=as.numeric(NA), maxyear=as.numeric(NA))),
     catch       =FLQuant(),
