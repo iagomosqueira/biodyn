@@ -177,7 +177,7 @@ setQ=function(object,index,error="log"){
   dmns=dimnames(t.)
   names(dmns)=c("params","iter")
   t.=FLPar(array(t.,dim=unlist(lapply(dmns,length)),dimnames=dmns))
-  units(t.)=NA
+  units(t.)="NA"
   
   object@params=t.
   #object@params=FLPar(rbind(FLPar(object@params),FLPar(res)))

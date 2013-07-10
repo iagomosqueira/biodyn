@@ -213,11 +213,11 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
                   set=setPella,
                   get=getPella,cmdOps=paste("-maxfn 500 -iprint 0"))          
   {
-   
   first=TRUE          
+
   if (dims(object)$iter==1 &  1<ifelse(is(index)[1]=="FLQuant",dims(index)$iter>1,max(laply(index,function(x) dims(x)$iter))))
     catch(object)=propagate(catch(object),dims(index)$iter)
- 
+
   max=min(dims(catch(object))$maxyear,ifelse(is(index)[1]=="FLQuant",dims(index)$maxyear,max(laply(index,function(x) dims(x)$maxyear))))
   if (!is.na(range(object)["maxyear"])) max=min(max,range(object)["maxyear"])
   min=min(dims(catch(object))$minyear,ifelse(is(index)[1]=="FLQuant",dims(index)$minyear,max(laply(index,function(x) dims(x)$minyear))))
@@ -249,6 +249,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
   bd@ll=FLPar(NA,dimnames=list(params=us,iter=seq(1)))
 
   if (its>1){
+   
       ## these are all results, so doesnt loose anything
       bd@stock  =FLCore:::iter(bd@stock,  1)
       bd@params =FLCore:::iter(bd@params, 1)
@@ -259,13 +260,20 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
       bd@mng    =FLPar(a=1)
       bd@mngVcov=FLPar(a=1,a=1)
       
-      bd=propagate(bd,its)
+      bd     <- qapply(bd, propagate, iter=its, fill.iter=TRUE)      
+      pnms   <- getSlots(class(bd))
+      pnames <- names(pnms)[pnms == "FLPar"]
+      for(i in pnames){
+        slot(bd, i)=FLCore:::iter(slot(bd, i),1)
+        slot(bd, i) <- propagate(slot(bd, i), its)}
+      
+      #bd=propagate(bd,its)      
       }
-   
+ 
   cpue=object[[2]]
   for (i in seq(its)){     
      object[[2]] = FLCore:::iter(cpue,i) 
-    
+  
      for (s in names(slts)[-(7:8)]){      
         slot(object[[1]],s) = FLCore:::iter(slot(bd,s),i) 
         }  
@@ -290,7 +298,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
        H<-matrix(readBin(x,"numeric",nopar*nopar),nopar)
        try(bd@hessian@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- H, silent=TRUE)
        close(x)
-     
+       print(5)     
        ## vcov
        if (file.exists(paste(dir,"admodel.cov",sep="/")))
          try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- biodyn:::cv(paste(dir,"admodel.hes",sep="/")), silent=TRUE) 
@@ -304,7 +312,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
        if (file.exists(paste(dir,"pella.hst",sep="/")))
          try(bd@profile<-admbProfile(paste(dir,"pella.hst",sep="/"))$profile)
        }
-  
+     
      bd@params@.Data[  ,i] = object[[1]]@params
      bd@control@.Data[,,i] = object[[1]]@control
      #bd@objFn@.Data[   ,i] = object[[1]]@objFn
@@ -316,7 +324,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
        err1=try(mng.<-read.table("pella.std",header=T)[,-1])
     
        err2=try(mngVcov.<-fitFn(paste(dir,"pella",sep="/"))$vcov)
-         
+       
      ## FLPar hack
      if (first) {
        if (any(is(err1)!="try-error")) 
@@ -348,7 +356,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
        ps=array(t(ps),dim=unlist(llply(dmns,length)),dimnames=dmns)
        ps=FLPar(ps)
        
-       units(ps)=NA
+       units(ps)="NA"
        ps}
 
     par=setMCMC(bd,dir)
@@ -518,23 +526,23 @@ fitFn=function(file){
   #est        
   hat =FLPar(array(c(res$est),dim     =c(length(res$names),1),
                               dimnames=list(params=res$names,iter=1)))
-  units(hat)=NA  
+  units(hat)="NA"  
     
   #std        
   std =FLPar(array(c(res$std),dim     =c(length(res$names),1),
                               dimnames=list(params=res$names,iter=1)))
-  units(std)=NA  
+  units(std)="NA"  
     
   #cor 
   cor =FLPar(array(c(res$cor),dim     =c(length(res$names),length(res$names),1),
                               dimnames=list(params=res$names,params=res$names,iter=1)))
-  units(cor)=NA  
+  units(cor)="NA"  
     
   #cov
   vcov=FLPar(array(c(res$cov),dim     =c(length(res$names),length(res$names),1),
                               dimnames=list(params=res$names,params=res$names,iter=1)))
     
-  units(vcov)=NA  
+  units(vcov)="NA"  
     
   return(list(std       =std,hat=hat,cor=cor,vcov=vcov,  
               nlogl     =res$nlogl,      
