@@ -154,9 +154,15 @@ setQ=function(object,index,error="log"){
              FLQuant   ={res=fn(index,stock(object));data.frame(name=1,res)},
              #FLQuants  =ldply(index, fn, model.frame(mcf(FLQuants(stock=stock,index=x))),stock=stock(object)),
              FLQuants  =ldply(index, function(x,stock) fn(x,stock), stock=stock(object)),
-             data.frame=merge(model.frame(stock=stock(object)),index,by=year,all=T))
+             data.frame=merge(model.frame(FLQuants("stock"=stock(object))),index,by="year",all=T))
+
+  res=res[!is.na(res$iter),]
   
-  names(res)[1]="name"
+  if (!("name" %in% names(res))) 
+    names(res)[1]="name"
+  
+  res=res[!is.na(res$name),]
+  
   res=ddply(res, .(name,iter), function(x,log) data.frame(calcQ(x$stock,x$index)),log="log")
   
   its=max(as.numeric(ac(res$iter)))

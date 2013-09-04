@@ -31,7 +31,7 @@ setMethod('biodyn', signature(model='factor',params="FLPar"),
             
             if (!is.null(stock))
                res@stock[]=params(res)["k"]*params(res)["b0"]
-            
+          
             if (!is.null(catch)){
                res@catch=catch
                res=fwd(res,catch=catch)
@@ -56,11 +56,11 @@ setMethod('biodyn', signature(model='factor',params="FLPar"),
             return(res)})
 
 setMethod('biodyn', signature(model='character',params="FLPar"),
-          function(model,params,min=0.1,max=10,msy=NULL,catch=NULL,stock=NULL,...) 
-            biodyn(model=factor(model,levels=biodyn:::models),params,min=min,max=max,msy=msy,catch=catch,stock=stock,...))
+          function(model,params,min=0.1,max=10,catch=NULL,stock=NULL,...) 
+            biodyn(model=factor(model,levels=biodyn:::models),params,min=min,max=max,catch=catch,stock=stock,...))
 
 setMethod('biodyn', signature(model='factor',params="missing"),
-          function(model,params,min=min,max=max,msy=msy,catch=NULL,stock=NULL,...){
+          function(model,params,min=min,max=max,catch=NULL,stock=NULL,...){
             
             args = list(...)
             
@@ -90,7 +90,7 @@ setMethod('biodyn', signature(model='factor',params="missing"),
             return(res)})
 
 setMethod('biodyn', signature(model='character',params="missing"),
-          function(model=model,min=0.1,max=10.0,msy=NULL,catch=NULL,index=NULL,stock=NULL,...) 
+          function(model=model,min=0.1,max=10.0,catch=NULL,index=NULL,stock=NULL,...) 
             biodyn(model=factor(model,levels=biodyn:::models),min=min,max=max,catch=catch,stock=stock,...))
 
 setMethod('biodyn', signature(model='missing',params="missing"),
