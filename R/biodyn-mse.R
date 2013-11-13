@@ -1,12 +1,12 @@
-  mseBiodyn<-function(OM,start,
-                      brp,srRsdl=FLQuant(1,dimnames=dimnames(window(rec(OM),start=start))),
-                      CV   =0.1,
-                      Ftar =0.75,    Btrig=0.75,
-                      Fmin =Ftar*0.1,Blim =Btrig*0.0001,
-                      Bpct =0.5,     Fpct =0.5,
-                      jk    =FALSE,
-                      bounds=NULL,
-                      fishDepend=TRUE){
+mseBiodyn<-function(OM,start,
+                    brp,srRsdl=FLQuant(1,dimnames=dimnames(window(rec(OM),start=start))),
+                    CV   =0.1,
+                    Ftar =0.75,    Btrig=0.75,
+                    Fmin =Ftar*0.1,Blim =Btrig*0.0001,
+                    Bpct =0.5,     Fpct =0.5,
+                    jk    =FALSE,
+                    bounds=NULL,
+                    fishDepend=TRUE){
   
   ## Get number of iterations in OM
   nits=c(OM=dims(OM)$iter, sr=dims(params(brp))$iter, rsdl=dims(srRsdl)$iter)

@@ -41,8 +41,9 @@
 # v <- ggplot(res, aes(r, k, z = ll))
 # v <- ggplot(res, aes(r, k, z = ll))+ stat_contour(aes(colour = ..level..), size = 1)
 setMethod("profile", signature(fitted="biodyn"),
-      function(fitted,index,which,fixed=c(),
-                   maxsteps=11, range=0.5,
+      function(fitted,index,
+                   which,
+                   range=seq(0.5,1.5,length.out=21),
                    fn   =function(x) cbind(model.frame(params(x)),ll=model.frame(x@ll)[,1],model.frame(refpts(x))[,-4],
                                            stock  =c(stock(  x)[,ac(range(x)["maxyear"])]%/%bmsy(x)),
                                            harvest=c(harvest(x)[,ac(range(x)["maxyear"])]%/%fmsy(x))),
@@ -52,11 +53,9 @@ setMethod("profile", signature(fitted="biodyn"),
         if (dims(fitted)$iter>1) stop("can only be done for a single iter")
                  
         if (dim(fitted@control)[3]==1){
-           fitted@control=propagate(fitted@control,maxsteps^length(which))
+           fitted@control=propagate(fitted@control,length(range)^length(which))
           
-           if (length(range)==1) range=c(range,2-range)
-        
-           sq=list(seq(range[1],range[2],length.out=maxsteps))
+           sq=list(range)
            sq=do.call("expand.grid",sq[rep(1,length(which))])
        
            for (i in seq(length(which))){
@@ -64,7 +63,7 @@ setMethod("profile", signature(fitted="biodyn"),
                fitted@control[which[i],"min"]=min(fitted@control[which[i],"val"])*range[1]
                fitted@control[which[i],"max"]=max(fitted@control[which[i],"val"])*range[2]}
 
-           fitted@control[c(fixed,which),"phase"]=-1
+           fitted@control[which,"phase"]=-1
            }
         else
           fitted@control=profileGrid(fitted@control,which,range)

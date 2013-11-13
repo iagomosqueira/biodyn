@@ -241,6 +241,8 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
   object=list(object,index)
   bd =object[[1]]
   its=max(maply(names(slts), function(x) dims(slot(bd,x))$iter))
+  its=max(its,dims(bd@control)$iter)
+  
   nms=dimnames(params(bd))$params
   bd@vcov   =FLPar(array(NA, dim=c(length(nms),length(nms),its), dimnames=list(params=nms,params=nms,iter=seq(its))))
   bd@hessian=bd@vcov
@@ -269,15 +271,18 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
       
       #bd=propagate(bd,its)      
       }
- 
+  
+  print(slot(object[[1]],"control"))
+  
   cpue=object[[2]]
+  bd2 =object[[1]]
   for (i in seq(its)){     
      object[[2]] = FLCore:::iter(cpue,i) 
   
      for (s in names(slts)[-(7:8)]){      
-        slot(object[[1]],s) = FLCore:::iter(slot(bd,s),i) 
+        slot(object[[1]],s) = FLCore:::iter(slot(bd2,s),i) 
         }  
-     
+
      object[[1]]=set(object,exeNm,dir)
 
      # run
@@ -298,7 +303,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
        H<-matrix(readBin(x,"numeric",nopar*nopar),nopar)
        try(bd@hessian@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- H, silent=TRUE)
        close(x)
-       print(5)     
+   
        ## vcov
        if (file.exists(paste(dir,"admodel.cov",sep="/")))
          try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- biodyn:::cv(paste(dir,"admodel.hes",sep="/")), silent=TRUE) 
