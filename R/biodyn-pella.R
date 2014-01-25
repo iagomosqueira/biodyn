@@ -502,6 +502,7 @@ exe=function(package="biodyn"){
     path = paste(system.file("bin", "linux",  package=package, mustWork=TRUE), sep="/")
     # Windows
   } else if (.Platform$OS.type == "windows") {
+    
     path = paste(system.file("bin", "windows", package=package, mustWork=TRUE), sep="/")
     # Mac OSX
   }else 

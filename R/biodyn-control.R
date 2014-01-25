@@ -143,7 +143,7 @@ calcQ<-function(stock,index,error="log",na.rm=T){
   return(res)}
 
 setQ=function(object,index,error="log"){
-  
+    
   fn=function(index,stock){
     if (dims(stock)$iter==1 & dims(index)$iter>1)
       stock=propagate(stock,dims(index)$iter)
