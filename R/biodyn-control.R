@@ -77,7 +77,7 @@ setMethod('setParams<-', signature(object='biodyn',value="FLQuants"), function(o
 #'      
 setGeneric('setControl<-', function(object,value,...)  standardGeneric('setControl<-'))
 
-setMethod('setControl<-', signature(object='biodyn',value="FLPar"), function(object,value,min=0.1,max=10.0) {
+setMethod('setControl<-', signature(object='biodyn',value="FLPar"), function(object,value,phase=NULL,min=0.1,max=10.0) {
    
   if (dims(value)$iter>1 & dims(object@control)$iter==1)
     object@control=propagate(control(object),dims(value)$iter)
@@ -89,6 +89,11 @@ setMethod('setControl<-', signature(object='biodyn',value="FLPar"), function(obj
   
   object@control[nms,"min"]=value[nms]*min
   object@control[nms,"max"]=value[nms]*max
+ 
+  if (!is.null(phase)){
+     nms.=nms[nms %in% dimnames(object@params)$phase]
+     object@control[nms.,"phase"]=phase[nms.]
+     }
   
   if (!is.na(any(value[nms]<0)) & any(value[nms]<0))
     object@control[nms[value[nms]<0],c("min","max")]=object@control[nms[value[nms]<0],c("max","min")]

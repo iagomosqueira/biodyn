@@ -31,7 +31,7 @@ setMethod( 'tac', signature(object='biodyn'),
              
              #object=fwd(object, harvest=harvest(object)[,ac(dimnames(object)$year-1)])
              
-             object=window(object, end=max(yrs))
+             object=window(object, end=max(as.numeric(yrs)))
              object=fwd(object,harvest=harvest(object)[,ac(dims(object)$maxyear-1)])
              object=fwd(object, harvest=harvest)
              
@@ -106,19 +106,20 @@ hcrParams=function(ftar,btrig,fmin,blim){
 #' #hcr("logistic",FLPar(msy=100,k=500))
 #'
 setMethod('hcr', signature(object='biodyn'),
-  function(object, 
+ function(object, 
            params=hcrParams(ftar =0.80*refpts(object)["fmsy"],
                             btrig=0.80*refpts(object)["bmsy"],
                             fmin =0.02*refpts(object)["fmsy"],
                             blim =0.20*refpts(object)["bmsy"]),
-           yrs   =dims(object)$maxyear+1,
-           refYrs=dims(object)$maxyear,
+           yrs   =max(as.numeric(dimnames(catch(object))$year))+1,
+           refYrs=max(as.numeric(dimnames(catch(object))$year)),
            tac   =FALSE,
            bndF  =NULL, #c(1,Inf),
            bndTac=NULL, #c(1,Inf),
            maxF  =2,
            ...) {
   ## HCR
+  dimnames(params)$params=tolower(dimnames(params)$params)
   params=as(params,"FLQuant")  
   #if (blim>=btrig) stop("btrig must be greater than blim")
   a=(params["ftar"]-params["fmin"])/(params["btrig"]-params["blim"])
@@ -147,9 +148,10 @@ setMethod('hcr', signature(object='biodyn'),
   ### Bounds ##################################################################################
   ## F
   if (!is.null(bndF)){  
+
       rtn[,ac(min(yrs))]=qmax(rtn[,ac(min(yrs))],harvest(object)[,ac(min(yrs)-1)]*bndF[1])
       rtn[,ac(min(yrs))]=qmin(rtn[,ac(min(yrs))],harvest(object)[,ac(min(yrs)-1)]*bndF[2])
-      
+    
       if (length(yrs)>1)        
         for (i in yrs[-1]){
           rtn[,ac(i)]=qmax(rtn[,ac(i)],rtn[,ac(i-1)]*bndF[1])
@@ -176,7 +178,8 @@ setMethod('hcr', signature(object='biodyn'),
             rtn[,ac(i)]=qmin(rtn[,ac(i)],rtn[,ac(i-1)]*bndTac[2])}}          
        }
   
-  return(rtn)})
+  return(rtn)}
+ )
 
 ##############################################################
 #' hcrPlot

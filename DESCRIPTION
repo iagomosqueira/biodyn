@@ -13,6 +13,7 @@ Depends:
     ggplotFL(>= 0.2)
 Maintainer: Laurence Kell <laurie.kell@iccat.int>
 Collate:
+    'plotComp.R'
     'biodyn-class.R'
     'biodyn-accessors.R'
     'biodyn-generic.R'
@@ -40,6 +41,7 @@ Collate:
     'biodyn-delta.R'
     'biodyn-mcmc.R'
     'biodyn-mvn.R'
+    'sbt-mse.R'
 License: GPL-2
 LazyLoad: Yes
 LazyData: No

@@ -5,8 +5,8 @@ delta=function(par,object,fn){
   
     rtn=fn(object)
     
-    print(par)
-    print(rtn)
+    #print(par)
+    #print(rtn)
     
     return(rtn)}
   

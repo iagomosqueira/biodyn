@@ -272,7 +272,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
       #bd=propagate(bd,its)      
       }
   
-  print(slot(object[[1]],"control"))
+  #print(slot(object[[1]],"control"))
   
   cpue=object[[2]]
   bd2 =object[[1]]
@@ -342,8 +342,8 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
                                                                    param=dimnames(mngVcov.)[[1]],iter=seq(its))))
        first=!first  
     }else{
-       if (is(err1)!="try-error") bd@mng@.Data[,,i][]=unlist(c(mng.[,-1]))
-       if (is(err2)!="try-error") bd@mngVcov@.Data[,,i][]=unlist(c(mngVcov.))
+       try(if (is(err1)!="try-error") bd@mng@.Data[,,i][]=unlist(c(mng.[,-1])))
+       try(if (is(err2)!="try-error") bd@mngVcov@.Data[,,i][]=unlist(c(mngVcov.)))
        }}
   }
   

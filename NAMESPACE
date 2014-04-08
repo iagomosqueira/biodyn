@@ -29,3 +29,8 @@ exportMethods(psuedo)
 export(plotSP)
 export(read.psv)
 export(mvn)
+export(hcrSBT1)
+export(mseSBT1)
+export(hcrSBT2)
+export(mseSBT2)
+
