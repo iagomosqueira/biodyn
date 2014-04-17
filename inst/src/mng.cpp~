@@ -1,0 +1,65 @@
+
+  B[1] = k*a;
+  for(int t=1; t<=nc; t++)
+    B[t+1] = sfabs(B[t] + r/p*B[t]*(1-pow(B[t]/k,p)) - C[t]);
+  
+  for (int j=1; j<=ni; j++)
+     //Ifit[j] = B(X[j])*q(Idx[j]);
+     Ifit[j] = 0.5*(B(X[j])+B(X[j]+1))*q(Idx[j]);
+
+  cnow =C[nc];
+  fnow =C[nc]/B[nc];
+  bnow =B[nc];
+  msy  =r*k*pow(1/(1+p),1/p+1);
+  bmsy =(k*pow((1/(1+p)),(1/p)));
+  fmsy =msy/bmsy;
+  cmsy =C[nc]	/msy;
+  bbmsy=bnow/bmsy;
+  ffmsy=fnow/fmsy;
+
+function(fmsy,bmsy,stock,harvest){
+  
+
+  bk=bnow/k;
+  fr=fnow/r;
+  
+   bratio=0.0;
+   fratio=0.0;
+  _bratio=0.0;
+  _fratio=0.0;
+  
+  for (int i=nc; i>nc-3; i--){
+    bratio+=B[i];
+    fratio+=C[i]/B[i];
+    
+    _bratio+=B[i-3];
+    _fratio+=C[i-3]/B[i-3];
+    }
+ bratio=bratio/_bratio;
+ fratio=fratio/_fratio;
+
+  xy=0.0; 
+  x =0.0;
+   y=0.0; 
+  xx=0.0; 
+  for (int i=nc; i>nc-nReg; i--){
+    x +=i;
+    xx+=i*i;  
+    y +=B[i];  
+    xy+=i*B[i];  
+    }
+  slopeb = (nReg*xy - x*y)/(nReg*xx - x*2.0);
+   
+  xy=0.0; 
+  x =0.0;
+   y=0.0; 
+  xx=0.0; 
+  for (int i=nc; i>nc-nReg; i--){
+    x +=i;
+    xx+=i*i;  
+    y +=C[i]/B[i];  
+    xy+=i*C[i]/B[i];  
+    }
+  slopef = (nReg*xy - x*y)/(nReg*xx - x*2.0);
+   
+  }
