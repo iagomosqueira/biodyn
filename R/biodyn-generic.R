@@ -19,7 +19,8 @@ if (!isGeneric("harvest")) setGeneric('harvest',  function(object,params,...) st
 
 if (!isGeneric("fwd"))     setGeneric("fwd",      function(object, ctrl, ...)    standardGeneric("fwd"))
 if (!isGeneric("hcr"))     setGeneric("hcr",      function(object, ...)          standardGeneric("hcr"))
-if (!isGeneric("hcrPlot")) setGeneric("hcrPlot",  function(object, ...)          standardGeneric("hcrPlot"))
+#if (!isGeneric("hcrPlot")) 
+  setGeneric("hcrPlot",  function(object, ...)          standardGeneric("hcrPlot"))
 if (!isGeneric("tac"))     setGeneric("tac",      function(object, harvest, ...) standardGeneric("tac"))
 
 setGeneric('fit',   function(object,index,...)     standardGeneric('fit'))

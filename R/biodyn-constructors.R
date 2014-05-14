@@ -37,7 +37,9 @@ setMethod('biodyn', signature(model='factor',params="FLPar"),
                res=fwd(res,catch=catch)
                }
             else  if (!is.null(stock)) {
-               res@catch=window(res@stock,end=dims(res@catch)$maxyear-1)
+               res@stock=stock
+
+               res@catch=window(stock,end=dims(stock)$maxyear-1)
                res@catch[]=NA}
             
             res@control=propagate(res@control,dims(params)$iter)
@@ -115,4 +117,39 @@ setMethod('biodyn', signature(model='missing',params="missing"),
 #' is.biodyn(biodyn()) 
 is.biodyn = function(x)
   return(inherits(x, "biodyn"))
+
+# simFLBioDym {{{
+simBiodyn <- function(model='pellat', 
+                        params=FLPar(r=0.5, k=1000, p=1, b0=1.0,q=1,sigma=0.3),
+                        harvest=FLQuant(FLQuant(c(seq(0,1.5,length.out=30), rev(seq(0.5,1.5,length.out=15))[-1],rep(0.5,5)))*fmsy(model,params)),
+                        bounds =c(0.1,10), ...) {
+  
+  args <- list(...)
+  
+  nyr <- dims(harvest)$year
+  
+  object <- biodyn(model='pellat',
+                   stock =FLQuant(rep(params["k"], nyr), dimnames=dimnames(harvest)),
+                   params=params)
+  
+  object@control["r",     "val"]=params["r"]
+  object@control["k",     "val"]=params["k"]
+  object@control["p",     "val"]=params["p"]
+  object@control["b0",    "val"]=params["b0"]
+  
+  object@control[,"min"]=object@control[,"val"]*bounds[1]
+  object@control[,"max"]=object@control[,"val"]*bounds[2]
+  
+  object@control["p", "phase"]=-1
+  object@control["b0","phase"]=-1
+  object@priors[,1]=-1
+  
+  # Load given slots
+  for(i in names(args))
+    slot(object, i) <- args[[i]]
+  
+  object <- fwd(object, harvest=harvest)
+    
+  return(object)
+} # }}}
 

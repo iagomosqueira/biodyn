@@ -46,9 +46,9 @@ setMethod('stock', signature(object='biodyn'),
 #' \dontrun{ computeSP(bd,seq(0,params(bd)["k"])) }
 #'  
 setGeneric('computeSP',function(object,biomass,...) standardGeneric('computeSP'))
-setMethod( 'computeSP', signature(object="biodyn",   biomass="missing"),     function(object,biomass=stock(object))  spFn(model(object),params(object),biomass))
-setMethod( 'computeSP', signature(object="biodyn",   biomass="numeric"),     function(object,biomass)                spFn(model(object),params(object),biomass))
-setMethod( 'computeSP', signature(object="biodyn",   biomass="FLQuant"),     function(object,biomass)                spFn(model(object),params(object),biomass))
+setMethod( 'computeSP', signature(object="biodyn",   biomass="missing"),     function(object,biomass=stock(object))  biodyn:::spFn(model(object),params(object),biomass))
+setMethod( 'computeSP', signature(object="biodyn",   biomass="numeric"),     function(object,biomass)                biodyn:::spFn(model(object),params(object),biomass))
+setMethod( 'computeSP', signature(object="biodyn",   biomass="FLQuant"),     function(object,biomass)                biodyn:::spFn(model(object),params(object),biomass))
 
 
 # calcLogLik

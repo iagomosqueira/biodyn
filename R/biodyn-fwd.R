@@ -154,7 +154,7 @@ setMethod("fwd", signature(object="biodyn",ctrl="missing"),
   }  
  
   if (stkTrgt) yrs = yrs[-length(yrs)]
-  
+print(1)  
   ## B0 in year 1?
   if (as.numeric(yrs[1]) == range(object,"minyear")){
      if (!("year" %in% names(dimnames(params(object)["k"]))))  
@@ -177,9 +177,9 @@ setMethod("fwd", signature(object="biodyn",ctrl="missing"),
   if (ctcTrgt) nits=max(nits,dims(catch  )$iter) else
   if (stkTrgt) nits=max(nits,dims(stock  )$iter) 
   if (nits>1){ 
-     object@catch =propagate(object@catch,nits)
-     object@stock =propagate(object@stock,nits)
-     if (hvtTrgt) harvest=propagate(harvest,nits)
+     if(dim(object@catch)[6]==1) object@catch =propagate(object@catch,nits)
+     if(dim(object@stock)[6]==1) object@stock =propagate(object@stock,nits)
+     if (hvtTrgt) if(dim(harvest)[6]==1) harvest=propagate(harvest,nits)
    
      if (dims(params(object))$iter==1) params(object)=propagate(params(object),nits)
      if (!is.null(pe))                 pe            =propagate(pe            ,nits)

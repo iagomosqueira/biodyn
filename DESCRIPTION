@@ -41,6 +41,7 @@ Collate:
     'biodyn-delta.R'
     'biodyn-mcmc.R'
     'biodyn-mvn.R'
+    'biodyn-stars.R'
     'sbt-mse.R'
 License: GPL-2
 LazyLoad: Yes

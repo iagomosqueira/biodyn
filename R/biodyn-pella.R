@@ -171,8 +171,8 @@ activeParams=function(obj) dimnames(obj@control)$params[c(obj@control[,"phase"]>
 setMethod("fit",signature(object='biodyn',index="FLQuant"),
           function(object,index=index,exeNm="pella",package="biodyn", 
                    dir=tempdir(),
-                   set=setPella,
-                   get=getPella,cmdOps=paste("-maxfn 500 -iprint 0"))
+                   set=biodyn:::setPella,
+                   get=biodyn:::getPella,cmdOps=paste("-maxfn 500 -iprint 0"))
    fitPella(object,index=index,exeNm=exeNm,package=package, 
             dir=dir,
             set=set,
@@ -198,7 +198,7 @@ setMethod("fit",signature(object='biodyn',index="FLQuantJK"),
             
             index =as.FLQuant(index)
 
-            object=fitPella(object,index=index,exeNm=exeNm,package=package, 
+            object=biodyn:::fitPella(object,index=index,exeNm=exeNm,package=package, 
                      dir=dir,
                      set=set,
                      get=get,cmdOps=cmdOps)
@@ -262,7 +262,9 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
       bd@mng    =FLPar(a=1)
       bd@mngVcov=FLPar(a=1,a=1)
       
-      bd     <- qapply(bd, propagate, iter=its, fill.iter=TRUE)      
+      if (dim(bd@stock)[6]==1) bd@stock=propagate(bd@stock, iter=its, fill.iter=TRUE)      
+      if (dim(bd@catch)[6]==1) bd@stock=propagate(bd@catch, iter=its, fill.iter=TRUE)     
+      
       pnms   <- getSlots(class(bd))
       pnames <- names(pnms)[pnms == "FLPar"]
       for(i in pnames){
@@ -527,7 +529,7 @@ calcSS=function(x) daply(x@diags, .(name),
 
 fitFn=function(file){
 
-  res=admbFit(file)
+  res=biodyn:::admbFit(file)
 
   #est        
   hat =FLPar(array(c(res$est),dim     =c(length(res$names),1),

@@ -107,12 +107,12 @@ hcrParams=function(ftar,btrig,fmin,blim){
 #'
 setMethod('hcr', signature(object='biodyn'),
  function(object, 
-           params=hcrParams(ftar =0.80*refpts(object)["fmsy"],
+           params=hcrParams(ftar =0.70*refpts(object)["fmsy"],
                             btrig=0.80*refpts(object)["bmsy"],
-                            fmin =0.02*refpts(object)["fmsy"],
-                            blim =0.20*refpts(object)["bmsy"]),
-           yrs   =max(as.numeric(dimnames(catch(object))$year))+1,
-           refYrs=max(as.numeric(dimnames(catch(object))$year)),
+                            fmin =0.01*refpts(object)["fmsy"],
+                            blim =0.40*refpts(object)["bmsy"]),
+           yrs   =max(as.numeric(dimnames(stock(object))$year)),
+           refYrs=max(as.numeric(dimnames(stock(object))$year)),
            tac   =FALSE,
            bndF  =NULL, #c(1,Inf),
            bndTac=NULL, #c(1,Inf),
@@ -164,8 +164,7 @@ setMethod('hcr', signature(object='biodyn'),
      
       object=window(object, end=max(as.numeric(yrs)))
       object=fwd(object,harvest=harvest(object)[,ac(min(as.numeric(yrs)-1))])
-
-      
+     
       rtn   =catch(fwd(object, harvest=rtn))[,ac(yrs)]
       
       if (!is.null(bndTac)){  
@@ -197,23 +196,22 @@ setMethod('hcr', signature(object='biodyn'),
 #' @rdname hcrPlot
 #'
 #' @examples
-#' hcrPlot(object)
-# setMethod('hcrPlot', signature(object='biodyn'),
-#   function(object,params=FLPar(ftar=0.7, btrig=0.7, fmin=0.025, blim=0.20) ,maxB=1){
-#   
-#   pts=rbind(cbind(refpt="Target",model.frame(rbind(bmsy(object)*c(params["btrig"]),
-#                                                    fmsy(object)*c(params["ftar"])))),
-#             cbind(refpt="Limit", model.frame(rbind(bmsy(object)*c(params["blim"]),
-#                                                    fmsy(object)*c(params["fmin"])))))
-#   pts.=pts
-#   pts.[1,"bmsy"]=params(object)["k"]*maxB
-#   pts.[2,"bmsy"]=0
-#   pts.[,1]=c("")
-#   
-#   pts=rbind(pts.[1,],pts[1:2,],pts.[2,])
-#   
-#   names(pts)[2:3]=c("biomass","harvest")
-#   pts[,"biomass"]=pts[,"biomass"]/bmsy(object)
-#   pts[,"harvest"]=pts[,"harvest"]/fmsy(object)
-#   
-#   pts})
+setMethod('hcrPlot', signature(object='biodyn'),
+  function(object,params=FLPar(ftar=0.7, btrig=0.7, fmin=0.01, blim=0.20) ,maxB=1){
+  
+  pts=rbind(cbind(refpt="Target",model.frame(rbind(bmsy(object)*c(params["btrig"]),
+                                                   fmsy(object)*c(params["ftar"])))),
+            cbind(refpt="Limit", model.frame(rbind(bmsy(object)*c(params["blim"]),
+                                                   fmsy(object)*c(params["fmin"])))))
+  pts.=pts
+  pts.[1,"bmsy"]=params(object)["k"]*maxB
+  pts.[2,"bmsy"]=0
+  pts.[,1]=c("")
+  
+  pts=rbind(pts.[1,],pts[1:2,],pts.[2,])
+  
+  names(pts)[2:3]=c("biomass","harvest")
+  pts[,"biomass"]=pts[,"biomass"]/bmsy(object)
+  pts[,"harvest"]=pts[,"harvest"]/fmsy(object)
+  
+  pts})
