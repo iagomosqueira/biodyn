@@ -154,7 +154,6 @@ setMethod("fwd", signature(object="biodyn",ctrl="missing"),
   }  
  
   if (stkTrgt) yrs = yrs[-length(yrs)]
-print(1)  
   ## B0 in year 1?
   if (as.numeric(yrs[1]) == range(object,"minyear")){
      if (!("year" %in% names(dimnames(params(object)["k"]))))  
