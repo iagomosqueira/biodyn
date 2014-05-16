@@ -1,10 +1,10 @@
-% aspic.Rnw --
+% biodyn.Rnw --
 %
 % Author: laurence kell <lauriekell@gmail.com>
 
-%\VignetteIndexEntry{aspic}
-%\VignetteIndexEntry{An R Package for read/wrting aspic files and plotting data from a variety of fish stock assessment programs}
-%\VignetteKeyword{aspic, diagnostics, IO, read, write}
+%\VignetteIndexEntry{biodyn}
+%\VignetteIndexEntry{An R Package for read/wrting biodyn files and plotting data from a variety of fish stock assessment programs}
+%\VignetteKeyword{biodyn, diagnostics, IO, read, write}
 
 
 \documentclass[shortnames,nojss,article]{jss}
@@ -24,14 +24,14 @@
 \author{Laurence Kell\\ICCAT}
 \Plainauthor{Laurence Kell}
 
-\title{\pkg{ASPIC}: Biomass Dynamic Stock Assessment Model}
-\Plaintitle{ASPIC: Biomass Dynamic Stock Assessment Model}
+\title{\pkg{biodyn}: Biomass Dynamic Stock Assessment Model}
+\Plaintitle{biodyn: Biomass Dynamic Stock Assessment Model}
 
-\Abstract{The \pkg{aspic} package is an implenentation of the ASPIC biomass dynamic stock assessment model in 
+\Abstract{The \pkg{biodyn} package is an implenentation of the biodyn biomass dynamic stock assessment model in 
 R using the original \pkg{FORTRA} executable. The package provides tools for checking of diagnostics, projections, running Monte Carlo simulation and conducting Management Strategy Evaluation.}
 
-\Keywords{\proglang{R}, aspic, stock assessment}
-\Plainkeywords{R, aspic, stock assessment}
+\Keywords{\proglang{R}, biodyn, stock assessment}
+\Plainkeywords{R, biodyn, stock assessment}
 
 \Address{
   Laurence Kell \\
@@ -49,7 +49,7 @@ R using the original \pkg{FORTRA} executable. The package provides tools for che
 <<prelim,echo=FALSE,print=FALSE>>=
 library(diags)
 library(kobe)
-library(aspic)
+library(biodyn)
 
 stampIt=function(...){
    require(plyr)
@@ -58,10 +58,10 @@ stampIt=function(...){
    
    ldply(args, function(x) { res=packageDescription(x)
                             c(Package=x,
-                              Version=packageDescription("aspic")$Version,
-                              Date   =packageDescription("aspic")$Date)})}
+                              Version=packageDescription("biodyn")$Version,
+                              Date   =packageDescription("biodyn")$Date)})}
 
-smry=stampIt("kobe","aspic")
+smry=stampIt("kobe","biodyn")
 
 theme_ms <- function(base_size = 12, base_family = "",...) { 
   # Starts with theme_grey and then modify some parts 
@@ -96,7 +96,7 @@ theme_ms <- function(base_size = 12, base_family = "",...) {
 %   facet_grid(age~name)           
 % @ 
 % \begin{figure}[h]\centering\includegraphics[width=1.0\textwidth]
-% {aspic-fig1}\caption{An example plot.}\label{fig:1}\end{figure}
+% {biodyn-fig1}\caption{An example plot.}\label{fig:1}\end{figure}
 
 \section{Data}
 
