@@ -103,7 +103,8 @@ setMethod('kobe', signature(object='biodyn'),
             
             res=model.frame(mcf(FLQuants(stock   =stock(  object)%/%bmsy(object),
                                           harvest=harvest(object)%/%fmsy(object))))
-                    
+            
+            if ("pts" %in% what & is.null(year)) year=range(object)["maxyear"]-1
             kobe:::kobeFn(res,what,prob,year,nwrms)})
 
 setMethod('kobe', signature(object='biodyns'),

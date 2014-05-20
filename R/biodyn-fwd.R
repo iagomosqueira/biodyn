@@ -106,7 +106,7 @@ iavFn=function(val,bnd,lag=1){
 #bnd=FLQuant(1,          dimnames=list(age=1:5,year=1:10,iter=1:4))
 
 setMethod("fwd", signature(object="biodyn",ctrl="missing"),
-   function(object, catch=NULL, harvest=NULL, stock=NULL, hcr=NULL, pe=NULL, peMult=TRUE,minF=0,maxF=2,lag=0,
+   function(object, catch=NULL, harvest=NULL, f=harvest, stock=NULL, hcr=NULL, pe=NULL, peMult=TRUE,minF=0,maxF=2,lag=0,
            bounds=list(catch=c(Inf,Inf)),end=NULL,ptYr=0,...) {
 #  object =simbiodyn()
 #  harvest=FLQuant(0.9,dimnames=list(year=50:80))
@@ -181,7 +181,7 @@ setMethod("fwd", signature(object="biodyn",ctrl="missing"),
      if (hvtTrgt) if(dim(harvest)[6]==1) harvest=propagate(harvest,nits)
    
      if (dims(params(object))$iter==1) params(object)=propagate(params(object),nits)
-     if (!is.null(pe))                 pe            =propagate(pe            ,nits)
+     #if (!is.null(pe))                 pe            =propagate(pe            ,nits)
      } 
  
   ## projections
@@ -190,8 +190,8 @@ setMethod("fwd", signature(object="biodyn",ctrl="missing"),
 
      ## sp & process error
      if (!is.null(pe)) {    
-        if (peMult) sp.=computeSP(object,object@stock[, ac(y)])*pe[, ac(y)] 
-        else        sp.=computeSP(object,object@stock[, ac(y)])+pe[, ac(y)]
+        if (peMult) sp.=computeSP(object,object@stock[, ac(y)])%*%pe[, ac(y)] 
+        else        sp.=computeSP(object,object@stock[, ac(y)])%+%pe[, ac(y)]
      } else sp.=computeSP(object,object@stock[, ac(y)])
      #} else sp.=computeSP(object,object@stock[, ac(y)]*(1-ptYr)+object@stock[, ac(y+1)]*(ptYr))
 

@@ -184,7 +184,7 @@ setQ=function(object,index,error="log"){
   if (dims(object@params)$iter==1)
     object@params=propagate(object@params,its)
 
-  t.=rbind(object@params,FLPar(as.FLQuant(res)[drop=T]))
+  t.=rbind(object@params,FLPar(as.FLQuant(cbind(res,year=1))[,1,drop=T]))
   dmns=dimnames(t.)
   names(dmns)=c("params","iter")
   t.=FLPar(array(t.,dim=unlist(lapply(dmns,length)),dimnames=dmns))
