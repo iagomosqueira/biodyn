@@ -13,6 +13,7 @@
   ofstream bounds("bnd.txt");
   ofstream    lls("lls.txt");
 #include <admodel.h>
+#include <contrib.h>
 
   extern "C"  {
     void ad_boundf(int i);
