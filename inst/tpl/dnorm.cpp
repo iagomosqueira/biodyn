@@ -1,4 +1,6 @@
 #include <admodel.h>
+#include "dnorm.hpp"
+
 dvariable dnorm(const double& x, const dvariable& mu, const dvariable& std){
   double pi=3.14159265358979323844;
   

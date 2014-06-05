@@ -21,6 +21,8 @@ setExe=function(exeNm,package,dir=tempdir()){
   } else if (.Platform$OS.type == "windows") {
     exe = paste(system.file("bin", "windows", package=package, mustWork=TRUE), paste(exeNm, ".exe", sep=""), sep="/")
     file.copy(exe, dir)
+    print(exe)
+    print(dir)
     dir = paste(dir, "\\", sep="")
     
     # Mac OSX

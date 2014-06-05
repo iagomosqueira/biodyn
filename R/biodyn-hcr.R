@@ -111,8 +111,9 @@ setMethod('hcr', signature(object='biodyn'),
                             btrig=0.80*refpts(object)["bmsy"],
                             fmin =0.01*refpts(object)["fmsy"],
                             blim =0.40*refpts(object)["bmsy"]),
-           refYrs=max(as.numeric(dimnames(stock(object))$year)),
-           yrs   =max(as.numeric(dimnames(stock(object))$year))+1,
+           stkYrs=max(as.numeric(dimnames(stock(object))$year)),
+           refYrs=max(as.numeric(dimnames(catch(object))$year)),
+           hcrYrs=max(as.numeric(dimnames(stock(object))$year)),
            tac   =FALSE,
            tacMn =TRUE,
            bndF  =NULL, #c(1,Inf),
@@ -131,10 +132,9 @@ setMethod('hcr', signature(object='biodyn'),
   ## Calc F
   # bug
   #val=(SSB%*%a) %+% b
-  ssb=FLCore:::apply(stock(object)[,ac(refYrs)],6,mean)
+  stk=FLCore:::apply(stock(object)[,ac(stkYrs)],6,mean)
   
-  #ssb=stock(object)[,ac(refYrs)]
-  rtn=(ssb%*%a)  
+  rtn=(stk%*%a)  
   rtn=FLCore:::sweep(rtn,2:6,b,"+")
 
   fmin=as(params["fmin"],"FLQuant")
@@ -143,22 +143,23 @@ setMethod('hcr', signature(object='biodyn'),
     FLCore:::iter(rtn,i)[]=max(FLCore:::iter(rtn,i),FLCore:::iter(fmin,i))
     FLCore:::iter(rtn,i)[]=min(FLCore:::iter(rtn,i),FLCore:::iter(ftar,i))} 
   
-  dimnames(rtn)$year=min(yrs)  
-  if (length(yrs)>1){
-    rtn=window(rtn,end=max(yrs))
-    rtn[,ac(yrs)]=rtn[,ac(min(yrs))]}
- 
+  rtn=window(rtn,end=max(hcrYrs))
+  #dimnames(rtn)$year=min(hcrYrs)  
+  if (length(hcrYrs)>1){
+    rtn=window(rtn,end=max(hcrYrs))
+    rtn[,ac(hcrYrs)]=rtn[,ac(min(hcrYrs))]}
+  
   ### Bounds ##################################################################################
   ## F
   if (!is.null(bndF)){  
 
-      ref=FLCore:::apply(harvest(object)[,ac(refYrs)],6,mean)
+      ref=FLCore:::apply(harvest(object)[,ac(refYrs-1)],6,mean)
     
-      rtn[,ac(min(yrs))]=qmax(rtn[,ac(min(yrs))],ref*bndF[1])
-      rtn[,ac(min(yrs))]=qmin(rtn[,ac(min(yrs))],ref*bndF[2])
+      rtn[,ac(min(hcrYrs))]=qmax(rtn[,ac(min(hcrYrs))],ref*bndF[1])
+      rtn[,ac(min(hcrYrs))]=qmin(rtn[,ac(min(hcrYrs))],ref*bndF[2])
     
-      if (length(yrs)>1)        
-        for (i in yrs[-1]){
+      if (length(hcrYrs)>1)        
+        for (i in hcrYrs[-1]){
           if (iaF){
             rtn[,ac(i)]=qmax(rtn[,ac(i)],rtn[,ac(i-1)]*bndF[1])
             rtn[,ac(i)]=qmin(rtn[,ac(i)],rtn[,ac(i-1)]*bndF[2])
@@ -166,23 +167,25 @@ setMethod('hcr', signature(object='biodyn'),
             rtn[,ac(i)]=rtn[,ac(i-1)]}
   
       if (!is.null(maxF)) rtn=qmin(rtn,maxF)}}
- 
+   hvt=rtn
+  
+   
    ## TAC
    if (tac){
      
       ref=FLCore:::apply(catch(object)[,ac(refYrs)],6,mean)
 
-      object=window(object, end=max(as.numeric(yrs)))
-      object=fwd(object,harvest=harvest(object)[,ac(min(as.numeric(yrs)-1))])
+      object=window(object, end=max(as.numeric(hcrYrs)))
+      object=fwd(object,harvest=harvest(object)[,ac(min(as.numeric(hcrYrs)-1))])
      
-      rtn   =catch(fwd(object, harvest=rtn))[,ac(yrs)]
+      rtn   =catch(fwd(object, harvest=rtn))[,ac(hcrYrs)]
 
       if (!is.null(bndTac)){  
-        rtn[,ac(min(yrs))]=qmax(rtn[,ac(min(yrs))],ref*bndTac[1])
-        rtn[,ac(min(yrs))]=qmin(rtn[,ac(min(yrs))],ref*bndTac[2])
+        rtn[,ac(min(hcrYrs))]=qmax(rtn[,ac(min(hcrYrs))],ref*bndTac[1])
+        rtn[,ac(min(hcrYrs))]=qmin(rtn[,ac(min(hcrYrs))],ref*bndTac[2])
 
-        if (length(yrs)>1)        
-          for (i in yrs[-1]){
+        if (length(hcrYrs)>1)        
+          for (i in hcrYrs[-1]){
             if (iaTac){
               rtn[,ac(i)]=qmax(rtn[,ac(i)],rtn[,ac(i-1)]*bndTac[1])
               rtn[,ac(i)]=qmin(rtn[,ac(i)],rtn[,ac(i-1)]*bndTac[2])
@@ -190,6 +193,8 @@ setMethod('hcr', signature(object='biodyn'),
               rtn[,ac(i)]=rtn[,ac(i-1)]}}
       
       if (tacMn) rtn[]=c(apply(rtn,3:6,mean))}}
+  
+      if (tac) rtn=list(hvt=hvt,tac=rtn,stock=stk) else rtn=list(hvt=hvt,stock=stk)
   
   return(rtn)})
 

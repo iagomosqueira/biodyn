@@ -13,14 +13,14 @@ oem=function(om,cv,fishDepend=FALSE){
 
 ## MSE function
 mseBiodyn<-function(om,brp,srDev,ctrl,
-                    start,          end,         interval=3, rcvPeriod=0,
+                    start,          end,         interval=3,
                     ftar  =0.70,    btrig =0.60,
                     fmin  =0.01,    blim  =0.01,
-                    bndF  =c(1,Inf),
+                    bndF  =NULL,
                     maxF  =2.0,     
                     uCV   =0.1,     phaseQ=-1,   fishDepend=TRUE,
-                    seed=7890){
-    
+                    seed =7890){
+ 
   ## Get number of iterations in OM
   nits=c(om=dims(om)$iter, br=dims(params(brp))$iter, rsdl=dims(srDev)$iter)
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in OM")
@@ -47,10 +47,11 @@ mseBiodyn<-function(om,brp,srDev,ctrl,
    
   #### Observation Error (OEM) setup #######################
   ## Random variation for CPUE  
-  cpue=oem(window(om,end=start+rcvPeriod),uCV)
+  cpue=oem(window(om,end=start),uCV)
   
   ## Loop round years
-  mp=NULL
+  mp =NULL
+  hcr=NULL
   for (iYr in seq(start,range(om,"maxyear")-interval,interval)){
     #iYr = seq(start+rcvPeriod,range(om,"maxyear")-interval,interval)[1]
     cat("===================", iYr, "===================\n")
@@ -70,27 +71,63 @@ mseBiodyn<-function(om,brp,srDev,ctrl,
     bd@control["q1","val"]  =1
     
     bd =fit(bd,cpue)
+    bd =fwd(bd,catch=catch(om)[,ac(iYr)])
     
     ## HCR
-    TAC=hcr(bd,hcrParams(ftar =ftar *fmsy(bd),
-                         btrig=btrig*bmsy(bd),
-                         fmin =fmin *fmsy(bd), 
-                         blim =blim *bmsy(bd)),
-            bndF=bndF,
-            tac=TRUE)
-    
+    hcrPar=hcrParams(ftar =ftar *fmsy(bd),
+                     btrig=btrig*bmsy(bd),
+                     fmin =fmin *fmsy(bd), 
+                     blim =blim *bmsy(bd))
+    hcrOutcome=hcr(bd,hcrPar,
+                   hcrYrs=iYr+seq(interval),
+                   bndF=bndF,
+                   tac =TRUE)
+            
     ## Set TACs for next year (iYtr+1) for n=interval years
-    TAC  =window(TAC,end=iYr+interval)
-    TAC[]=TAC[, 1]
-    TAC  =TAC[,-1]
+    TAC  =hcrOutcome$tac
+    TAC[]=rep(apply(TAC,6,mean)[drop=T],each=interval)
     
-    om=fwd(om,catch=TAC,maxF=maxF,sr=brp,sr.residuals=srDev)
+    hcr =rbind(hcr,data.frame(yearHcr=rep(as.numeric(dimnames(hcrOutcome$hvt)$year),dims(bd)$iter),
+                              #yearAss=rep(range(bd)[2],dims(bd)$iter),
+                              model.frame(           hcrPar,drop=T),
+                              tac    =as.data.frame(hcrOutcome$tac,drop=T)[,2],
+                              harvest=as.data.frame(hcrOutcome$hvt,drop=T)[,2],
+                              stock  =as.data.frame(hcrOutcome$stock,drop=T)[,2])[,-7])
     
     ## save assessment parameters and reference points
     mp =rbind(mp,cbind(cbind(year=iYr,model.frame(params(bd))),
-                                      model.frame(refpts(bd))[,-4]))
+                       model.frame(refpts(bd))[,-4],
+                       hcr))
+    
+    om =fwd(om,catch=TAC,maxF=maxF,sr=brp,sr.residuals=srDev)  
     }
   
   ## save OM, projection without feedback, last assessment, assessed parameters and cpue
-  return(list(om=om,prj=prj,bd=bd,mp=mp,cpue=cpue))}
+  return(list(om=om,prj=prj,bd=bd,mp=mp))}
+
+
+hcrFn=function(om,btrig,blim,ftar,fmin,start,end,interval,lag=seq(interval)){    
+  
+  a=(ftar-fmin)/(btrig-blim)
+  b=ftar-a*btrig
+  
+  for (iYr in seq(start+rcvPeriod,range(om,"maxyear")-interval,interval)){
+    stk=FLCore:::apply(stock(om)[,ac(iYr-1)],6,mean)
+    
+    trgt=(stk%*%a)+b  
+    
+    for (i in seq(dims(om)$iter)){
+      FLCore:::iter(trgt,i)[]=max(FLCore:::iter(trgt,i),FLCore:::iter(fmin,i))
+      FLCore:::iter(trgt,i)[]=min(FLCore:::iter(trgt,i),FLCore:::iter(ftar,i))} 
+    
+    dmns     =dimnames(trgt)
+    dmns$year=as.character(iYr+lag)
+    
+    trgt=FLQuant(rep(c(trgt),each=length(lag)),dimnames=dmns)
+    
+    om=fwd(om,f=trgt,sr=brp,sr.residuals=srDev)
+  }
+  
+  return(om)}
+
 
