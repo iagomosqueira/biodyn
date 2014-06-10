@@ -2,6 +2,8 @@
 #### biodyn stuff for Kobe #############################################################
 ########################################################################################
 
+setGeneric('kobe', function(object,method,...) standardGeneric('kobe'))
+
 utils::globalVariables(c("ddply",".","year","pctl","cast","kobeP","sims"))
 # 
 # #' @export

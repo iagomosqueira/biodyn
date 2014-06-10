@@ -60,7 +60,8 @@ mseBiodyn<-function(om,brp,srDev,ctrl,
     cpue=window(cpue,end=iYr-1)
     cpue[,ac(iYr-(interval:1))]=oem(om[,ac(iYr-(interval:1))],uCV)
     
-    ## assessment 
+    #### Management Procedure
+    ## Set up assessment parameter options
     bd=biodyn(window(om,end=iYr-1))
     params(bd)[dimnames(ctrl)$param]=ctrl[dimnames(ctrl)$param,"val"]
     
@@ -70,23 +71,29 @@ mseBiodyn<-function(om,brp,srDev,ctrl,
     bd@control["q1","phase"]=phaseQ
     bd@control["q1","val"]  =1
     
-    bd =fit(bd,cpue)
-    bd =fwd(bd,catch=catch(om)[,ac(iYr)])
+    ## fit
+    bd =fit(bd,cpue,cmdOps=paste("-maxfn 500 -iprint 0 -est"))
+    bd =biodyn:::fwd(bd,catch=catch(om)[,ac(iYr)])
     
     ## HCR
     hcrPar=hcrParams(ftar =ftar *fmsy(bd),
                      btrig=btrig*bmsy(bd),
                      fmin =fmin *fmsy(bd), 
                      blim =blim *bmsy(bd))
-    hcrOutcome=hcr(bd,hcrPar,
+    hcrOutcome=biodyn:::hcr(bd,hcrPar,
                    hcrYrs=iYr+seq(interval),
                    bndF=bndF,
                    tac =TRUE)
             
-    ## Set TACs for next year (iYtr+1) for n=interval years
+    ## TACs for next year (iYtr+1) for n=interval years
     TAC  =hcrOutcome$tac
     TAC[]=rep(apply(TAC,6,mean)[drop=T],each=interval)
     
+    #### Operating Model Projectionfor TAC
+    om =fwd(om,catch=TAC,maxF=maxF,sr=brp,sr.residuals=srDev)  
+
+    #### Summary Statistics
+    ## HCR actions, i.e. is biomass<Btrig?, what is F?, ..
     hcr =rbind(hcr,data.frame(yearHcr=rep(as.numeric(dimnames(hcrOutcome$hvt)$year),dims(bd)$iter),
                               #yearAss=rep(range(bd)[2],dims(bd)$iter),
                               model.frame(           hcrPar,drop=T),
@@ -94,15 +101,13 @@ mseBiodyn<-function(om,brp,srDev,ctrl,
                               harvest=as.data.frame(hcrOutcome$hvt,drop=T)[,2],
                               stock  =as.data.frame(hcrOutcome$stock,drop=T)[,2])[,-7])
     
-    ## save assessment parameters and reference points
+    ## Assessment parameters and reference points
     mp =rbind(mp,cbind(cbind(year=iYr,model.frame(params(bd))),
-                       model.frame(refpts(bd))[,-4],
+                       model.frame(biodyn:::refpts(bd))[,-4],
                        hcr))
-    
-    om =fwd(om,catch=TAC,maxF=maxF,sr=brp,sr.residuals=srDev)  
     }
   
-  ## save OM, projection without feedback, last assessment, assessed parameters and cpue
+  ## save OM, projection without feedback, last assessment and MP summary
   return(list(om=om,prj=prj,bd=bd,mp=mp))}
 
 

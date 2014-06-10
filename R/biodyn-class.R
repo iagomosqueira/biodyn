@@ -48,8 +48,8 @@ defaultParams<-function(object) {
   
   invisible(params(object))}
 
-setParams<-function(model="pellat",its=1)
-  return(FLPar(NA,dimnames=list(params=c(validParams(model),"b0","q","sigma"),iter=its)))
+# setParams<-function(model="pellat",its=1)
+#   return(FLPar(NA,dimnames=list(params=c(validParams(model),"b0","q","sigma"),iter=its)))
 
 getParams<-function(params,nm){
   if (nm %in% dimnames(params)$params)

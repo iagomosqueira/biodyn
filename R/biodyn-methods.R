@@ -67,7 +67,7 @@ calcSigma <- function(obs,hat=rep(0,length(obs)),error="log"){
   
   return((SS/length(hat))^.5)}
 
-logl<-function(obs,se,hat=rep(0,length(obs))){
+loglFn<-function(obs,se,hat=rep(0,length(obs))){
   flag=!is.na(obs) & !is.na(hat)
   obs =obs[flag]
   hat =hat[flag]
@@ -92,6 +92,6 @@ calcLogLik<-function(obs,hat=rep(0,length(obs)),error="log",type=1){
   
   se<-calcSigma(obs,hat)
   
-  if (type==1) return(logl(se,obs,hat)) else
+  if (type==1) return(loglFn(se,obs,hat)) else
     if (type==2) return(-sum(dnorm(obs, hat, se, log=(error=="log"), na.rm=TRUE))) else
       if (type==3) return(sum((obs-hat)^2))}

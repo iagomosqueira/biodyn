@@ -214,8 +214,8 @@ setMethod('hcr', signature(object='biodyn'),
 #' @rdname hcrPlot
 #'
 #' @examples
-#setMethod('hcrPlot', signature(object='biodyn'),
- hcrPlot=function(object,params=FLPar(ftar=0.7, btrig=0.7, fmin=0.01, blim=0.20),maxB=1,rel=TRUE){
+setMethod('hcrPlot', signature(object='biodyn'),
+ function(object,params=FLPar(ftar=0.7, btrig=0.7, fmin=0.01, blim=0.20),maxB=1,rel=TRUE){
   
   pts=rbind(cbind(refpt="Target",model.frame(rbind(bmsy(object)*c(params["btrig"]),
                                                    fmsy(object)*c(params["ftar"])))),
@@ -234,5 +234,4 @@ setMethod('hcr', signature(object='biodyn'),
     pts[,"stock"]=pts[,"stock"]/bmsy(object)
     pts[,"harvest"]=pts[,"harvest"]/fmsy(object)}
   
-  pts}
-#)
+  pts})

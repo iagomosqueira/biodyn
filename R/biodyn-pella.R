@@ -174,7 +174,7 @@ setMethod("fit",signature(object='biodyn',index="FLQuant"),
           function(object,index=index,exeNm="pella",package="biodyn", 
                    dir=tempdir(),
                    set=biodyn:::setPella,
-                   get=biodyn:::getPella,cmdOps=paste("-maxfn 500 -iprint 0"))
+                   get=biodyn:::getPella,cmdOps=paste("-maxfn 500 -iprint 0 -est"))
    fitPella(object,index=index,exeNm=exeNm,package=package, 
             dir=dir,
             set=set,

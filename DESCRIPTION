@@ -5,16 +5,13 @@ Author: Laurence Kell
 Description: implements a biomass dynamic model class
 Depends:
     R(>= 3.0.1),
-    ggplot2(>= 0.9.3.1),
-    kobe(>= 1.2.2),
-    diags(>= 0.0),
-    FLCore(>= 2.2),
-    FLBRP(>= 1.0.1),
-    ggplotFL(>= 0.2)
+    FLCore(>= 2.2)
+Imports:
+     ggplotFL(>= 0.2)
 Maintainer: Laurence Kell <laurie.kell@iccat.int>
 Collate:
-    'plotComp.R'
     'biodyn-class.R'
+    'plotComp.R'
     'biodyn-accessors.R'
     'biodyn-generic.R'
     'biodyn-methods.R'
@@ -43,6 +40,7 @@ Collate:
     'biodyn-mvn.R'
     'biodyn-stars.R'
     'sbt-mse.R'
+    'biodyn-mse-application.R'
 License: GPL-2
 LazyLoad: Yes
 LazyData: No

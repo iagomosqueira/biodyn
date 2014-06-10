@@ -33,8 +33,6 @@
 data(bd)
 bd=fit(bd,swonIndex)}
 /dontrun{
-library(aspic)
-library(biodyn)
 data(asp)
 cpue=FLQuant(asp
 }

@@ -49,7 +49,6 @@ R using the original \pkg{FORTRA} executable. The package provides tools for che
 <<prelim,echo=FALSE,print=FALSE>>=
 library(diags)
 library(kobe)
-library(biodyn)
 
 stampIt=function(...){
    require(plyr)
