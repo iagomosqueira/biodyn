@@ -41,6 +41,7 @@ Collate:
     'biodyn-stars.R'
     'sbt-mse.R'
     'biodyn-mse-application.R'
+    'biodyn-tseries.R'
 License: GPL-2
 LazyLoad: Yes
 LazyData: No
