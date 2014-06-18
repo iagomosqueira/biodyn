@@ -7,7 +7,7 @@
 
 readADMB<-function(file){
   ## read in data from ADMB Par or Rep file
-  dat  <-scan(file,what="",sep="\n",skip=1)
+  dat  <-scan(file,what="",sep="\n",skip=1,quiet=TRUE)
   ## Get values
   vals <-lapply(strsplit(dat[grep("#",dat,invert=TRUE)]," "), function(x) as.numeric(x[nchar(x)>0]))
   ## name elements
@@ -172,7 +172,7 @@ cv2=function(obj){
 
 admbProfile=function(file) {
   
-  dat =scan(file, what = "", sep = "\n", skip = 1)
+  dat =scan(file, what = "", sep = "\n", skip = 1,quiet=TRUE)
   nms =c("",unlist(lapply(grep("#", dat, value = T), function(x) str_trim(substr(x,2, nchar(x))))))
   
   brks=seq(length(dat))[substr(dat,1,1)=="#"]

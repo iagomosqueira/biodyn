@@ -12,38 +12,36 @@ oem=function(om,cv,fishDepend=FALSE){
   cpue}
 
 ## MSE function
-mseBiodyn<-function(om,brp,srDev,ctrl,
+mseBiodyn<-function(om,br,srDev,ctrl,prrs,
                     start,          end,         interval=3,
                     ftar  =0.70,    btrig =0.60,
                     fmin  =0.01,    blim  =0.01,
                     bndF  =NULL,
                     maxF  =2.0,     
-                    uCV   =0.1,     phaseQ=-1,   fishDepend=TRUE,
-                    seed =7890){
+                    uCV   =0.3,     phaseQ=1,   fishDepend=TRUE,
+                    cmdOps=paste("-maxfn 500 -iprint 0 -est")){
  
   ## Get number of iterations in OM
-  nits=c(om=dims(om)$iter, br=dims(params(brp))$iter, rsdl=dims(srDev)$iter)
+  nits=c(om=dims(om)$iter, br=dims(params(br))$iter, rsdl=dims(srDev)$iter)
   if (length(unique(nits))>=2 & !(1 %in% nits)) ("Stop, iters not '1 or n' in OM")
   if (nits["om"]==1) stock(om)=propagate(stock(om),max(nits))
-  
-  set.seed(seed)
-  
+
   ## Cut in capacity
   maxF=mean(apply(fbar(window(om,end=start)),6,max)*maxF)
   
   ## hcr without feedback
   #  hcr parameters
-#   par=hcrParams(btrig=btrig*brp["msy","biomass"],
-#                 blim =blim *brp["msy","biomass"],
-#                 ftar =ftar *brp["msy","harvest"],
-#                 fmin =fmin *brp["msy","harvest"])
+#   par=hcrParams(btrig=btrig*br["msy","biomass"],
+#                 blim =blim *br["msy","biomass"],
+#                 ftar =ftar *br["msy","harvest"],
+#                 fmin =fmin *br["msy","harvest"])
 #   # loop over years
 #   for (iYr in seq(start+rcvPeriod,range(om,"maxyear")-interval,interval)){
 #     # data from last year then use to set TAC start of next year
-#     TAC=tacFn(om,hcrFn(om,par,iYr-1,1+seq(interval),brp,srDev)
-#     om =fwd(om,catch=TAC,sr=brp,sr.residuals=srDev)}
+#     TAC=tacFn(om,hcrFn(om,par,iYr-1,1+seq(interval),br,srDev)
+#     om =fwd(om,catch=TAC,sr=br,sr.residuals=srDev)}
 #   # save for reference  
-  prj=om
+  mou=om
    
   #### Observation Error (OEM) setup #######################
   ## Random variation for CPUE  
@@ -62,17 +60,18 @@ mseBiodyn<-function(om,brp,srDev,ctrl,
     
     #### Management Procedure
     ## Set up assessment parameter options
-    bd=biodyn(window(om,end=iYr-1))
+    bd=biodyn:::biodyn(window(om,end=iYr-1))
     params(bd)[dimnames(ctrl)$param]=ctrl[dimnames(ctrl)$param,"val"]
     
+    bd@priors=prrs
     setParams( bd)=cpue
     setControl(bd)=params(bd)
     bd@control[dimnames(ctrl)$params,"phase"][]=ctrl[dimnames(ctrl)$params,"phase"]
     bd@control["q1","phase"]=phaseQ
     bd@control["q1","val"]  =1
-    
+
     ## fit
-    bd =fit(bd,cpue,cmdOps=paste("-maxfn 500 -iprint 0 -est"))
+    bd =biodyn:::fit(bd,cpue,cmdOps=cmdOps)
     bd =biodyn:::fwd(bd,catch=catch(om)[,ac(iYr)])
     
     ## HCR
@@ -90,16 +89,16 @@ mseBiodyn<-function(om,brp,srDev,ctrl,
     TAC[]=rep(apply(TAC,6,mean)[drop=T],each=interval)
     
     #### Operating Model Projectionfor TAC
-    om =fwd(om,catch=TAC,maxF=maxF,sr=brp,sr.residuals=srDev)  
+    om =FLash:::fwd(om,catch=TAC,maxF=maxF,sr=br,sr.residuals=srDev)  
 
     #### Summary Statistics
     ## HCR actions, i.e. is biomass<Btrig?, what is F?, ..
-    hcr =rbind(hcr,data.frame(yearHcr=rep(as.numeric(dimnames(hcrOutcome$hvt)$year),dims(bd)$iter),
+    hcr =rbind(hcr,data.frame(yearHcr=min(as.numeric(dimnames(hcrOutcome$hvt)$year)),
                               #yearAss=rep(range(bd)[2],dims(bd)$iter),
-                              model.frame(           hcrPar,drop=T),
-                              tac    =as.data.frame(hcrOutcome$tac,drop=T)[,2],
-                              harvest=as.data.frame(hcrOutcome$hvt,drop=T)[,2],
-                              stock  =as.data.frame(hcrOutcome$stock,drop=T)[,2])[,-7])
+                              model.frame(           hcrPar,drop=T)[,-5],
+                              tac    =as.data.frame(apply(hcrOutcome$tac,6,mean),drop=T)[,"data"],
+                              harvest=as.data.frame(apply(hcrOutcome$hvt,6,mean),drop=T)[,"data"],
+                              stock  =as.data.frame(hcrOutcome$stock,drop=T)[,2]))
     
     ## Assessment parameters and reference points
     mp =rbind(mp,cbind(cbind(year=iYr,model.frame(params(bd))),
@@ -108,7 +107,7 @@ mseBiodyn<-function(om,brp,srDev,ctrl,
     }
   
   ## save OM, projection without feedback, last assessment and MP summary
-  return(list(om=om,prj=prj,bd=bd,mp=mp))}
+  return(list(om=om,mou=mou,bd=bd,mp=mp))}
 
 
 hcrFn=function(om,btrig,blim,ftar,fmin,start,end,interval,lag=seq(interval)){    
@@ -130,7 +129,7 @@ hcrFn=function(om,btrig,blim,ftar,fmin,start,end,interval,lag=seq(interval)){
     
     trgt=FLQuant(rep(c(trgt),each=length(lag)),dimnames=dmns)
     
-    om=fwd(om,f=trgt,sr=brp,sr.residuals=srDev)
+    om=fwd(om,f=trgt,sr=br,sr.residuals=srDev)
   }
   
   return(om)}

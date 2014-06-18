@@ -91,6 +91,9 @@ DATA_SECTION
   init_vector k_prior(1,4)
   init_vector p_prior(1,4)
   init_vector a_prior(1,4)
+  init_vector msy_prior(1,4)
+  init_vector bmsy_prior(1,4)
+  init_vector fmsy_prior(1,4)
   init_vector q_prior(1,4)
   init_vector s_prior(1,4)
   
@@ -323,14 +326,21 @@ FUNCTION get_neglogL
   //neglogL = halfnlog2pi + ni*log(s(1)) + RSS[1]/(2*s(1)*s(1));
   
   // weighted likelihood priors
-  if (r_prior[1]>1) neglogL -= dnorm(r, r_prior[2], r_prior[3])/dnorm(r_prior[2], r_prior[2], r_prior[3]);
-  if (k_prior[1]>1) neglogL -= dnorm(k, k_prior[2], k_prior[3])/dnorm(k_prior[2], k_prior[2], k_prior[3]);
-  if (p_prior[1]>1) neglogL -= dnorm(p, p_prior[2], p_prior[3])/dnorm(p_prior[2], p_prior[2], p_prior[3]);
-  if (a_prior[1]>1) neglogL -= dnorm(a, a_prior[2], a_prior[3])/dnorm(a_prior[2], a_prior[2], a_prior[3]);
-  //for (i=1; i<=nIdx; i++){
-  //  neglogL += q_prior[i]*dnorm(q[i],    q_prior[i,2],     q_prior[i,3]);
-  //  neglogL += s_prior[i]*dnorm(s[i],    s_prior[i,2],     s_prior[i,3]);}
-   
+  dvariable _msy  =r*k*pow(1/(1+p),1/p+1);
+  dvariable _bmsy =(k*pow((1/(1+p)),(1/p)));
+  dvariable _fmsy =msy/bmsy;
+ 
+  if (r_prior[1]>0)    neglogL += r_prior[1]*dnorm(r, r_prior[2], r_prior[3]); // /dnorm(r_prior[2], r_prior[2], r_prior[3]);
+  if (k_prior[1]>0)    neglogL += k_prior[1]*dnorm(k, k_prior[2], k_prior[3]); // /dnorm(k_prior[2], k_prior[2], k_prior[3]);
+  if (p_prior[1]>0)    neglogL += p_prior[1]*dnorm(p, p_prior[2], p_prior[ 3]); // /dnorm(p_prior[2], p_prior[2], p_prior[3]);
+  if (a_prior[1]>0)    neglogL += a_prior[1]*dnorm(a, a_prior[2], a_prior[3]); // /dnorm(a_prior[2], a_prior[2], a_prior[3]);
+  if ( msy_prior[1]>0) neglogL += msy_prior[1]*dnorm(_msy,  msy_prior[2],  msy_prior[3]); // /dnorm( msy_prior[2],  msy_prior[2],  msy_prior[3]);
+  if (bmsy_prior[1]>0) neglogL += bmsy_prior[1]*dnorm(_bmsy, bmsy_prior[2], bmsy_prior[3]); // /dnorm(bmsy_prior[2], bmsy_prior[2], bmsy_prior[3]);
+  if (fmsy_prior[1]>0) neglogL += fmsy_prior[1]*dnorm(_fmsy, fmsy_prior[2], fmsy_prior[3]); // /dnorm(fmsy_prior[2], fmsy_prior[2], fmsy_prior[3]);
+ //for (i=1; i<=nIdx; i++){
+  //  if (q_prior[i]>0) neglogL += q_prior[1]*dnorm(q, q_prior[2], q_prior[3]); // /dnorm(q_prior[2], q_prior[2], q_prior[3]);
+  //  if (s_prior[i]>0) neglogL += s_prior[1]*dnorm(s, s_prior[2], s_prior[3]); // /dnorm(s_prior[2], s_prior[2], s_prior[3]);}
+    
 
 FUNCTION get_summary
   summary.colfill(1,(dvector)Cyear);

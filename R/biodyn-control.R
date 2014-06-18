@@ -63,12 +63,14 @@ setMethod('setParams<-', signature(object='biodyn',value="FLQuants"), function(o
 #'
 #' @param  \code{object}, an object of class \code{biodyn}
 #'
+#' @seealso \code{\link{controlFn}}
+#' 
 #' @export
 #' @docType methods
 #' @rdname control
 #'
 #' @examples
-#' /dintrun{
+#' /dontrun{
 #' data(bd)
 #' control(bd) <-params(bd)
 #' params(bd)
@@ -99,6 +101,9 @@ setMethod('setControl<-', signature(object='biodyn',value="FLPar"), function(obj
     object@control[nms[value[nms]<0],c("min","max")]=object@control[nms[value[nms]<0],c("max","min")]
 
   prr=object@priors
+  nms=c(nms[!substr(dimnames(object@params)$params,1,1) %in% c("s","q")],
+        "msy","bmsy","fmsy",
+        nms[substr(dimnames(object@params)$params,1,1) %in% c("s","q")])
   object@priors=array(rep(c(0,0,0.3,1),each=length(nms)), dim=c(length(nms),4),   dimnames=list(params=nms,c("weight","a","b","type")))
   nms=dimnames(prr)$params[dimnames(prr)$params %in%  dimnames(object@priors)$params]
   
@@ -214,4 +219,88 @@ setMethod('control<-', signature(object='biodyn',value="FLPar"), function(object
   return(object)})
 setMethod('control', signature(object='biodyn'), function(object) {
   object@control})
+
+#' controlFn
+#' @description 
+#' A utility function to help set up the \code{control} slot in \code{biodyn} 
+#'           
+#' @aliases mseBiodyn
+#' 
+#' @param om an \code{FLStock} object
+#' 
+#' @param r a \code{numeric} value with best guess
+#' @param k a \code{numeric} value with best guess      
+#' @param p a \code{numeric} value with best guess, default=1      
+#' @param b0 a \code{numeric} value with best guess default=1
+#' @param phaseR a \code{numeric} value for phase, default=1
+#' @param phaseK a \code{numeric}  value for phase, default=1,
+#' @param phaseP a \code{numeric}  value for phase, default=-1,
+#' @param phaseB0 a \code{numeric}  value for phase, default=-1,
+#' @param min a \code{numeric} a multipler for the best guess  
+#' @param max \code{numeric} a multipler for the best guess
+#'
+#' @seealso \code{\link{control}} 
+#' 
+#' @return a \code{control} object
+#'  
+#' @export
+#' @docType methods
+#' @rdname runMSE
+#' 
+#' @seealso \code{\link{biodyn}}, \code{\link{mseBiodyn}}
+#' 
+#' @examples
+#' \dontrun{
+#'    }
+## utility function for setting control object
+controlFn=function(r,       k,       p=1,      b0=1,
+                   phaseR=1,phaseK=1,phaseP=-1,phaseB0=-1,
+                   min=.5,  max=2){ 
+  
+  dmns=list(params=c("r","k","p","b0"),
+            option=c("phase","min","val","max"),  
+            iter  =1)
+  
+  res=FLPar(array(0,unlist(laply(dmns,length)),dmns))
+  res[,"val"][]=c(r,k,p,b0)
+  res[,"min"]=res[,"val"]*min
+  res[,"max"]=res[,"val"]*max
+  
+  res[,"phase"]=c(phaseR,phaseK,phaseP,phaseB0)
+  
+  res}  
+  
+#' priorFn
+#' @description 
+#' A utility function to help set up the \code{prior} slot in \code{biodyn}.
+#'           
+#' @aliases mseBiodyn
+#' 
+#' @param ... named \code{vectors}, with elements named "weight", "a" and "b"
+#' where a and b are the mean and standard deviation of the penalty to be added to likelihood uisng dnorm}
+#'
+#' @return a \code{prior} object
+#'  
+#' @export
+#' @docType methods
+#' @rdname priorFn
+#' 
+#' @seealso \code{\link{biodyn}}, \code{\link{mseBiodyn}}
+#' 
+#' @examples
+#'    priorFn(r=c(weight=1,0.3,0.03)
+priorFn=function(...){
+  
+  args=list(...)
+  if ("list" %in% is(args[[1]]))
+    args=args[[1]]
+  
+  res=biodyn:::biodyn()@priors
+  
+  for (i in dimnames(res)$params[dimnames(res)$params %in% names(args)]){
+    if ("weight" %in% names(args[[i]])) res[i,c("weight")]=args[[i]]["weight"]
+    if ("a"      %in% names(args[[i]])) res[i,c("a")]     =args[[i]]["a"]
+    if ("b"      %in% names(args[[i]])) res[i,c("b")]     =args[[i]]["b"]}
+  
+  res}  
 

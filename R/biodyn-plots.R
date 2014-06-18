@@ -75,7 +75,7 @@ plotMSEfn=function(mp,om,brp){
   ### OM ######################################
   ## absolute
   omAbs=cbind(Type="Absolute",
-              rbind(as.data.frame(om[["stock","ssb","catch"]],          drop=T),
+              rbind(as.data.frame(FLQuants(om,"stock","ssb","catch"),          drop=T),
                     as.data.frame(FLQuants(harvest=catch(om)/stock(om)),drop=T)))
   
   ## relative
@@ -88,7 +88,7 @@ plotMSEfn=function(mp,om,brp){
   
   ### MP ######################################
   ## absolute
-  mpAbs=cbind(Type="Absolute",as.data.frame(mp[["stock","harvest","catch"]],drop=T))
+  mpAbs=cbind(Type="Absolute",as.data.frame(FLQuants(mp,"stock","harvest","catch"),drop=T))
   
   ## relative
   mpRel=cbind(Type="Relative",as.data.frame(FLQuants("stock"  =stock(  mp)%/%bmsy(mp),
@@ -140,11 +140,11 @@ plotSPfn=function(object,biomass=FLQuant(seq(0,max(params(object)["k"]),length.o
   invisible(p)} 
 
 plotProdfn=function(bd,brp,II=FALSE){
-  res=cbind(What="Age I",  model.frame(brp[["catch","stock"]],drop=T))
+  res=cbind(What="Age I",  model.frame(FLQuants("catch"=catch(brp),"stock"=stock(brp)),drop=T))
   
   if (II){
     landings.wt(brp)=stock.wt(brp)*mat(brp)
-    res=rbind(res, cbind(What="Age II",   model.frame(brp[["catch","stock"]],drop=T)))}
+    res=rbind(res, cbind(What="Age II",   model.frame(FLQuants("catch"=catch(brp),"stock"=stock(brp)),drop=T)))}
   
   if (!is.null(bd)){
     bm =FLQuant(seq(0, max(params(bd)["k"]), length.out = 101))

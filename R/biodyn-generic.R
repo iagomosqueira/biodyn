@@ -1,4 +1,4 @@
-  #' Creates a list of biodyn
+#' Creates a list of biodyn
 #'
 #' @description Creates a list of biodyn biomass dynamic model classes.
 #' @return list of biodyn objects
@@ -36,9 +36,9 @@ if (!isGeneric("diags<-"))
 if (!isGeneric("kobe")) 
   setGeneric('kobe',          function(object,method,...)    standardGeneric('kobe'))
 
-if (!isGeneric("control"))    
+#if (!isGeneric("control"))    
   setGeneric('control',     function(object,method,...) standardGeneric('control'))
-if (!isGeneric("control<-"))  
+#if (!isGeneric("control<-"))  
   setGeneric('control<-',   function(object,value)      standardGeneric('control<-'))
 
 if (!isGeneric("plot"))  

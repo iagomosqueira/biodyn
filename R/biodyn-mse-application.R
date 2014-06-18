@@ -1,22 +1,3 @@
-## utility function for setting control object
-controlFn=function(r,       k,       p=1,      b0=1,
-                   phaseR=1,phaseK=1,phaseP=-1,phaseB0=-1,
-                   min=.5,  max=2){ 
-  
-  dmns=list(params=c("r","k","p","b0"),
-            option=c("phase","min","val","max"),  
-            iter  =1)
-  
-  res=FLPar(array(0,unlist(laply(dmns,length)),dmns))
-  res[,"val"][]=c(r,k,p,b0)
-  res[,"min"]=res[,"val"]*min
-  res[,"max"]=res[,"val"]*max
-  
-  res[,"phase"]=c(phaseR,phaseK,phaseP,phaseB0)
-  
-  res}  
-
-
 #' runMSE
 #' @description 
 #' Runs a full MSE using an \code{FLStock} object as the Operating Model and \code{biodyn} as the Mangement Procedure

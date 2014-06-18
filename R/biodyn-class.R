@@ -106,7 +106,7 @@ validity<-function(object) {
     model       =models[3],
     params      =FLPar(c(.5,NA,2,1,NA,NA),                            dimnames=list(params=c("r","k","p","b0"),iter=1)),
     control     =FLPar(array(rep(c(1,NA,NA,NA),each=4), dim=c(4,4,1), dimnames=list(params=c("r","k","p","b0"),option=c("phase","min","val","max"),iter=1))),
-    priors      =array(rep(c(0,0,0.3,1),      each=4), dim=c(4,4),   dimnames=list(params=c("r","k","p","b0"),c("weight","a","b","type"))),
+    priors      =array(rep(c(0,0,0.3,1),       each=7), dim=c(7,4),   dimnames=list(params=c("r","k","p","b0","msy","bmsy","fmsy"),c("weight","a","b","type"))),
     vcov        =FLPar(array(NA, dim=c(4,4,1), dimnames=list(params=c("r","k","p","b0"),params=c("r","k","p","b0"),iter=1))),
     hessian     =FLPar(array(NA, dim=c(4,4,1), dimnames=list(params=c("r","k","p","b0"),params=c("r","k","p","b0"),iter=1))),
     objFn       =FLPar(array(NA,dim=c(2,1),dimnames=list("value"=c("ll","rss"),iter=1)))),
