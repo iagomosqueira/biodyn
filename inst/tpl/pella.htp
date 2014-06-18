@@ -32,6 +32,9 @@ class model_data : public ad_comm{
   data_vector k_prior;
   data_vector p_prior;
   data_vector a_prior;
+  data_vector msy_prior;
+  data_vector bmsy_prior;
+  data_vector fmsy_prior;
   data_vector q_prior;
   data_vector s_prior;
   ~model_data();
