@@ -52,7 +52,7 @@ mseBiodyn<-function(om,br,srDev,ctrl,prrs,
   hcr=NULL
   for (iYr in seq(start,range(om,"maxyear")-interval,interval)){
     #iYr = seq(start+rcvPeriod,range(om,"maxyear")-interval,interval)[1]
-    cat("===================", iYr, "===================\n")
+    cat("\n===================", iYr, "===================\n")
     
     ## use data from last year
     cpue=window(cpue,end=iYr-1)
@@ -73,7 +73,7 @@ mseBiodyn<-function(om,br,srDev,ctrl,prrs,
     ## fit
     bd =biodyn:::fit(bd,cpue,cmdOps=cmdOps)
     bd =biodyn:::fwd(bd,catch=catch(om)[,ac(iYr)])
-    
+        
     ## HCR
     hcrPar=hcrParams(ftar =ftar *fmsy(bd),
                      btrig=btrig*bmsy(bd),
