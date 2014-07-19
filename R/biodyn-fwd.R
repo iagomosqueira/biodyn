@@ -119,6 +119,7 @@ setMethod("fwd", signature(object="biodyn",ctrl="missing"),
 #  lag    =1
 #  bounds=list(catch=c(Inf,Inf))
 
+  object@stock=FLQuant(object@stock,quant=names(object@catch)[1])   
   lag=max(lag,0)
 
   ## catch, harvest or stock?

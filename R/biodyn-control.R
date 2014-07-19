@@ -31,9 +31,9 @@ setMethod('setParams<-', signature(object='biodyn',value="FLPar"), function(obje
   return(object)})
 
 setMethod('setParams<-', signature(object='biodyn',value="FLQuant"), function(object,value) {
-  nms=c(biodyn:::modelParams(tolower(as.character(object@model))),"b0")
-  object@params=object@params[nms]
 
+  nms=c(biodyn:::modelParams(tolower(as.character(object@model))),"b0")
+ 
   #value=FLCore:::apply(value,2,mean)
   object@params =setQ(object,value)
   
@@ -130,7 +130,7 @@ calcB0<-function(index,q,k,nyrB0=3,error="log"){
 }
 
 calcQ<-function(stock,index,error="log",na.rm=T){
-  
+
   stock<-(stock[-length(stock)]+stock[-1])/2
   n    <-length(stock)
   index<-index[seq(n)]
@@ -153,13 +153,18 @@ calcQ<-function(stock,index,error="log",na.rm=T){
   return(res)}
 
 setQ=function(object,index,error="log"){
-    
+  
   fn=function(index,stock){
+    if (dims(index)$iter==1)
+      dimnames(index)$iter=1
+    if (dims(stock)$iter==1)
+      dimnames(stock)$iter=1
+    
     if (dims(stock)$iter==1 & dims(index)$iter>1)
       stock=propagate(stock,dims(index)$iter)
     
     model.frame(mcf(FLQuants(stock=stock,index=index)))}
-  
+
   res=switch(is(index)[1],
              FLQuant   ={res=fn(index,stock(object));data.frame(name=1,res)},
              #FLQuants  =ldply(index, fn, model.frame(mcf(FLQuants(stock=stock,index=x))),stock=stock(object)),
@@ -170,16 +175,14 @@ setQ=function(object,index,error="log"){
   
   if (!("name" %in% names(res))) 
     names(res)[1]="name"
-  
+
   res=res[!is.na(res$name),]
-  
   res=ddply(res, .(name,iter), function(x,log) data.frame(calcQ(x$stock,x$index)),log="log")
-  
   its=max(as.numeric(ac(res$iter)))
   
   res.=transform(melt(res,id=c("name","iter")),params=paste(variable,name,sep=""))[,c("params","value","iter")]
   names(res.)[2]="data"
- 
+  
   #bug
   res=as(res.,"FLPar")[,1]
   #res=FLCore:::iter(res,seq(its))
@@ -188,7 +191,7 @@ setQ=function(object,index,error="log"){
   
   if (dims(object@params)$iter==1)
     object@params=propagate(object@params,its)
-
+  
   t.=rbind(object@params,FLPar(as.FLQuant(cbind(res,year=1))[,1,drop=T]))
   dmns=dimnames(t.)
   names(dmns)=c("params","iter")

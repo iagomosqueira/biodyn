@@ -57,4 +57,4 @@ createFLAccesors <- function(class, exclude=character(1), include=missing) {
 	return(defined)
 }	# }}}
 
-invisible(createFLAccesors("biodyn", exclude=c("desc","range","priors","objFn","mng","diags","stock","refpts"))) #,"priors","diags","objFn","control","mng")))
+invisible(createFLAccesors("biodyn", exclude=c("desc","range","priors","objFn","mng","diags","stock","refpts","profile","catch"))) #,"priors","diags","objFn","control","mng")))

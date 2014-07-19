@@ -8,32 +8,42 @@
 #' @examples bd=biodyn("pellat",FLPar(r=0.6,k=50000,p=1,b0=1))
 setGeneric('biodyn',   function(model,params,...)  standardGeneric('biodyn'))
 setMethod('biodyn', signature(model='factor',params="FLPar"),
-          function(model,params,min=0.1,max=10,catch=NULL,stock=NULL,...){
-     
-            args = list(...)
-          
-            dimnames(params)$params=tolower(dimnames(params)$params)
+          function(model,params,min=0.1,max=10,catch=NULL,stock=NULL,msy=NULL,...){
+            model=tolower(model)
+            if (is.null(msy) & !is.null(catch)) 
+              msy=mean(catch,na.rm=TRUE)
 
+            args = list(...)
+
+            dimnames(params)$params=tolower(dimnames(params)$params)
+          
             if (!("b0" %in%  dimnames(params)$params)) 
               params=rbind(params,propagate(FLPar("b0"=1),dims(params)$iter))
             
             if (model=="pellat" & !("p" %in%  dimnames(params)$params)) 
               params=rbind(params,propagate(FLPar("p"=1),dims(params)$iter))
-            
-            if (!("k" %in%  dimnames(params)$params) & !is.null(msy))
-              if (model=="pellat") params=rbind(params,"k"=FLPar(calcK(msy,params)))
           
+            if (!("k" %in%  dimnames(params)$params))
+              if (!is.null(msy) & model=="pellat") 
+                params=rbind(params,"k"=FLPar(calcK(msy,params)))
+              else  
+                params=rbind(params,"k"=FLPar(k=as.numeric(NA)))
+                   
             if (model=="pellat")
                 params=params[c("r","k","p","b0"),]
             res        =biodyn()
+
+            if (!("factor" %in% is(model)))
+              model=factor(model)
             res@model  =model
             res@params =params 
-            
+
             if (!is.null(stock))
                res@stock[]=params(res)["k"]*params(res)["b0"]
-          
+         
             if (!is.null(catch)){
                res@catch=catch
+      
                res=fwd(res,catch=catch)
                }
             else  if (!is.null(stock)) {
@@ -41,13 +51,13 @@ setMethod('biodyn', signature(model='factor',params="FLPar"),
 
                res@catch=window(stock,end=dims(stock)$maxyear-1)
                res@catch[]=NA}
-            
+                       
             res@control=propagate(res@control,dims(params)$iter)
             nms=dimnames(res@control)$param[dimnames(res@control)$param %in% dimnames(res@params)$param]
             res@control[nms,  "val"]=res@params[nms,]
             res@control[nms,  "min"]=res@params[nms,]*min
             res@control[nms,  "max"]=res@params[nms,]*max
-            
+          
             if (!("b0" %in% nms))
                res@control["b0",c("min","max","val")]=c(0.75,1,1)
                 

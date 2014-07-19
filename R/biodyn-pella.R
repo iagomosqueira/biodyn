@@ -308,7 +308,7 @@ fitPella=function(object,index=index,exeNm="pella",package="biodyn",
   its=max(its,dims(bd@control)$iter)
   
   nms=dimnames(params(bd))$params
-  bd@vcov   =FLPar(array(NA, dim=c(length(nms),length(nms),its), dimnames=list(params=nms,params=nms,iter=seq(its))))
+  bd@vcov   =FLPar(array(as.numeric(NA), dim=c(length(nms),length(nms),its), dimnames=list(params=nms,params=nms,iter=seq(its))))
   bd@hessian=bd@vcov
   
   us=paste("u",seq(length(dimnames(params(bd))$params[grep("q",dimnames(params(bd))$params)])),sep="")
@@ -588,7 +588,7 @@ calcSS=function(x) daply(x@diags, .(name),
                          with, sum(residual^2,na.rm=T)/sum(count(!is.na(residual))))
 
 #FLParBug
-#tst=FLPar(NA,dimnames=list(params=c("a","b"),col=c("x","y"),iter=1:2))
+#tst=FLPar(as.numeric(NA),dimnames=list(params=c("a","b"),col=c("x","y"),iter=1:2))
 #tst["a","x",2]=3
 
 fitFn=function(file){

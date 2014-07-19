@@ -1,4 +1,4 @@
-import("kobe","diags","FLCore")
+import("kobe","diags","FLCore","FLBRP")
 export(calcK)
 exportClasses(biodyn)
 export(hcrParams)

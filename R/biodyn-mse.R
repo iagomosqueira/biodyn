@@ -107,7 +107,7 @@ mseBiodyn<-function(om,br,srDev,ctrl,prrs,
     }
   
   ## save OM, projection without feedback, last assessment and MP summary
-  return(list(om=om,mou=mou,bd=bd,mp=mp))}
+  return(list(om=om,mou=mou,bd=bd,mp=mp,oem=mcf(FLQuants(cpue=cpue,catch=catch(om)))))}
 
 
 hcrFn=function(om,btrig,blim,ftar,fmin,start,end,interval,lag=seq(interval)){    

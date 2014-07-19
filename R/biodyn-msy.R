@@ -19,10 +19,10 @@
 #'
 #' @examples \dontrun{ msy("logistic",FLPar(msy=100,k=500))}
 #'   
-setMethod('msy',   signature(object='character', params="FLPar"),   function(object=factor(object), params=params)         msyFn(   object, params))
-setMethod('msy',   signature(object='factor',    params="FLPar"),   function(object=       object,  params=params)         msyFn(   object, params))
-setMethod('msy',   signature(object='biodyn',    params="missing"), function(object,prob=0.5)                              msyFn(model(object), params(object),prob=prob))
-setMethod('msy',   signature(object='biodyn',    params="numeric"), function(object,params=params)                         msyFn(object, params(object), prob=params))
+setMethod('msy',   signature(object='character', params="FLPar"),   function(object=factor(object), params=params)            msyFn(   object, params))
+setMethod('msy',   signature(object='factor',    params="FLPar"),   function(object=       object,  params=params)            msyFn(   object, params))
+setMethod('msy',   signature(object='biodyn',    params="missing"), function(object,                params=paramas, prob=0.5) msyFn(model(object), params(object),prob=prob))
+setMethod('msy',   signature(object='biodyn',    params="numeric"), function(object,                params=params)            msyFn(object, params(object), prob=params))
 
 
 ##############################################################
@@ -50,7 +50,7 @@ setMethod('msy',   signature(object='biodyn',    params="numeric"), function(obj
 setMethod('fmsy',  signature(object='biodyn',    params="missing"), function(object,prob=0.5)                              fmsyFn(model(object), params(object),prob=prob))
 setMethod('fmsy',  signature(object='character', params="FLPar"),   function(object=factor(object), params=params)         fmsyFn(object,params))
 setMethod('fmsy',  signature(object='factor',    params="FLPar"),   function(object=       object,  params=params)         fmsyFn(object,params))
-setMethod('fmsy',  signature(object='biodyn',    params="numeric"), function(object,params=params)                         fmsyFn(object, params(object), prob=params))
+setMethod('fmsy',  signature(object='biodyn',    params="numeric"), function(object,                params=params)         fmsyFn(object,params(object)))
 
 ##############################################################
 #' Biomass at Maximum Sustainable Yield.
@@ -279,7 +279,7 @@ refptsFn=function(model,params){
   dmns<-dimnames(params)
   names(dmns)[1]<-"refpts"
   dmns[[1]]<-c("msy","fmsy","bmsy")
-  res<-FLPar(NA,dimnames=dmns)
+  res<-FLPar(as.numeric(NA),dimnames=dmns)
   
   obj=as.character(model)
   

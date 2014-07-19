@@ -7,7 +7,9 @@ Depends:
     R(>= 3.0.1),
     FLCore(>= 2.2)
 Imports:
-     ggplotFL(>= 0.2)
+     bdm,
+     ggplotFL(>= 0.2),
+     FLBRP
 Maintainer: Laurence Kell <laurie.kell@iccat.int>
 Collate:
     'biodyn-class.R'
@@ -42,6 +44,7 @@ Collate:
     'sbt-mse.R'
     'biodyn-mse-application.R'
     'biodyn-tseries.R'
+    'bdm-methods.R'
 License: GPL-2
 LazyLoad: Yes
 LazyData: No

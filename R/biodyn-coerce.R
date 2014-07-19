@@ -7,7 +7,7 @@ setMethod('biodyn', signature(model="FLStock",params="missing"),
       
       dmns=dimnames(res@params)
       
-      res@params=FLPar(NA,dimnames=dmns)
+      res@params=FLPar(as.numeric(NA),dimnames=dmns)
       res@params[]=c(.6,4*mean(res@catch),1,1)
       
       res@control[,"val"]=res@params
