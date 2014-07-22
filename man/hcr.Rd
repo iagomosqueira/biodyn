@@ -36,7 +36,6 @@
 }
 \seealso{
   \code{\link{bmsy}}, \code{\link{fmsy}},
-  \code{\link{fwd}}, \code{\link{hcr} and
-  \code{\link{hcrParams}}
+  \code{\link{fwd}}, \code{\link{hcr}} and \code{\link{hcrParams}}
 }
 
