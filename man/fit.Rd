@@ -29,11 +29,11 @@
   Profiles biodyn
 }
 \examples{
-/dontrun{
+\dontrun{
 data(bd)
-bd=fit(bd,swonIndex)}
-/dontrun{
+bd=fit(bd,swonIndex)
 data(asp)
-cpue=FLQuant(asp
+cpue=FLQuant(asp)
+}
 }
 
