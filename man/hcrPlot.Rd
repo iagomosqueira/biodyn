@@ -14,7 +14,6 @@
   Calculates break pointts for a hockey stick HCR
 }
 \examples{
-hcrPlot(object)
 }
 \seealso{
   \code{\link{hcr}}, \code{\link{msy}}, \code{\link{bmsy}},

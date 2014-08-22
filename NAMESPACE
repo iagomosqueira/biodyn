@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import("diags","FLCore")
+=======
+import("FLCore","FLBRP")
+>>>>>>> 85f542032e5da7e5a777aaa17c62ed02b48fcb13
 export(calcK)
 exportClasses(biodyn)
 export(hcrParams)
@@ -34,5 +38,6 @@ export(mvn)
 export(hcrSBT1)
 export(mseSBT1)
 export(hcrSBT2)
+export(hcrPlot)
 export(mseSBT2)
 

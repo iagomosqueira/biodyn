@@ -12,7 +12,7 @@
   bounds to .1 and 10 times of these.
 }
 \examples{
-/dintrun{
+\dontrun{
 data(bd)
 control(bd) <-params(bd)
 params(bd)

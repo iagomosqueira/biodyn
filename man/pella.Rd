@@ -17,7 +17,7 @@
   using CPUE index
 }
 \examples{
-/dontrun{
+\dontrun{
 data(bd)
 bd=fit(bd,swonIndex)}
 }
