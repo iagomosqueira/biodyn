@@ -102,7 +102,7 @@ mseBiodyn<-function(om,br,srDev,ctrl,prrs,
     
     ## Assessment parameters and reference points
     mp =rbind(mp,cbind(cbind(year=iYr,model.frame(params(bd))),
-                       model.frame(biodyn:::refpts(bd))[,-4],
+                       model.frame(refpts(bd))[,-4],
                        hcr))
     }
   

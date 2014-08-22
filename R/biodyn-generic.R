@@ -34,7 +34,7 @@ if (!isGeneric("diags<-"))
   setGeneric('diags<-',   function(object,value)      standardGeneric('diags<-'))
 
 if (!isGeneric("kobe")) 
-  setGeneric('kobe',          function(object,method,...)    standardGeneric('kobe'))
+   setGeneric('kobe',          function(object,method,...)    standardGeneric('kobe'))
 
 #if (!isGeneric("control"))    
   setGeneric('control',     function(object,method,...) standardGeneric('control'))

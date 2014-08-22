@@ -7,9 +7,8 @@ Depends:
     R(>= 3.0.1),
     FLCore(>= 2.2)
 Imports:
-     bdm,
      ggplotFL(>= 0.2),
-     FLBRP
+     plyr
 Maintainer: Laurence Kell <laurie.kell@iccat.int>
 Collate:
     'biodyn-class.R'

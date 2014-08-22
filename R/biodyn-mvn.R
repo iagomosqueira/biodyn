@@ -16,7 +16,7 @@
 #' @examples
 #' x=1
 mvn=function(object,n,nms=dimnames(object@control[object@control[,"phase",]>0,])$params,
-                      fwd=FALSE){
+                      fwd=FALSE,params=TRUE){
   
   res=mvrnorm(n,params(object)[nms,drop=T],vcov(object)[nms,nms,drop=T])
   dmns=list(iter=seq(n),params=nms)

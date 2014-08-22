@@ -21,8 +21,8 @@
 #'   
 setMethod('msy',   signature(object='character', params="FLPar"),   function(object=factor(object), params=params)            msyFn(   object, params))
 setMethod('msy',   signature(object='factor',    params="FLPar"),   function(object=       object,  params=params)            msyFn(   object, params))
-setMethod('msy',   signature(object='biodyn',    params="missing"), function(object,                params=paramas, prob=0.5) msyFn(model(object), params(object),prob=prob))
-setMethod('msy',   signature(object='biodyn',    params="numeric"), function(object,                params=params)            msyFn(object, params(object), prob=params))
+setMethod('msy',   signature(object='biodyn',    params="missing"), function(object,                params=paramas, probs=0.5) msyFn(model(object), params(object),probs=probs))
+setMethod('msy',   signature(object='biodyn',    params="numeric"), function(object,                params=params)            msyFn(object, params(object), probs=params))
 
 
 ##############################################################
@@ -47,7 +47,7 @@ setMethod('msy',   signature(object='biodyn',    params="numeric"), function(obj
 #' @examples
 #' fmsy("logistic",FLPar(msy=100,k=500))
 #'   
-setMethod('fmsy',  signature(object='biodyn',    params="missing"), function(object,prob=0.5)                              fmsyFn(model(object), params(object),prob=prob))
+setMethod('fmsy',  signature(object='biodyn',    params="missing"), function(object,probs=0.5)                              fmsyFn(model(object), params(object),probs=probs))
 setMethod('fmsy',  signature(object='character', params="FLPar"),   function(object=factor(object), params=params)         fmsyFn(object,params))
 setMethod('fmsy',  signature(object='factor',    params="FLPar"),   function(object=       object,  params=params)         fmsyFn(object,params))
 setMethod('fmsy',  signature(object='biodyn',    params="numeric"), function(object,                params=params)         fmsyFn(object,params(object)))
@@ -76,8 +76,8 @@ setMethod('fmsy',  signature(object='biodyn',    params="numeric"), function(obj
 #'  
 setMethod('bmsy',  signature(object='character', params="FLPar"),   function(object=factor(object), params=params)         bmsyFn(  object, params))
 setMethod('bmsy',  signature(object='factor',    params="FLPar"),   function(object=       object,  params=params)         bmsyFn(  object, params))
-setMethod('bmsy',  signature(object='biodyn',    params="missing"), function(object,prob=0.5)                              bmsyFn(model(object), params(object), prob=prob))
-setMethod('bmsy',  signature(object='biodyn',    params="numeric"), function(object,params=params)                         bmsyFn(object, params(object), prob=params))
+setMethod('bmsy',  signature(object='biodyn',    params="missing"), function(object,probs=0.5)                              bmsyFn(model(object), params(object), probs=probs))
+setMethod('bmsy',  signature(object='biodyn',    params="numeric"), function(object,params=params)                         bmsyFn(object, params(object), probs=params))
 
 ##############################################################
 #' Maximum Sustainable Yield reference points
@@ -174,10 +174,10 @@ bmsyGulland <-function(params)
 bmsyFletcher <- function(params)
   params["k"]*(1/(params["p"]+1)^(1/(params["p"])))
 
-fmsyFn=function(object,params,prob=0.5){
+fmsyFn=function(object,params,probs=0.5){
   
-  if (prob!=0.5){
-    res=qnorm(prob, object@mng["fmsy","hat"],object@mng["fmsy","sd"])
+  if (probs!=0.5){
+    res=qnorm(probs, object@mng["fmsy","hat"],object@mng["fmsy","sd"])
     return(res)}
   
   object=tolower(object)
@@ -204,10 +204,10 @@ fmsyFn=function(object,params,prob=0.5){
   
   return(res)}
 
-msyFn=function(object,params,prob=0.5) {
+msyFn=function(object,params,probs=0.5) {
    
-  if (prob!=0.5){
-    res=qnorm(prob, object@mng["msy","hat"],object@mng["msy","sd"])
+  if (probs!=0.5){
+    res=qnorm(probs, object@mng["msy","hat"],object@mng["msy","sd"])
     return(res)}
   
   
@@ -226,10 +226,10 @@ msyFn=function(object,params,prob=0.5) {
   
   return(res)}
 
-bmsyFn=function(object,params,prob=0.5) {
+bmsyFn=function(object,params,probs=0.5) {
   
-  if (prob!=0.5){    
-      res=qnorm(prob, object@mng["bmsy","hat"],object@mng["bmsy","sd"])
+  if (probs!=0.5){    
+      res=qnorm(probs, object@mng["bmsy","hat"],object@mng["bmsy","sd"])
       return(res)}
   
   object=tolower(object)

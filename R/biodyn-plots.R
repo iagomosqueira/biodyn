@@ -1,8 +1,8 @@
 utils::globalVariables(c("ggplot","geom_line","aes","yield","geom_point","cast","xlab","ylab"))
 
 ##############################################################
-#' Create a \code{ggplot} plot
-#'
+#' plot
+#' 
 #' Creates a \code{ggplot2} object that plots time series of biomass, harvest rate and catch. The basic object can then be modified by adding ggpot2 layers.
 #'
 #' @param  \code{x}, an object of class \code{biodyn} 
@@ -102,8 +102,8 @@ plotMSEfn=function(mp,om,brp){
 
 
 ##############################################################
-#' Create a \code{ggplot} plot
-#'
+#' plotSP
+#' 
 #' Creates a \code{ggplot2} object that plots time series of biomass, harvest rate and catch. The basic object can then be modified by adding ggpot2 layers.
 #'
 #' @param  object, an object of class \code{biodyn} 
@@ -153,4 +153,64 @@ plotProdfn=function(bd,brp,II=FALSE){
   
   ggplot(res)}
 
+##############################################################
+#' plotJack
+#' 
+#' Create a \code{ggplot2} plot based on a jack knifed biodyn and plots 
+#' time series of biomass and harvest rate. 
+#' The basic object can then be modified by adding ggpot2 layers.
+#'
+#' @param  \code{x}, an object of class \code{biodyn} that has been jack knifed, i.e. by 
+#' providing a jack knifed CPUE series to fit
+#' @param \code{y} the original \code{biodyn} object
+#'
+#' @return an \code{ggplot2} object
+#' 
+#' @export
+#' @docType methods
+#' @rdname plotJack
+#'
+#' @examples
+#' \dontrun{
+#' bd=fit(bd,cpue)
+#' jk=fit(bd,jacknife(cpue))
+#' plotJack(jk,bd)
+#' }  
+plotJack=function(x,y,ncol=1){
+  
+  js=function(x,y, ...) {
+    
+    n <- dims(x)$iter 
+    
+    mnU <- apply(x, 1:5, mean)   
+    
+    SS <- apply(sweep(x, 1:5, mnU,"-")^2, 1:5, sum)
+    
+    bias <- (n - 1) * (mnU - y)
+    se <- sqrt(((n-1)/n)*SS)
+    
+    res=FLQuants(list(jack.mean=y, jack.se=se, jack.bias=bias))
+    
+    attributes(res)$jackknife=TRUE
+    
+    return(res)}
+  
+  df=rbind(cbind(qname="stock",  
+                 model.frame(js(stock(  x),stock(  y)),drop=TRUE)),
+           cbind(qname="harvest",
+                 model.frame(js(harvest(x),harvest(y)),drop=TRUE)))
+  
+  # basic plot data vs. year
+  p=ggplot(data=df, aes(x=year, y=jack.mean))+
+    facet_wrap(~qname,ncol=ncol,scale="free_y")+
+    geom_ribbon(aes(x=year, ymin=jack.mean-2*jack.se, 
+                    ymax=jack.mean+2*jack.se),
+                fill="blue", alpha = .20)+
+    # line + xlab + ylab + limits to include 0 +
+    geom_line(colour="red") + xlab("Year") + ylab("") + expand_limits(y=0) +
+    geom_line(aes(year,jack.mean+jack.bias),colour="black")   +
+    # no legend
+    theme(legend.title = element_blank())
+  
+  return(p)}
 
