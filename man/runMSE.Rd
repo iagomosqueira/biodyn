@@ -2,7 +2,6 @@
 \docType{methods}
 \name{controlFn}
 \alias{controlFn}
-\alias{mseBiodyn}
 \alias{runMSE}
 \title{controlFn}
 \usage{

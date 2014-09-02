@@ -260,7 +260,7 @@ setMethod('control', signature(object='biodyn'), function(object) {
 #'  
 #' @export
 #' @docType methods
-#' @rdname runMSE
+#' @rdname controlFn
 #' 
 #' @seealso \code{\link{biodyn}}, \code{\link{mseBiodyn}}
 #' 

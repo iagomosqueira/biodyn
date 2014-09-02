@@ -17,69 +17,6 @@ diagsFn=function(res){
   
   res}
 
-
-# '[['  {{{
-setMethod('[[', signature(x='FLComp', i='character'),
-          function(x, i, j, ..., drop=FALSE) {
-            
-            res <- FLlst()
-            args <- list(...)
-            
-            # j
-            if(!missing(j))
-              if(is(j, 'character'))
-                i <- c(i, j)
-            else
-              stop(paste('Only character vectors for slot names allowed:', as.character(j)))
-            # args
-            if(length(args) > 0)
-              if(all(unlist(lapply(args, function(x) is(x, 'character')))))
-                i <- c(i, unlist(args))
-            else
-              stop(paste('Only character vectors for slot names allowed:',
-                         unlist(args[!unlist(lapply(args, function(x) is(x, 'character')))])))
-            
-            for (j in 1:length(i))
-              res[[i[j]]] <- do.call(i[j],list(x))
-            
-            names(res) <- i
-            
-            return(new(getPlural(res[[1]]), res))
-          }
-) # }}}
-
-# '[[<-'  {{{
-setMethod('[[<-', signature(x='FLComp', i='character', value='FLlst'),
-          function(x, i, j, ..., value) {
-            
-            args <- list(...)
-            
-            # j
-            if(!missing(j))
-              if(is(j, 'character'))
-                i <- c(i, j)
-            else
-              stop(paste('Only character vectors for slot names allowed:', as.character(j)))
-            
-            # args
-            if(length(args) > 0)
-              if(all(unlist(lapply(args, function(x) is(x, 'character')))))
-                i <- c(i, unlist(args))
-            else
-              stop(paste('Only character vectors for slot names allowed:',
-                         unlist(args[!unlist(lapply(args, function(x) is(x, 'character')))])))
-            
-            # check names match
-            if(!identical(sort(names(value)), sort(i)))
-              stop('Names in list do not match those in selection.')
-            
-            for (j in 1:length(i))
-              slot(x, i[j]) <- value[[i[j]]]
-            
-            return(x)
-          }
-) # }}}
-
 #### ADMB ###################################################################################
 ## 1) setExe copies exe from bin and creates a temo dir
 ## 2) Write data files
