@@ -9,7 +9,7 @@ setMethod('harvest', signature(object='biodyn'),
              
              yrs=dimnames(catch(object))$year[dimnames(catch(object))$year %in% dimnames(catch(object))$year]
              res <- catch(object)[,yrs]/stock(object)[,yrs]
-             units(res) <- "hr"
+             units(res) <- 'hr'
              return(res)
            })
 
@@ -43,23 +43,23 @@ setMethod('stock', signature(object='biodyn'),
 #' @rdname sp
 #'
 #' @examples
-#' \dontrun{ computeSP(bd,seq(0,params(bd)["k"])) }
+#' \dontrun{ computeSP(bd,seq(0,params(bd)['k'])) }
 #'  
 setGeneric('computeSP',function(object,biomass,...) standardGeneric('computeSP'))
-setMethod( 'computeSP', signature(object="biodyn",   biomass="missing"),     function(object,biomass=stock(object))  biodyn:::spFn(model(object),params(object),biomass))
-setMethod( 'computeSP', signature(object="biodyn",   biomass="numeric"),     function(object,biomass)                biodyn:::spFn(model(object),params(object),biomass))
-setMethod( 'computeSP', signature(object="biodyn",   biomass="FLQuant"),     function(object,biomass)                biodyn:::spFn(model(object),params(object),biomass))
+setMethod( 'computeSP', signature(object='biodyn',   biomass='missing'),     function(object,biomass=stock(object))  biodyn:::spFn(model(object),params(object),biomass))
+setMethod( 'computeSP', signature(object='biodyn',   biomass='numeric'),     function(object,biomass)                biodyn:::spFn(model(object),params(object),biomass))
+setMethod( 'computeSP', signature(object='biodyn',   biomass='FLQuant'),     function(object,biomass)                biodyn:::spFn(model(object),params(object),biomass))
 
 
 # calcLogLik
 
-calcSigma <- function(obs,hat=rep(0,length(obs)),error="log"){
+calcSigma <- function(obs,hat=rep(0,length(obs)),error='log'){
   yrs=dimnames(obs)$year
   yrs=yrs[yrs %in% dimnames(hat)$year]
   hat=hat[,yrs]
   obs=obs[,yrs]
   
-  if (error=="log"){
+  if (error=='log'){
     hat=log(hat)
     obs=log(obs)}
   
@@ -79,19 +79,19 @@ loglFn<-function(obs,se,hat=rep(0,length(obs))){
   
   return(res)}
 
-calcLogLik<-function(obs,hat=rep(0,length(obs)),error="log",type=1){
+calcLogLik<-function(obs,hat=rep(0,length(obs)),error='log',type=1){
   
   yrs=dimnames(obs)$year
   yrs=yrs[yrs %in% dimnames(hat)$year]
   hat=hat[,yrs]
   obs=obs[,yrs]
   
-  if (error=="log"){
+  if (error=='log'){
     hat=log(hat)
     obs=log(obs)}
   
   se<-calcSigma(obs,hat)
   
   if (type==1) return(loglFn(se,obs,hat)) else
-    if (type==2) return(-sum(dnorm(obs, hat, se, log=(error=="log"), na.rm=TRUE))) else
+    if (type==2) return(-sum(dnorm(obs, hat, se, log=(error=='log'), na.rm=TRUE))) else
       if (type==3) return(sum((obs-hat)^2))}

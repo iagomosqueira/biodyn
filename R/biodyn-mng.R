@@ -12,8 +12,10 @@
 #' @docType methods
 #' @rdname power
 #'
-setMethod('power',  signature(object='biodyn',ref="missing"), 
-          function(object,ref=ref,test=data.frame(param =c("bbmsy","bk","bratio","ffmsy", "fr","fratio","slopeb","slopef"),
+setGeneric('powerAnalysis',  function(object,ref,...) signature(object,ref)) 
+          
+setMethod('powerAnalysis',  signature(object='biodyn',ref='missing'), 
+          function(object,ref=ref,test=data.frame(param =c('bbmsy','bk','bratio','ffmsy', 'fr','fratio','slopeb','slopef'),
                                               q         =c(     1,    0,       1,      0,    1,       0,       1,      0),
                                               lower.tail=c( FALSE, TRUE,   FALSE,   TRUE,FALSE,    TRUE,   FALSE,    TRUE))){
   
@@ -22,22 +24,22 @@ setMethod('power',  signature(object='biodyn',ref="missing"),
   if (its==1) object=propagate(object,2)
   
   res=maply(seq(dim(test)[1]),function(x,mng,test) {
-    par=ac(test[x,"param"])
-    pnorm(test[x,"q"],mng[par,"hat"],mng[par,"sd"],test[x,"lower.tail"])
+    par=ac(test[x,'param'])
+    pnorm(test[x,'q'],mng[par,'hat'],mng[par,'sd'],test[x,'lower.tail'])
     
   },mng=object@mng,test=test)
-  res=as(res,"FLPar")
+  res=as(res,'FLPar')
   dimnames(res)$X1=test$param
-  names(dimnames(res))="param"
-  res=as(res,"FLPar")
+  names(dimnames(res))='param'
+  res=as(res,'FLPar')
   
   if (its==1) res=FLCore:::iter(object,1)
   
   return(res)})
 
-setMethod('power',  signature(object='biodyn',ref="biodyn"), 
-          function(object,ref,test=data.frame(param     =c("bnow","fnow","bnow","fnow"),
-                                              ref       =c("bmsy","fmsy","bnow","fnow"),
+setMethod('powerAnalysis',  signature(object='biodyn',ref='biodyn'), 
+          function(object,ref,test=data.frame(param     =c('bnow','fnow','bnow','fnow'),
+                                              ref       =c('bmsy','fmsy','bnow','fnow'),
                                               q         =c(     1,    0,      1,    0),
                                               lower.tail=c( FALSE, TRUE, FALSE, TRUE))){
   
@@ -55,22 +57,22 @@ setMethod('power',  signature(object='biodyn',ref="biodyn"),
   
   obj=object@mng
   ref=ref@mng
-  sd =obj[,"sd"]^2*(1/ref[,"hat"])^2 + ref[,"sd"]^2*(obj[,"hat"]/ref[,"hat"]^2)^2
-  hat=obj[,"hat"]/ref[,"hat"]
+  sd =obj[,'sd']^2*(1/ref[,'hat'])^2 + ref[,'sd']^2*(obj[,'hat']/ref[,'hat']^2)^2
+  hat=obj[,'hat']/ref[,'hat']
   mng=object@mng
-  mng[,"sd"] =sd
-  mng[,"hat"]=hat
+  mng[,'sd'] =sd
+  mng[,'hat']=hat
   
   res=maply(seq(dim(test)[1]),function(x,mng,test) {
-    par=ac(test[x,"param"])
-    pnorm(test[x,"q"],mng[par,"hat"],mng[par,"sd"],test[x,"lower.tail"])
+    par=ac(test[x,'param'])
+    pnorm(test[x,'q'],mng[par,'hat'],mng[par,'sd'],test[x,'lower.tail'])
     
   },mng=mng,test=test)
   
-  as(res,"FLPar")
+  as(res,'FLPar')
   dimnames(res)$X1=test$param
-  names(dimnames(res))="param"
-  res=as(res,"FLPar")
+  names(dimnames(res))='param'
+  res=as(res,'FLPar')
   
   if (its==1){
     object=FLCore:::iter(object,1)

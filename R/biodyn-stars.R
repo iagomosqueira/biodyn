@@ -82,7 +82,7 @@ rod=function(val,year=NULL){
   
   ShiftsVec<-Shift[!is.na(Shift)]
   
-  plot(val,type="l")
+  plot(val,type='l')
   mn=NULL
   sd=NULL
   ln=NULL
@@ -98,7 +98,7 @@ rod=function(val,year=NULL){
       
       polygon(x=c(1,Shift[i]+rgLN-1,Shift[i]+rgLN-1,1),
               y=c(regMean+regSD,regMean+regSD,regMean-regSD,regMean-regSD),
-              border=NA,col="#0000ff55")
+              border=NA,col='#0000ff55')
     }
     
     if(i>1){
@@ -120,7 +120,7 @@ rod=function(val,year=NULL){
                   regMean+regSD,
                   regMean-regSD,
                   regMean-regSD),
-              border=NA,col="#0000ff55")}
+              border=NA,col='#0000ff55')}
   }
   
   #print(ln)

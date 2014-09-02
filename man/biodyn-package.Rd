@@ -3,11 +3,10 @@
 \docType{package}
 \title{
 Biomass Dynamic Model
-~~ package title ~~
 }
 \description{
-implements a biomass dynamic model class
-~~ A concise (1-5 lines) description of the package ~~
+Implements a biomass dynamic model as an R class for fish stock abundance. The class can be used to fit catch and catch per unit effort to estimate stock abundance. It also has methods for evaluating the goodness of fit, estimating reference points and for modelling harvest control rules.
+
 }
 \details{
 \tabular{ll}{
@@ -55,7 +54,7 @@ Index:
 \preformatted{
 biodyn                  Biomass Dynamic Model Class
 biodyn-class            Class '"biodyn"'
-biodyn-package          Biomass Dynamic Model ~~ package title ~~
+biodyn-package          Biomass Dynamic Model 
 biodyns                 Creates a list of biodyn
 bmsy                    Biomass at Maximum Sustainable Yield.
 calcK                   Calculate Carrying Capacity
@@ -78,7 +77,7 @@ setControl<-            control
 setParams<-             setParams<-
 tac                     tac ,
 }
-~~ An overview of how to use the package, including the most important functions ~~
+
 }
 \author{
 Laurence Kell
@@ -132,8 +131,6 @@ Maintainer: Laurence Kell <laurie.kell@iccat.int>
 
 }
 
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation ~~
-~~ directory ~~
 \keyword{ package }
 \seealso{
 ~~ Optional links to other man pages, e.g. ~~

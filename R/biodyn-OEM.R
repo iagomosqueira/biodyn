@@ -15,11 +15,11 @@ survey=function(object,timing=FLQuant(0,dimnames=dimnames(m(object))),wt=stock.w
             
             res=FLQuant(res, dimnames=dimnames(object@stock))
       } else
-            stop("Correct units (f or hr) not specified in the harvest slot")
+            stop('Correct units (f or hr) not specified in the harvest slot')
       
       if (sd>0){
-           if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sd=sd),sd=sd) else 
-                     res=apply(res,2:6,function(x,sd) rlnorm(1,x,sd=sd),sd=sd)
+           if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sdlog=sd),sd=sd) else 
+                     res=apply(res,2:6,function(x,sd) rlnorm(1,x,sdlog=sd),sd=sd)
            }
         
       res}
@@ -41,15 +41,15 @@ u=function(object,partialf=FLQuant(1,dimnames=dimnames(m(object))),wt=catch.wt(o
               
               res=FLQuant(res, dimnames=dimnames(object@stock))
             } else
-              stop("Correct units (f or hr) not specified in the harvest slot")
+              stop('Correct units (f or hr) not specified in the harvest slot')
           
           if (sd>0){
-            if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sd=sd),sd=sd) else 
-                      res=apply(res,2:6,function(x,sd) rlnorm(1,x,sd=sd),sd=sd)}
+            if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sdlog=sd),sd=sd) else 
+                      res=apply(res,2:6,function(x,sd) rlnorm(1,x,sdlog=sd),sd=sd)}
           
           res} 
 
-cpueBiodym2Aspic=function(bd,type="B0",n=1,sd=0,log=TRUE){
+cpueBiodym2Aspic=function(bd,type='B0',n=1,sd=0,log=TRUE){
   
    type=toupper(type)
    effort=harvest(bd)
@@ -64,25 +64,25 @@ cpueBiodym2Aspic=function(bd,type="B0",n=1,sd=0,log=TRUE){
    switch(type,
           
           ## Error on Catch
-          CC={ res=cbind(name="CC sim",model.frame(mcf(FLQuants(effort=effort,catch=ctc,dev=dev)),drop=T, stringsAsFactors=FALSE))
+          CC={ res=cbind(name='CC sim',model.frame(mcf(FLQuants(effort=effort,catch=ctc,dev=dev)),drop=T, stringsAsFactors=FALSE))
                res=transform(res,catch=catch*dev,index=catch*dev/effort)
                res},
           
           ## Error on index
-          CE={ res=cbind(name="CE sim",model.frame(mcf(FLQuants(effort=effort,catch=ctc,dev=dev)),drop=T, stringsAsFactors=FALSE))
+          CE={ res=cbind(name='CE sim',model.frame(mcf(FLQuants(effort=effort,catch=ctc,dev=dev)),drop=T, stringsAsFactors=FALSE))
                res=transform(res,index=catch*dev/effort)
              },   
           
           ## Error on stock
-          B0=cbind(name="B0 sim",model.frame(mcf(FLQuants(stock=stock(bd)*dev)),drop=T, stringsAsFactors=FALSE)),
-          B1=cbind(name="I1 sim",model.frame(mcf(FLQuants(stock=(stock(bd)[,-dim(stock(bd))[2]]+stock(bd)[,-1]/2),dev=dev)),drop=T, stringsAsFactors=FALSE)),
-          B2={ res=cbind(name="I0 sim",model.frame(mcf(FLQuants(stock=stock(bd),dev=dev)),drop=T, stringsAsFactors=FALSE))
+          B0=cbind(name='B0 sim',model.frame(mcf(FLQuants(stock=stock(bd)*dev)),drop=T, stringsAsFactors=FALSE)),
+          B1=cbind(name='I1 sim',model.frame(mcf(FLQuants(stock=(stock(bd)[,-dim(stock(bd))[2]]+stock(bd)[,-1]/2),dev=dev)),drop=T, stringsAsFactors=FALSE)),
+          B2={ res=cbind(name='I0 sim',model.frame(mcf(FLQuants(stock=stock(bd),dev=dev)),drop=T, stringsAsFactors=FALSE))
                res},          
           
           ## Error on stock
-          I0=cbind(name="B0 sim",model.frame(mcf(FLQuants(index=.1*stock(bd)*dev)),drop=T, stringsAsFactors=FALSE)),
-          I1=cbind(name="I1 sim",model.frame(mcf(FLQuants(index=.1*(stock(bd)[,-dim(stock(bd))[2]]+stock(bd)[,-1]/2),dev=dev)),drop=T, stringsAsFactors=FALSE)),
-          I2={ res=cbind(name="I0 sim",model.frame(mcf(FLQuants(index=.1*stock(bd),dev=dev)),drop=T, stringsAsFactors=FALSE))
+          I0=cbind(name='B0 sim',model.frame(mcf(FLQuants(index=.1*stock(bd)*dev)),drop=T, stringsAsFactors=FALSE)),
+          I1=cbind(name='I1 sim',model.frame(mcf(FLQuants(index=.1*(stock(bd)[,-dim(stock(bd))[2]]+stock(bd)[,-1]/2),dev=dev)),drop=T, stringsAsFactors=FALSE)),
+          I2={ res=cbind(name='I0 sim',model.frame(mcf(FLQuants(index=.1*stock(bd),dev=dev)),drop=T, stringsAsFactors=FALSE))
                res}                
    )}
 

@@ -1,10 +1,10 @@
 
 # biodyns {{{
-biodyns <- setClass("biodyns", contains="FLComps",
+biodyns <- setClass('biodyns', contains='FLComps',
                    validity=function(object) {
                      # All items are biodyn
                      if(!all(unlist(lapply(object, is, 'biodyn'))))
-                       return("Components must be biodyn")	
+                       return('Components must be biodyn')	
                      
                      return(TRUE)})
 
@@ -12,16 +12,16 @@ setGeneric('biodyns', function(object, ...)
   standardGeneric('biodyns'))
 
 # constructor
-setMethod("biodyns", signature(object="biodyn"), function(object, ...) {
+setMethod('biodyns', signature(object='biodyn'), function(object, ...) {
   lst <- c(object, list(...))
   biodyns(lst)
 })
 
-setMethod("biodyns", signature(object="missing"),
+setMethod('biodyns', signature(object='missing'),
           function(...) {
             # empty
             if(missing(...)){
-              new("biodyns")
+              new('biodyns')
               # or not
             } else {
               args <- list(...)
@@ -32,13 +32,13 @@ setMethod("biodyns", signature(object="missing"),
           }
 )
 
-setMethod("biodyns", signature(object="list"),
+setMethod('biodyns', signature(object='list'),
           function(object, ...) {
             
             args <- list(...)
             
             # names in args, ... 
-            if("names" %in% names(args)) {
+            if('names' %in% names(args)) {
               names <- args[['names']]
             } else {
               # ... or in object,
@@ -48,14 +48,14 @@ setMethod("biodyns", signature(object="list"),
               } else {
                 names <- unlist(lapply(object, name))
                 # ... or 1:n
-                idx <- names == "NA" | names == ""
+                idx <- names == 'NA' | names == ''
                 if(any(idx))
                   names[idx] <- as.character(length(names))[idx]
               }
             }
             
             # desc & lock
-            args <- c(list(Class="biodyns", .Data=object, names=names),
+            args <- c(list(Class='biodyns', .Data=object, names=names),
                       args[!names(args)%in%'names'])
             
             return(

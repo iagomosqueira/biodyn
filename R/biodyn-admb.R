@@ -1,3 +1,5 @@
+utils::globalVariables('read.fit')
+
 # io.ADMB.R - 
 # FLCore/R/io.ADMB.R
 
@@ -5,23 +7,31 @@
 # Maintainer: Iago Mosqueira, JRC
 # $Id:  $
 
+utils::globalVariables(c('admbCor','maply',
+                         'str_trim',
+                         'laply',
+                         'llply',
+                         'upper.triangle',
+                         'str_trim'))
+
+
 readADMB<-function(file){
   ## read in data from ADMB Par or Rep file
-  dat  <-scan(file,what="",sep="\n",skip=1,quiet=TRUE)
+  dat  <-scan(file,what='',sep='\n',skip=1,quiet=TRUE)
   ## Get values
-  vals <-lapply(strsplit(dat[grep("#",dat,invert=TRUE)]," "), function(x) as.numeric(x[nchar(x)>0]))
+  vals <-lapply(strsplit(dat[grep('#',dat,invert=TRUE)],' '), function(x) as.numeric(x[nchar(x)>0]))
   ## name elements
-  names(vals)<-lapply(grep("#",dat,value=T),function(x) substr(x,3,nchar(x)))
+  names(vals)<-lapply(grep('#',dat,value=T),function(x) substr(x,3,nchar(x)))
   return(vals)}
 
 writeADMB<-function(x,file,append=FALSE){
-  cat("#", names(x[1]),"\n",file=file,append=append)
-  cat(x[[1]],"\n",file=file,append=TRUE)
+  cat('#', names(x[1]),'\n',file=file,append=append)
+  cat(x[[1]],'\n',file=file,append=TRUE)
   
   if (length(x)>1)
   for (i in 2:length(x)){
-    cat("#", names(x[i]),"\n",file=file,append=TRUE)
-    cat(x[[i]],"\n",file=file,append=TRUE)}}
+    cat('#', names(x[i]),'\n',file=file,append=TRUE)
+    cat(x[[i]],'\n',file=file,append=TRUE)}}
 
 
 read.admb <-
@@ -54,7 +64,7 @@ admbFit <-
 function(ifile)
 {
 	# __Example:             
-	#	file <-("~/admb/simple")
+	#	file <-('~/admb/simple')
 	#	A <- reptoRlist(file)
 	#	Note there is no extension on the file name.
 	
@@ -80,7 +90,7 @@ function(ifile)
 	ret$cor[lower.tri(ret$cor)] <- t(ret$cor)[lower.tri(ret$cor)] 
 	ret$cov<-ret$cor*(ret$std%o%ret$std)
 	
-	class(ret) <-"admb"
+	class(ret) <-'admb'
 	return(ret)
 }
 
@@ -92,14 +102,14 @@ function(fn)
 	# with all the elemements in the report file.
 	# In the REPORT_SECTION of the AMDB template use 
 	# the following format to output objects:
-	#  	report<<"object \n"<<object<<endl;
+	#  	report<<'object \n'<<object<<endl;
 	#
 	# The part in quotations becomes the list name.
 	# Created By Steven Martell
 	options(warn=-1)  #Suppress the NA message in the coercion to double
 	
 	
-	ifile=scan(fn,what="character",flush=TRUE,blank.lines.skip=FALSE,quiet=TRUE)
+	ifile=scan(fn,what='character',flush=TRUE,blank.lines.skip=FALSE,quiet=TRUE)
 	idx=sapply(as.double(ifile),is.na)
 	vnam=ifile[idx] #list names
 	nv=length(vnam) #number of objects
@@ -110,8 +120,8 @@ function(fn)
 		ir=match(vnam[i],ifile)
 		if(i!=nv) irr=match(vnam[i+1],ifile) else irr=length(ifile)+1 #next row
 		dum=NA
-		if(irr-ir==2) dum=as.double(scan(fn,skip=ir,nlines=1,quiet=TRUE,what=""))
-		if(irr-ir>2) dum=as.matrix(read.table(fn,skip=ir,nrow=irr-ir-1,fill=TRUE))
+		if(irr-ir==2) dum=as.double(scan(fn,skip=ir,nlines=1,quiet=TRUE,what=''))
+		if(irr-ir>2) dum=as.matrix(read.table(fn,skip=ir,nrows=irr-ir-1,fill=TRUE))
 
 		if(is.numeric(dum))#Logical test to ensure dealing with numbers
 		{
@@ -127,25 +137,25 @@ read.psv <-function(fn, nsamples=10000){
 	#This function reads the binary output from ADMB
 	#-mcsave command line option.
 	#fn = paste(ifile,'.psv',sep='')
-	filen <- file(fn, "rb")
+	filen <- file(fn, 'rb')
 	nopar <- readBin(filen, what = integer(), n = 1)
 	mcmc <- readBin(filen, what = numeric(), n = nopar * nsamples)
 	mcmc <- matrix(mcmc, byrow = TRUE, ncol = nopar)
 	close(filen)
 	return(mcmc)}
 
-getADMBHessian <- function(hess="admodel.hes"){
+getADMBHessian <- function(hess='admodel.hes'){
   ## This function reads in all of the information contained in the
   ## admodel.hes file. Some of this is needed for relaxing the covariance
   ## matrix, and others just need to be recorded and rewritten to file so ADMB
-  ## "sees" what it's expecting.
-  filename <- file(hess, "rb")
+  ## 'sees' what it's expecting.
+  filename <- file(hess, 'rb')
   on.exit(close(filename))
-  num.pars <- readBin(filename, "integer", 1)
-  hes.vec <- readBin(filename, "numeric", num.pars^2)
+  num.pars <- readBin(filename, 'integer', 1)
+  hes.vec <- readBin(filename, 'numeric', num.pars^2)
   hes <- matrix(hes.vec, ncol=num.pars, nrow=num.pars)
-  hybrid_bounded_flag <- readBin(filename, "integer", 1)
-  scale <- readBin(filename, "numeric", num.pars)
+  hybrid_bounded_flag <- readBin(filename, 'integer', 1)
+  scale <- readBin(filename, 'numeric', num.pars)
   result <- list(num.pars=num.pars, hes=hes,
                  hybrid_bounded_flag=hybrid_bounded_flag, scale=scale)
   return(result)
@@ -168,27 +178,27 @@ cv2=function(obj){
   
   cov.bounded}
 
-#file="/home/laurie/Desktop/gcode/mse4mfcl/ALB/papers/SCRS/SCRS2013-117/Inputs/pella.hst"
+#file='/home/laurie/Desktop/gcode/mse4mfcl/ALB/papers/SCRS/SCRS2013-117/Inputs/pella.hst'
 
 admbProfile=function(file) {
   
-  dat =scan(file, what = "", sep = "\n", skip = 1,quiet=TRUE)
-  nms =c("",unlist(lapply(grep("#", dat, value = T), function(x) str_trim(substr(x,2, nchar(x))))))
+  dat =scan(file, what = '', sep = '\n', skip = 1,quiet=TRUE)
+  nms =c('',unlist(lapply(grep('#', dat, value = T), function(x) str_trim(substr(x,2, nchar(x))))))
   
-  brks=seq(length(dat))[substr(dat,1,1)=="#"]
-  brks=data.frame("from"=c(1,brks+1),"to"=c(1,brks[-1]-1,length(dat)))
+  brks=seq(length(dat))[substr(dat,1,1)=='#']
+  brks=data.frame('from'=c(1,brks+1),'to'=c(1,brks[-1]-1,length(dat)))
   
-  vals=mlply(brks, function(from,to,dat) as.numeric(unlist(strsplit(unlist(dat[from:to])," "))),dat=dat)
+  vals=mlply(brks, function(from,to,dat) as.numeric(unlist(strsplit(unlist(dat[from:to]),' '))),dat=dat)
   names(vals)=nms
   
   # when do profiles start?
-  flag=seq(length(nms))[substr(nms,1,4)=="rand"]
+  flag=seq(length(nms))[substr(nms,1,4)=='rand']
   
   prf=ldply(vals[-(1:(flag))], function(x) t(array(x,c(2,length(x)/2))))
-  names(prf)=c("param","value","p")
+  names(prf)=c('param','value','p')
   
   vals=vals[1:flag]
-  vals[["profile"]]=prf
+  vals[['profile']]=prf
   
   return(vals)}
 
@@ -196,7 +206,7 @@ admbProfile=function(file) {
 admbCor<-function(ifile)
   {
     # __Example:             
-    #	file <-("~/admb/simple")
+    #	file <-('~/admb/simple')
     #	A <- reptoRlist(file)
     #	Note there is no extension on the file name.
     
@@ -222,7 +232,7 @@ admbCor<-function(ifile)
     ret$cor[lower.tri(ret$cor)] <- t(ret$cor)[lower.tri(ret$cor)] 
     ret$cov<-ret$cor*(ret$std%o%ret$std)
     
-    class(ret) <-"admb"
+    class(ret) <-'admb'
     return(ret)}
 
 

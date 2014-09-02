@@ -1,12 +1,14 @@
+utils::globalVariables(c('laply','llply','laply'))
+
 combineFlr=function(...){
 
   object=list(...)
-  if ("list" %in% is(object[[1]])) object=object[[1]]
+  if ('list' %in% is(object[[1]])) object=object[[1]]
   dmns=dimnames(object[[1]])
   dmns$iter=seq(sum(laply(object,function(x) dims(x)$iter)))
  
-  if ("FLQuant" %in% is(object[[1]]))  res=FLQuant(NA,dimnames=dmns)
-  if ("FLPar"   %in% is(object[[1]]))  res=FLPar(  NA,dimnames=dmns)
+  if ('FLQuant' %in% is(object[[1]]))  res=FLQuant(NA,dimnames=dmns)
+  if ('FLPar'   %in% is(object[[1]]))  res=FLPar(  NA,dimnames=dmns)
   
   its=llply(object,function(x) seq(dims(x)$iter))
   
@@ -20,7 +22,7 @@ combineFlr=function(...){
 combineFlr=function(...){
   
   object=list(...)
-  if ("list" %in% is(object[[1]])) object=object[[1]]
+  if ('list' %in% is(object[[1]])) object=object[[1]]
   dmns=dimnames(object[[1]])
   dmns$iter=seq(sum(laply(object,function(x) dim(x)[length(dim(x))])))
   

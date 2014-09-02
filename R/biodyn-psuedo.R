@@ -16,12 +16,12 @@
 #' @rdname psuedo
 #'
 #' @examples
-#' /dontrun{
+#' \dontrun{
 #'    bd=psuedo(bd,FLQuant(10000,dimnames=list(year=2009:2012)))
 #'    plot(bd)}
 setGeneric('psuedo',   function(object,catch,...)    standardGeneric('psuedo'))
 
-setMethod('psuedo', signature(object="biodyn",catch="FLQuant"),  
+setMethod('psuedo', signature(object='biodyn',catch='FLQuant'),  
     function(object,catch,cov=vcov(object)[modelParams(model(object)),modelParams(model(object))],rand=TRUE){
 
   if (dims(catch)$iter>1 & dims(object)$iter==1)

@@ -1,3 +1,5 @@
+utils::globalVariables('aaply')
+
 ####################################################################################
 ####################################################################################
 ####################################################################################
@@ -55,8 +57,8 @@ mseSBT1<-function(om,brp,srDev,
   ## Loop round years
   tac=catch(om)[,ac(start-1)]
   for (iYr in seq(start,end,interval)){
-    #iYr = (start:(range(om,"maxyear")-2))[1]
-    cat("===================", iYr, "===================\n")
+    #iYr = (start:(range(om,'maxyear')-2))[1]
+    cat('===================', iYr, '===================\n')
     
     cpue=window(cpue,end=iYr)
     cpue[,ac(iYr-(interval:1)+1)]=stock(om)[,ac(iYr-(interval:1)+1)]*uDev[,ac(iYr-(interval:1)+1)]
@@ -83,18 +85,18 @@ hcrSBT2=function(adult,juve,yrAdult,yrJuve,refJuve=-(1:5),tac,tarCatch,eb=0.25,e
   flag    =juveIdx<juveRef
   rBit    =(juveIdx/juveRef)*(1+ifelse(flag,er,-er))
 
-# cat("ref Juve:",   as.integer(mean(refJuve)),
-#     "\t Juve:",    as.integer(mean(juve)),
-#     "\t ratio:",   mean(juve/refJuve),
-#     "\t rBit:",    mean(rBit),"\n")
+# cat('ref Juve:',   as.integer(mean(refJuve)),
+#     '\t Juve:',    as.integer(mean(juve)),
+#     '\t ratio:',   mean(juve/refJuve),
+#     '\t rBit:',    mean(rBit),'\n')
 
   res =0.5*(tac+cBit*rBit)
   
-#   cat("TAC:",        as.integer(mean(tac)),
-#       "\t ratio:",   as.integer((mean(adult/refAdult))),
-#       "\t delta:",   as.integer((mean(cBit))),
-#       "\t New TAC:", as.integer(mean(res)),
-#       "\t rBit:",    mean(rBit),"\n")
+#   cat('TAC:',        as.integer(mean(tac)),
+#       '\t ratio:',   as.integer((mean(adult/refAdult))),
+#       '\t delta:',   as.integer((mean(cBit))),
+#       '\t New TAC:', as.integer(mean(res)),
+#       '\t rBit:',    mean(rBit),'\n')
 
   dmns=dimnames(tac)
 print(dmns$year)
@@ -142,8 +144,8 @@ mseSBT2<-function(om,brp,srDev,yrAdult,yrJuve,refJuve=-(1:5),tarCatch,
   ## Loop round years
   tac=catch(om)[,ac(start-1)]
   for (iYr in seq(start,end,interval)){
-     #iYr = (start:(range(om,"maxyear")-2))[1]
-    cat("===================", iYr, "===================\n")
+     #iYr = (start:(range(om,'maxyear')-2))[1]
+    cat('===================', iYr, '===================\n')
     
     adult=window(adult,end=iYr)
     adult[,ac(iYr-(interval:1)+1)]=ssb(om)[,ac(iYr-(interval:1)+1)]*uDev[,ac(iYr-(interval:1)+1)]

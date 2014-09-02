@@ -1,4 +1,5 @@
-##############################################################
+utils::globalVariables('laply')
+
 #' tac , 
 #' 
 #' Calculates the Total Allowable Catch for a given harvest rate and stock biomass
@@ -14,8 +15,9 @@
 #' @rdname tac
 #'
 #' @examples
-#' #tac("logistic",FLPar(msy=100,k=500))
-#'
+#' \dontrun{
+#' tac('logistic',FLPar(msy=100,k=500))
+#' }
 setMethod( 'tac', signature(object='biodyn'),
            function(object,harvest,...){
 
@@ -37,8 +39,7 @@ setMethod( 'tac', signature(object='biodyn'),
              
              return(catch(object)[,yrs])})
 
-##############################################################
-#' hcrParams 
+#' hcrParam
 #' 
 #' Combines reference points into the HCR breakpts
 #'
@@ -54,13 +55,14 @@ setMethod( 'tac', signature(object='biodyn'),
 #' @rdname tac
 #'
 #' @examples
-#' #tac("logistic",FLPar(msy=100,k=500))
-#'
-hcrParams=function(ftar,btrig,fmin,blim){
+#' \dontrun{
+#' tac('logistic',FLPar(msy=100,k=500))
+#' }
+hcrParam=function(ftar,btrig,fmin,blim){
   
   setNms=function(x,nm,nits){
     
-    names(dimnames(x))[1]="params"
+    names(dimnames(x))[1]='params'
     dimnames(x)[[1]]     =nm
     if (nits!=dims(x)$iter)
       x=propagate(x,nits)
@@ -69,48 +71,49 @@ hcrParams=function(ftar,btrig,fmin,blim){
   
   nits=max(laply(list(ftar,btrig,fmin,blim), function(x) dims(x)$iter))
   
-  ftar =setNms(ftar, nm="ftar", nits)
-  btrig=setNms(btrig,nm="btrig",nits)
-  fmin =setNms(fmin, nm="fmin", nits)
-  blim =setNms(blim, nm="blim", nits)
+  ftar =setNms(ftar, nm='ftar', nits)
+  btrig=setNms(btrig,nm='btrig',nits)
+  fmin =setNms(fmin, nm='fmin', nits)
+  blim =setNms(blim, nm='blim', nits)
   
-  if (nits==1) res=FLPar(  array(c(ftar,btrig,fmin,blim),c(4,nits),dimnames=list(params=c("ftar","btrig","fmin","blim"),iter=seq(nits)))) else
-               res=FLPar(t(array(c(ftar,btrig,fmin,blim),c(nits,4),dimnames=list(iter=seq(nits),params=c("ftar","btrig","fmin","blim")))))
+  if (nits==1) res=FLPar(  array(c(ftar,btrig,fmin,blim),c(4,nits),dimnames=list(params=c('ftar','btrig','fmin','blim'),iter=seq(nits)))) else
+               res=FLPar(t(array(c(ftar,btrig,fmin,blim),c(nits,4),dimnames=list(iter=seq(nits),params=c('ftar','btrig','fmin','blim')))))
   
-  units(res)="harvest"
+  units(res)='harvest'
   return(res)}
-  #return(as(res,"FLQuant"))}
+  #return(as(res,'FLQuant'))}
   
-##############################################################
-#' HCR
+#' hcr
 #' 
 #' Harvest Control Rule, calculates F, or Total Allowable Catch (TAC) based on a hockey stock harvest control rule.
 #'
 #' @param  \code{object} an object of class \code{biodyn} or
-#' @param  \code{params} \code{FLPar} object with hockey stick HCR parameters
-#' @param  \code{yrs}, numeric vector with yrs for HCR prediction
-#' @param  \code{refYrs}, numeric vector with years used to for stock/ssb in HCR
-#' @param  \code{tac}, \code{logical} should return value be TAC rather than F?
-#' @param  \code{bndF}, \code{vector} with bounds on iter-annual variability on  F
-#' @param  \code{bndTac}, \code{vector} with bounds on iter-annual variability on TAC
+#' @param  \code{params} \code{FLPar} object with hockey stick HCR parameters, see hcrParam
+#' @param  \code{yrs} numeric vector with yrs for HCR prediction
+#' @param  \code{refYrs} numeric vector with years used to for stock/ssb in HCR
+#' @param  \code{tac} \code{logical} should return value be TAC rather than F?
+#' @param  \code{bndF} \code{vector} with bounds (i.e.min and max values) on iter-annual variability on  F
+#' @param  \code{bndTac} \code{vector} with bounds (i.e. min and max values) on iter-annual variability on TAC
 #' 
 #' @return \code{FLPar} object with value(s) for F or TAC if tac==TRUE
 #' 
-#' @seealso \code{\link{bmsy}}, \code{\link{fmsy}}, \code{\link{fwd}}, \code{\link{hcr} and \code{\link{hcrParams}}
+#' @seealso \code{\link{bmsy}}, \code{\link{fmsy}}, \code{\link{fwd}} and \code{\link{hcrParam}}
 #' 
 #' @export
 #' @docType methods
 #' @rdname hcr
 #'
 #' @examples
-#' #hcr("logistic",FLPar(msy=100,k=500))
-#'
+#' \dontrun{
+#' hcr('logistic',FLPar(msy=100,k=500))
+#' }
+setGeneric('hcr', function(object,...) standardGeneric('hcr'))
 setMethod('hcr', signature(object='biodyn'),
  function(object, 
-           params=hcrParams(ftar =0.70*refpts(object)["fmsy"],
-                            btrig=0.80*refpts(object)["bmsy"],
-                            fmin =0.01*refpts(object)["fmsy"],
-                            blim =0.40*refpts(object)["bmsy"]),
+           params=hcrParam(ftar =0.70*refpts(object)['fmsy'],
+                           btrig=0.80*refpts(object)['bmsy'],
+                           fmin =0.01*refpts(object)['fmsy'],
+                           blim =0.40*refpts(object)['bmsy']),
            stkYrs=max(as.numeric(dimnames(stock(object))$year)),
            refYrs=max(as.numeric(dimnames(catch(object))$year)),
            hcrYrs=max(as.numeric(dimnames(stock(object))$year)),
@@ -124,10 +127,10 @@ setMethod('hcr', signature(object='biodyn'),
            ...) {
   ## HCR
   dimnames(params)$params=tolower(dimnames(params)$params)
-  params=as(params,"FLQuant")  
-  #if (blim>=btrig) stop("btrig must be greater than blim")
-  a=(params["ftar"]-params["fmin"])/(params["btrig"]-params["blim"])
-  b=params["ftar"]-a*params["btrig"]
+  params=as(params,'FLQuant')  
+  #if (blim>=btrig) stop('btrig must be greater than blim')
+  a=(params['ftar']-params['fmin'])/(params['btrig']-params['blim'])
+  b=params['ftar']-a*params['btrig']
 
   ## Calc F
   # bug
@@ -135,10 +138,10 @@ setMethod('hcr', signature(object='biodyn'),
   stk=FLCore:::apply(stock(object)[,ac(stkYrs)],6,mean)
   
   rtn=(stk%*%a)  
-  rtn=FLCore:::sweep(rtn,2:6,b,"+")
+  rtn=FLCore:::sweep(rtn,2:6,b,'+')
 
-  fmin=as(params["fmin"],"FLQuant")
-  ftar=as(params["ftar"],"FLQuant")
+  fmin=as(params['fmin'],'FLQuant')
+  ftar=as(params['ftar'],'FLQuant')
   for (i in seq(dims(object)$iter)){
     FLCore:::iter(rtn,i)[]=max(FLCore:::iter(rtn,i),FLCore:::iter(fmin,i))
     FLCore:::iter(rtn,i)[]=min(FLCore:::iter(rtn,i),FLCore:::iter(ftar,i))} 
@@ -214,24 +217,26 @@ setMethod('hcr', signature(object='biodyn'),
 #' @rdname hcrPlot
 #'
 #' @examples
+#' \dontrun{
+#' }
 setMethod('hcrPlot', signature(object='biodyn'),
  function(object,params=FLPar(ftar=0.7, btrig=0.7, fmin=0.01, blim=0.20),maxB=1,rel=TRUE){
   
-  pts=rbind(cbind(refpt="Target",model.frame(rbind(bmsy(object)*c(params["btrig"]),
-                                                   fmsy(object)*c(params["ftar"])))),
-            cbind(refpt="Limit", model.frame(rbind(bmsy(object)*c(params["blim"]),
-                                                   fmsy(object)*c(params["fmin"])))))
+  pts=rbind(cbind(refpt='Target',model.frame(rbind(bmsy(object)*c(params['btrig']),
+                                                   fmsy(object)*c(params['ftar'])))),
+            cbind(refpt='Limit', model.frame(rbind(bmsy(object)*c(params['blim']),
+                                                   fmsy(object)*c(params['fmin'])))))
   pts.=pts
-  pts.[1,"bmsy"]=params(object)["k"]*maxB
-  pts.[2,"bmsy"]=0
-  pts.[,1]=c("")
+  pts.[1,'bmsy']=params(object)['k']*maxB
+  pts.[2,'bmsy']=0
+  pts.[,1]=c('')
   
   pts=rbind(pts.[1,],pts[1:2,],pts.[2,])
   
-  names(pts)[2:3]=c("stock","harvest")
+  names(pts)[2:3]=c('stock','harvest')
   
   if (rel){
-    pts[,"stock"]=pts[,"stock"]/bmsy(object)
-    pts[,"harvest"]=pts[,"harvest"]/fmsy(object)}
+    pts[,'stock']=pts[,'stock']/bmsy(object)
+    pts[,'harvest']=pts[,'harvest']/fmsy(object)}
   
   pts})

@@ -7,43 +7,13 @@ Depends:
     R(>= 3.0.1),
     FLCore(>= 2.2)
 Imports:
-     ggplotFL(>= 0.2),
-     plyr
+    FLash,
+    FLBRP,
+    ggplotFL(>= 0.2),
+    plyr,
+    numDeriv,
+    matrixcalc
 Maintainer: Laurence Kell <laurie.kell@iccat.int>
-Collate:
-    'biodyn-class.R'
-    'plotComp.R'
-    'biodyn-accessors.R'
-    'biodyn-generic.R'
-    'biodyn-methods.R'
-    'biodyn-constructors.R'
-    'biodyn-coerce.R'
-    'biodyn-control.R'
-    'biodyns.R'
-    'biodyn-pella.R'
-    'biodyn-profile.R'
-    'biodyn-mng.R'
-    'biodyn-diags.R'
-    'biodyn-kobe.R'
-    'biodyn-plots.R'
-    'biodyn-fwd.R'
-    'biodyn-msy.R'
-    'biodyn-hcr.R'
-    'biodyn-mse.R'
-    'biodyn-OEM.R'
-    'biodyn-admb.R'
-    'biodyn-cpp.R'
-    'biodyn-psuedo.R'
-    'biodyn-ll.R'
-    'biodyn-combine.R'
-    'biodyn-delta.R'
-    'biodyn-mcmc.R'
-    'biodyn-mvn.R'
-    'biodyn-stars.R'
-    'sbt-mse.R'
-    'biodyn-mse-application.R'
-    'biodyn-tseries.R'
-    'bdm-methods.R'
 License: GPL-2
 LazyLoad: Yes
 LazyData: No

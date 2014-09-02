@@ -1,4 +1,6 @@
-  ##############################################################
+utils::globalVariables(c('profileGrid'))
+utils::globalVariables('maply')
+
 #' profile
 #'
 #' Profiles biodyn  
@@ -12,58 +14,52 @@
 #' @rdname fit
 #'
 #' @examples
-#' /dontrun{
+#' \dontrun{
 #' library(aspic)
 #' library(biodyn)
 #' data(asp)
-#' index=FLQuant(asp@index$index,dimnames=list(year=asp@index$year))
-#' bd=as(asp,"biodyn")
-#' setParams(bd)  =index
-#' setControl(bd,.01,100) =params(bd)
-#' res=profile(bd,index,which="r",fixed=c("b0","p"),range=c(.95,1.1),maxstep=51)
-#' ggplot(res)+geom_line(aes(r,ll))
 #' }
 
 # ### debugging stuff
 # data(bd)
-# fitted=biodyn(factor("pellat"),params(bd),catch=catch(bd))
+# fitted=biodyn(factor('pellat'),params(bd),catch=catch(bd))
 # index=rlnorm(1,log(stock(bd)),.2)[,-60]
 # setParams(fitted)     =index
 # 
 # 
 # attach(list(maxsteps=11, range=0.5, ci=c(0.25, 0.5, 0.75, 0.95),
 #             plot=TRUE,fixed=c()))
-# which="r"
-# fixed=c("p","b0")
+# which='r'
+# fixed=c('p','b0')
 # ###
-# res=profile(bd,which="r",fixed=c("b0","p"),index,range=c(1.2,3.0))
+# res=profile(bd,which='r',fixed=c('b0','p'),index,range=c(1.2,3.0))
 # ggplot(res)+geom_line(aes(r,ll))
 # v <- ggplot(res, aes(r, k, z = ll))
 # v <- ggplot(res, aes(r, k, z = ll))+ stat_contour(aes(colour = ..level..), size = 1)
-setMethod("profile", signature(fitted="biodyn"),
+setMethod('profile', signature(fitted='biodyn'),
       function(fitted,index,
                    which,
                    range=seq(0.5,1.5,length.out=21),
                    fn   =function(x) cbind(model.frame(params(x)),ll=model.frame(x@ll)[,1],model.frame(refpts(x))[,-4],
-                                           stock  =c(stock(  x)[,ac(range(x)["maxyear"])]%/%bmsy(x)),
-                                           harvest=c(harvest(x)[,ac(range(x)["maxyear"])]%/%fmsy(x))),
+                                           stock  =c(stock(  x)[,ac(range(x)['maxyear'])]%/%bmsy(x)),
+                                           harvest=c(harvest(x)[,ac(range(x)['maxyear'])]%/%fmsy(x))),
                    run  =TRUE,...){
   
-        if (dims(index)$maxyear>=dims(stock(fitted))$maxyear) stop("index years greater in length than stock")
-        if (dims(fitted)$iter>1) stop("can only be done for a single iter")
+        if (dims(index)$maxyear>=dims(stock(fitted))$maxyear) stop('index years greater in length than stock')
+        if (dims(fitted)$iter>1) stop('can only be done for a single iter')
                  
         if (dim(fitted@control)[3]==1){
            fitted@control=propagate(fitted@control,length(range)^length(which))
           
            sq=list(range)
-           sq=do.call("expand.grid",sq[rep(1,length(which))])
+           sq=do.call('expand.grid',sq[rep(1,length(which))])
        
            for (i in seq(length(which))){
-               fitted@control[which[i],"val"]=     params(fitted)[which[i]]*sq[,i]
-               fitted@control[which[i],"min"]=min(fitted@control[which[i],"val"])*range[1]
-               fitted@control[which[i],"max"]=max(fitted@control[which[i],"val"])*range[2]}
+               fitted@control[which[i],'val']=     params(fitted)[which[i]]*sq[,i]
+               fitted@control[which[i],'min']=min(fitted@control[which[i],'val'])*range[1]
+               fitted@control[which[i],'max']=max(fitted@control[which[i],'val'])*range[2]}
 
-           fitted@control[which,"phase"]=-1
+           fitted@control[which,'phase']=-1
            }
         else
           fitted@control=profileGrid(fitted@control,which,range)
@@ -86,7 +82,7 @@ setMethod("profile", signature(fitted="biodyn"),
 profileGrid=function(object,which,range=seq(0.95,1.05,length.out=11)){
     
     res=maply(range,function(x,which,ctl) {
-      ctl[which,"val"]=ctl[which,"val"]*x
+      ctl[which,'val']=ctl[which,'val']*x
       ctl}, which=which, ctl=object)
     
     res=aperm(res,c(2:4,1))

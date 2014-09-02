@@ -1,3 +1,5 @@
+utils::globalVariables('llply')
+
 #' mvn
 #' 
 #' @description 
@@ -10,19 +12,21 @@
 #' @param fwd, \code{logical} do you want to simuate historic time series of stock biomass?, default is \code{FALSE} 
 #' @return \code{biodyn} with simuated time series 
 #' @export
-#' @docType functions
+#' @docType methods
 #' @rdname mvn
 #' 
 #' @examples
+#' \dontrun{
 #' x=1
-mvn=function(object,n,nms=dimnames(object@control[object@control[,"phase",]>0,])$params,
+#' }
+mvn=function(object,n,nms=dimnames(object@control[object@control[,'phase',]>0,])$params,
                       fwd=FALSE,params=TRUE){
   
   res=mvrnorm(n,params(object)[nms,drop=T],vcov(object)[nms,nms,drop=T])
   dmns=list(iter=seq(n),params=nms)
   res=array(res,dim=unlist(llply(dmns,length)),dimnames=dmns)
   res=FLPar(t(res))
-  units(res)="NA"
+  units(res)='NA'
   
   params(object)=propagate(params(object),n)
   object@stock  =propagate(stock( object),n)

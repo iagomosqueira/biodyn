@@ -1,3 +1,5 @@
+utils::globalVariables(c('geom_path','scale_size_manual','scale_linetype_manual'))
+
 # plotComp.R - 
 # ggplotFL/R/plotComp.R
 
@@ -13,19 +15,19 @@ whooow  =function(x,fn,probs)
           
 # plotComp {{{
 plotComp = function(x, fn=NULL, probs=c(0.75,0.50,0.25), size=c(0.5,1.0,0.5),
-  lty=c(2,1,2), facet=facet_wrap(~qname, scale="free"),worm=NA) {
+  lty=c(2,1,2), facet=facet_wrap(~qname, scale='free'),worm=NA) {
 
   if (dims(x)$iter>=length(probs)){  
     res = whooow(x,fn,probs)
       p1  = ggplot(res) + geom_path(aes(x=year,y=data,group=iter,size=iter,lty=iter)) +
-                        scale_size_manual(    values=size, name="Quantile") +
-                        scale_linetype_manual(values=lty , name="Quantile")
+                        scale_size_manual(    values=size, name='Quantile') +
+                        scale_linetype_manual(values=lty , name='Quantile')
   }else{
     res = whooow(x,fn,0.5)
     p1  = ggplot(res) + geom_path(aes(x=year,y=data))    }
 
   p1 = p1 +  expand_limits(y = 0) +
-             xlab("Year") + ylab("") +
+             xlab('Year') + ylab('') +
              facet
 
   if (length(worm) > 0)
@@ -39,7 +41,7 @@ plotComp = function(x, fn=NULL, probs=c(0.75,0.50,0.25), size=c(0.5,1.0,0.5),
 
 # plotComps {{{
 plotComps = function(x, fn=NULL, probs=c(0.75,0.50,0.25), size=c(0.5,1.0,0.5),
-  lty=c(2,1,2), facet=facet_wrap(~qname,scale="free")) {
+  lty=c(2,1,2), facet=facet_wrap(~qname,scale='free')) {
 
   x=x[seq(length(x))]
   
@@ -48,24 +50,24 @@ plotComps = function(x, fn=NULL, probs=c(0.75,0.50,0.25), size=c(0.5,1.0,0.5),
   else
     res = ldply(x, whooow, fn=fn, probs=0.5)
 
-  if ("X1" %in% names(res)) 
-    names(res)[names(res)=="X1"]=".id"
+  if ('X1' %in% names(res)) 
+    names(res)[names(res)=='X1']='.id'
   
-  if (".id" %in% names(res)) 
+  if ('.id' %in% names(res)) 
     res$.id  = factor(res$.id)
   
   res$iter = factor(res$iter)
   
   if (length(unique(res$iter))>=length(probs)){
     p1  = ggplot(res) + geom_path(aes(x=year,y=data,group=.id:iter,size=iter,col=.id)) +
-                        scale_size_manual(    values=size, name="Quantile") +
-                        scale_linetype_manual(values=lty , name="Quantile")
+                        scale_size_manual(    values=size, name='Quantile') +
+                        scale_linetype_manual(values=lty , name='Quantile')
   }else{
     p1  = ggplot(res) + geom_path(aes(x=year,y=data,group=.id,col=.id)) 
     }  
 
     p1= p1 + expand_limits(y = 0) +
-           xlab("Year") + ylab("") +
+           xlab('Year') + ylab('') +
            facet
 
    p1} 

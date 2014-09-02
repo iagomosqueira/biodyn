@@ -1,11 +1,13 @@
+utils::globalVariables('calcSigmaFLQ')
+
 # calcSigma
-calcSigma=function(obs,hat=rep(0,length(obs)),error="log"){
+calcSigma=function(obs,hat=rep(0,length(obs)),error='log'){
   SS   <-sum((obs-hat)^2,na.rm=T)
   
   return((SS/length(hat))^.5)}
 
 # calcLogLik
-calcLogLik<-function(obs,hat=rep(0,length(obs)),error="log",type=1){
+calcLogLik<-function(obs,hat=rep(0,length(obs)),error='log',type=1){
   
   logl<-function(se,obs,hat){
     SS<-sum((obs-hat)^2)
@@ -18,7 +20,7 @@ calcLogLik<-function(obs,hat=rep(0,length(obs)),error="log",type=1){
   se<-calcSigma(obs,hat,error=error)
   
   if (type==1) return(logl(se,obs,hat)) else
-    if (type==2) return(-sum(dnorm(obs, hat, se, log=(error=="log"), na.rm=TRUE))) else
+    if (type==2) return(-sum(dnorm(obs, hat, se, log=(error=='log'), na.rm=TRUE))) else
       if (type==3) return(sum((obs-hat)^2))}
 
 
@@ -31,7 +33,7 @@ llSigma=function(obs,hat=obs*0,dims=c(1,3:6)){
   
   return((SS/n)^.5)}
 
-llQ=function(obs,hat,dims=c(1,3:6),error="log"){
+llQ=function(obs,hat,dims=c(1,3:6),error='log'){
   
   yrs=dimnames(obs)$year[dimnames(obs)$year %in% dimnames(hat)$year]
   obs=obs[,yrs]
@@ -58,7 +60,7 @@ llQ=function(obs,hat,dims=c(1,3:6),error="log"){
   return(res)}
 
 # calcLogLik
-calcLl<-function(obs,hat=obs*0,error="log",type=1){
+calcLl<-function(obs,hat=obs*0,error='log',type=1){
   
   hat=hat[,dimnames(obs)$year]
   
@@ -77,7 +79,7 @@ calcLl<-function(obs,hat=obs*0,error="log",type=1){
   if (type==2) return(apply(obs-hat, dims, 
                       function(x) {
                            se=llSigma(x)  
-                          -sum(dnorm(x, 0, se, log=(error=="log")))}))
+                          -sum(dnorm(x, 0, se, log=(error=='log')))}))
   if (type==3) return(apply(obs-hat, dims, function(x) sum(x^2)))
 
   }

@@ -16,42 +16,37 @@
 #' @seealso \code{\link{kobe}}, \code{\link{mseBiodyn}}
 #' 
 #' @examples
-#'    \dontrun{tseries(ple4,FLBRP(ple4))
+#'  \dontrun{tseries(ple4,FLBRP(ple4))}
 #'    
 setGeneric('tseries',function(object,refpts,...)    standardGeneric('tseries'))
 
-
-tseriesFn2=function(stk,brp,proxy="msy"){
-  
-  res=FLQuants(stock  =stock(stk)%/%FLBRP:::refpts(brp)[proxy,"biomass"],
-               ssb    =ssb(  stk)%/%FLBRP:::refpts(brp)[proxy,"ssb"],
-               rec    =rec(  stk)%/%FLBRP:::refpts(brp)[proxy,"rec"],
-               catch  =catch(stk)%/%FLBRP:::refpts(brp)[proxy,"yield"],
-               fbar   =fbar( stk)%/%FLBRP:::refpts(brp)[proxy,"harvest"],
-               harvest=(catch(stk)/stock(stk))%/%(FLBRP:::refpts(brp)[proxy,"yield"]/FLBRP:::refpts(brp)[proxy,"biomass"]))
-  
-  model.frame(res,drop=T)}
-
-
 tseriesFn1=function(stk){
   
-  res=FLQuants(stock     =stock(stk),
-               ssb       =ssb(stk),
-               rec       =rec(stk),
-               catch     =catch(stk),
-               fbar      =fbar(stk),   
-               harvest   =catch(stk)%/%stock(stk))
+  res=FLQuants(stock     =stock(stk)%/%bmsy(stk),
+               catch     =catch(stk)%/%msy( stk),
+               harvest   =harvest(stk)%/%fmsy(stk))
   
   model.frame(res,drop=T)}
 
-setMethod('tseries', signature(object='FLStock',refpts="FLBRP"), 
-  function(object,refpts,proxy="msy",...) {
+tseriesFn2=function(stk,brp,proxy='msy'){
+  
+  res=FLQuants(stock  =stock(stk)%/%refpts(brp)[proxy,'biomass'],
+               ssb    =ssb(  stk)%/%refpts(brp)[proxy,'ssb'],
+               rec    =rec(  stk)%/%refpts(brp)[proxy,'rec'],
+               catch  =catch(stk)%/%refpts(brp)[proxy,'yield'],
+               fbar   =fbar( stk)%/%refpts(brp)[proxy,'harvest'],
+               harvest=(catch(stk)/stock(stk))%/%(refpts(brp)[proxy,'yield']/refpts(brp)[proxy,'biomass']))
+  
+  model.frame(res,drop=T)}
+
+setMethod('tseries', signature(object='FLStock',refpts='FLBRP'), 
+  function(object,refpts,proxy='msy',...) {
 
   res=tseriesFn2(object,refpts,proxy)
     
   return(res)})
 
-setMethod('tseries', signature(object='FLStock',refpts="missing"), 
+setMethod('tseries', signature(object='FLStock',refpts='missing'), 
           function(object,refpts,...) {
             
             res=tseriesFn1(object)
