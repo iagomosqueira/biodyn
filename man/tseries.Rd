@@ -2,6 +2,7 @@
 \docType{methods}
 \name{tseries}
 \alias{tseries}
+\alias{tseries,FLStock,missing}
 \title{tseries}
 \usage{
 tseries(object, refpts, ...)
@@ -22,8 +23,5 @@ stock biomass, SSB, recruitment, F, harvest rate
 }
 \examples{
 \dontrun{tseries(ple4,FLBRP(ple4))}
-}
-\seealso{
-\code{\link{kobe}}, \code{\link{mseBiodyn}}
 }
 

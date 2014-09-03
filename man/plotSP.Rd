@@ -2,6 +2,9 @@
 \docType{methods}
 \name{plotSP}
 \alias{plotSP}
+\alias{plotSP,biodyn,FLBRP-method}
+\alias{plotSP,biodyn,FLQuant-method}
+\alias{plotSP,biodyn,missing-method}
 \title{plotSP}
 \usage{
 plotSP(object, biomass, ...)

@@ -2,6 +2,7 @@
 \docType{methods}
 \name{hcrPlot,biodyn-method}
 \alias{hcrPlot,biodyn-method}
+\alias{hcrPlot-method}
 \title{hcrPlot}
 \usage{
 \S4method{hcrPlot}{biodyn}(object, params = FLPar(ftar = 0.7, btrig = 0.7,
@@ -23,6 +24,6 @@ Calculates break pointts for a hockey stick HCR
 }
 }
 \seealso{
-\code{\link{hcr}},  \code{\link{msy}},  \code{\link{bmsy}}, \code{\link{fmsy}} and  \code{\link{refpts}}
+\code{\link{hcr}},  \code{\link{msy}},  \code{\link{bmsy}}, \code{\link{fmsy}}
 }
 

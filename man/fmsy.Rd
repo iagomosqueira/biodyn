@@ -2,10 +2,11 @@
 \docType{methods}
 \name{fmsy}
 \alias{fmsy}
+\alias{fmsy,biodyn,missing-method}
 \alias{fmsy,biodyn,numeric-method}
 \alias{fmsy,character,FLPar-method}
 \alias{fmsy,factor,FLPar-method}
-\alias{fmsy,fmsy-method,biodyn,missing-method}
+\alias{fmsy,fmsy-method}
 \title{fmsy}
 \usage{
 fmsy(object, params, ...)
@@ -29,6 +30,6 @@ fmsy('logistic',FLPar(msy=100,k=500))
 }
 }
 \seealso{
-\code{\link{msy}}, \code{\link{bmsy}} and  \code{\link{refpts}}
+\code{\link{msy}}, \code{\link{bmsy}}
 }
 

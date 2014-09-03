@@ -21,6 +21,6 @@ A utility function to help set up the \code{prior} slot in \code{biodyn}.
    }
 }
 \seealso{
-\code{\link{biodyn}}, \code{\link{mseBiodyn}}
+\code{\link{biodyn}}
 }
 

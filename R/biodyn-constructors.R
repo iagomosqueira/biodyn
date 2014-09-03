@@ -72,7 +72,7 @@ setMethod('biodyn', signature(model='factor',params='FLPar'),
 
 setMethod('biodyn', signature(model='character',params='FLPar'),
           function(model,params,min=0.1,max=10,catch=NULL,stock=NULL,...) 
-            biodyn(model=factor(model,levels=biodyn:::models),params,min=min,max=max,catch=catch,stock=stock,...))
+            biodyn(model=factor(model,levels=models),params,min=min,max=max,catch=catch,stock=stock,...))
 
 setMethod('biodyn', signature(model='factor',params='missing'),
           function(model,params,min=min,max=max,catch=NULL,stock=NULL,...){
@@ -82,7 +82,7 @@ setMethod('biodyn', signature(model='factor',params='missing'),
             res        =biodyn()
             res@model  =model
             
-            nms=c(biodyn:::modelParams(model),'b0')
+            nms=c(modelParams(model),'b0')
             par=rep(NA,length(nms))
             names(par)=nms
             
@@ -106,7 +106,7 @@ setMethod('biodyn', signature(model='factor',params='missing'),
 
 setMethod('biodyn', signature(model='character',params='missing'),
           function(model=model,min=0.1,max=10.0,catch=NULL,index=NULL,stock=NULL,...) 
-            biodyn(model=factor(model,levels=biodyn:::models),min=min,max=max,catch=catch,stock=stock,...))
+            biodyn(model=factor(model,levels=models),min=min,max=max,catch=catch,stock=stock,...))
 
 setMethod('biodyn', signature(model='missing',params='missing'),
           function(model,params,min=0.1,max=10.0,catch=catch,stock=stock,...) {
@@ -133,7 +133,23 @@ setMethod('biodyn', signature(model='missing',params='missing'),
 is.biodyn = function(x)
   return(inherits(x, 'biodyn'))
 
-# simFLBioDym {{{
+#' Simulates a \code{biodyn} object
+#'
+#' @description Creates a biodyn object with known properties
+#' @param model
+#' @param params
+#' @param harvest
+#' @param bounds
+#' 
+#' @export
+#' @rdname simBiodyn
+#' 
+#' @return TRUE or FALSE
+#' @export
+#' @examples
+#' \dontrun{
+#'  bd=simBiodyn() 
+#'  }
 simBiodyn <- function(model='pellat', 
                       params=FLPar(r=0.5, k=1000, p=1, b0=1.0,q=1,sigma=0.3),
                       harvest=FLQuant(FLQuant(c(seq(0,1.5,length.out=30), rev(seq(0.5,1.5,length.out=15))[-1],rep(0.5,5)))*fmsy(model,params)),

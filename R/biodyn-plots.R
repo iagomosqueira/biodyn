@@ -26,6 +26,8 @@ utils::globalVariables(c('qname','What'))
 #' @export
 #' @docType methods
 #' @rdname plot
+#' 
+#' @aliases plot,biodyns,missing
 #'
 #' @examples
 #' \dontrun{
@@ -75,6 +77,8 @@ setMethod('plot', signature(x='biodyns', y='missing'),
 #' @docType methods
 #' @rdname plotMSE
 #'
+#' @aliases plotMSE,biodyn,FLStock,FLBRP-method
+#' 
 #' @examples
 #' \dontrun{ 
 #' refpts('logistic',FLPar(msy=100,k=500))
@@ -131,6 +135,8 @@ plotMSEfn=function(mp,om,brp){
 #' @docType methods
 #' @rdname plotSP
 #'
+#' @aliases plotSP,biodyn,FLBRP-method plotSP,biodyn,FLQuant-method plotSP,biodyn,missing-method
+#' 
 #' @examples
 #' \dontrun{
 #'  refpts('logistic',FLPar(msy=100,k=500))

@@ -1,0 +1,13 @@
+base
+biodyn
+diags
+FLCore
+ggplot2
+ggplotFL
+gridExtra
+knitr
+lattice
+MASS
+plyr
+reshape2
+xtable

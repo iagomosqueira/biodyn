@@ -7,6 +7,8 @@
 #' @param   \code{test}, a \code{data.frame} with 3 columns \code{param,q,lower.tail} for the choice of parameter, the desired qunatile and teh tail of the distribution for the test.
 #'
 #' @return an \code{FLPar} object with probability of being greater (lower.tail=FALSE) or less (lower.tail=TRUE) then q
+#'
+#' @aliases powerAnalysis-method powerAnalysis,biodyn,biodyn-method  powerAnalysis,biodyn,missing-method
 #' 
 #' @export
 #' @docType methods
@@ -33,7 +35,7 @@ setMethod('powerAnalysis',  signature(object='biodyn',ref='missing'),
   names(dimnames(res))='param'
   res=as(res,'FLPar')
   
-  if (its==1) res=FLCore:::iter(object,1)
+  if (its==1) res=FLCore::iter(object,1)
   
   return(res)})
 
@@ -75,7 +77,7 @@ setMethod('powerAnalysis',  signature(object='biodyn',ref='biodyn'),
   res=as(res,'FLPar')
   
   if (its==1){
-    object=FLCore:::iter(object,1)
-    ref   =FLCore:::iter(ref,   1)}
+    object=FLCore::iter(object,1)
+    ref   =FLCore::iter(ref,   1)}
     
   return(res)})

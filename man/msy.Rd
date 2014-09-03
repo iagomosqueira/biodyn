@@ -27,6 +27,6 @@ Calculates MSY given the model parameters, can be done for a biodyn class, or by
 \dontrun{ msy('logistic',FLPar(msy=100,k=500))}
 }
 \seealso{
-\code{\link{bmsy}}, \code{\link{fmsy}} and  \code{\link{refpts}}
+\code{\link{bmsy}}, \code{\link{fmsy}}
 }
 

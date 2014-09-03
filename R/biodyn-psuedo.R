@@ -15,6 +15,8 @@
 #' @docType methods
 #' @rdname psuedo
 #'
+#' @aliases psuedo-method psuedo,biodyn,FLQuant-method
+#'
 #' @examples
 #' \dontrun{
 #'    bd=psuedo(bd,FLQuant(10000,dimnames=list(year=2009:2012)))

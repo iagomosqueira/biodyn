@@ -62,7 +62,7 @@ mseBiodyn<-function(om,br,srDev,ctrl,prrs,
     
     #### Management Procedure
     ## Set up assessment parameter options
-    bd=biodyn:::biodyn(window(om,end=iYr-1))
+    bd=biodyn::biodyn(window(om,end=iYr-1))
     params(bd)[dimnames(ctrl)$param]=ctrl[dimnames(ctrl)$param,'val']
     
     bd@priors=prrs
@@ -73,15 +73,15 @@ mseBiodyn<-function(om,br,srDev,ctrl,prrs,
     bd@control['q1','val']  =1
 
     ## fit
-    bd =biodyn:::fit(bd,cpue,cmdOps=cmdOps)
-    bd =biodyn:::fwd(bd,catch=catch(om)[,ac(iYr)])
+    bd =biodyn::fit(bd,cpue,cmdOps=cmdOps)
+    bd =biodyn::fwd(bd,catch=catch(om)[,ac(iYr)])
         
     ## HCR
     hcrPar=hcrParam(ftar =ftar *fmsy(bd),
                      btrig=btrig*bmsy(bd),
                      fmin =fmin *fmsy(bd), 
                      blim =blim *bmsy(bd))
-    hcrOutcome=biodyn:::hcr(bd,hcrPar,
+    hcrOutcome=biodyn::hcr(bd,hcrPar,
                    hcrYrs=iYr+seq(interval),
                    bndF=bndF,
                    tac =TRUE)
@@ -118,13 +118,13 @@ hcrFn=function(om,btrig,blim,ftar,fmin,start,end,interval,lag=seq(interval)){
   b=ftar-a*btrig
   
   for (iYr in seq(start+rcvPeriod,range(om,'maxyear')-interval,interval)){
-    stk=FLCore:::apply(stock(om)[,ac(iYr-1)],6,mean)
+    stk=FLCore::apply(stock(om)[,ac(iYr-1)],6,mean)
     
     trgt=(stk%*%a)+b  
     
     for (i in seq(dims(om)$iter)){
-      FLCore:::iter(trgt,i)[]=max(FLCore:::iter(trgt,i),FLCore:::iter(fmin,i))
-      FLCore:::iter(trgt,i)[]=min(FLCore:::iter(trgt,i),FLCore:::iter(ftar,i))} 
+      FLCore::iter(trgt,i)[]=max(FLCore::iter(trgt,i),FLCore::iter(fmin,i))
+      FLCore::iter(trgt,i)[]=min(FLCore::iter(trgt,i),FLCore::iter(ftar,i))} 
     
     dmns     =dimnames(trgt)
     dmns$year=as.character(iYr+lag)

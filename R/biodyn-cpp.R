@@ -112,7 +112,7 @@
 #             
 #             if(!diag.flag) {
 #               
-#               res<-.Call('FLXSA', FLCore:::iter(stock, 1), lapply(indices, iter, 1), control, FALSE)
+#               res<-.Call('FLXSA', FLCore::iter(stock, 1), lapply(indices, iter, 1), control, FALSE)
 #               iters <- max(iters.stock,iters.indices)
 #               
 #               if (iters>1) {
@@ -120,9 +120,9 @@
 #                 res@stock.n<-propagate(FLQuant(res@stock.n@.Data),iters)
 #                 res@harvest<-propagate(FLQuant(res@harvest@.Data),iters)
 #                 for (i in as.character(2:iters)) {
-#                   res. <- .Call('FLXSA', FLCore:::iter(stock,i), lapply(indices, iter,i), control, FALSE)
-#                   FLCore:::iter(res@stock.n,i)<-FLQuant(res.@stock.n@.Data)
-#                   FLCore:::iter(res@harvest,i)<-FLQuant(res.@harvest@.Data)
+#                   res. <- .Call('FLXSA', FLCore::iter(stock,i), lapply(indices, iter,i), control, FALSE)
+#                   FLCore::iter(res@stock.n,i)<-FLQuant(res.@stock.n@.Data)
+#                   FLCore::iter(res@harvest,i)<-FLQuant(res.@harvest@.Data)
 #                 }
 #               }       
 #               

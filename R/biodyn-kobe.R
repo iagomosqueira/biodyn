@@ -1,6 +1,22 @@
 ########################################################################################
 #### biodyn stuff for Kobe #############################################################
-########################################################################################
+#' kobe
+#' 
+#' @description Creates time series of stock relative to BMSY and harvest rate relative
+#' to FMSY
+#' 
+#' @name kobe
+#' @param object
+#' @param method
+#' @return data.frame or list of data.frames
+#' 
+#' @aliases kobe,biodyn,missing-method kobe,biodyns,missing-method
+#' @export
+#' @rdname kobe
+#' @examples 
+#' \dontrun{
+#' }
+
 
 #if (!isGeneric('kobe')) 
 setGeneric('kobe',  function(object,method,...) standardGeneric('kobe'))
@@ -79,7 +95,7 @@ utils::globalVariables(c('ddply','.','year','pctl','cast','kobeP','sims'))
 #     if (is.null(year)) year=range(object)['maxyear']
 #     dat=model.frame(mcf(FLQuants(stock  =stock(  object)%/%bmsy(object),
 #                                  harvest=harvest(object)%/%fmsy(object))),drop=T)
-#     res=kobe:::kobeFn(dat,what=what,probs=probs,year=year,nwrms=nwrms)
+#     res=kobe::kobeFn(dat,what=what,probs=probs,year=year,nwrms=nwrms)
 #     if (length(what)==1)
 #          return(res[[what]])
 #     else
@@ -88,7 +104,7 @@ utils::globalVariables(c('ddply','.','year','pctl','cast','kobeP','sims'))
 # 
 # setMethod('kobe',  signature(object='data.frame',method='missing'), 
 #           function(object,what=c('sims','trks','pts','smry','wrms')[1],probs=c(0.75,0.5,.25),year=NULL,nwrms=10){ 
-#             kobe:::kobeFn(object,what=what,probs=probs,year=year,nwrms=nwrms)})
+#             kobe::kobeFn(object,what=what,probs=probs,year=year,nwrms=nwrms)})
 # # 
 # # kobeFn=function(object,what=c('sims','trks','pts','smry','wrms')[1],probs=c(0.75,0.5,.25),year=NULL,nwrms=10){         
 # #   
@@ -132,22 +148,6 @@ utils::globalVariables(c('ddply','.','year','pctl','cast','kobeP','sims'))
 # #   
 # #   res}
 
-#' kobePhase 
-#' 
-#' @description 
-#' produces the kobe Phase plot background, i.e. green, red and yellow quadrants to which 
-#' layers can be added
-#'
-#' @param object; a \code{biodyn} object 
-#' @return A ggplot2 object 
-#' @seealso \code{\link{kobe}}
-#' @export
-#' @examples
-#' \dontrun{
-#'     data(asp)
-#'     kobePhase(asp)+geom_path( aes(stock,harvest)) +
-#'     geom_point(aes(stock,harvest))
-#'     }
 setMethod('kobe', signature(object='biodyn',method='missing'),
           function(object,what=c('sims','trks','pts','smry','wrms')[1],probs=c(0.75,0.5,.25),year=NULL,nwrms=10){
             

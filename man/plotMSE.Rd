@@ -2,6 +2,7 @@
 \docType{methods}
 \name{plotMSE}
 \alias{plotMSE}
+\alias{plotMSE,biodyn,FLStock,FLBRP-method}
 \title{Create a \code{ggplot2} plot}
 \usage{
 plotMSE(x, y, z, ...)

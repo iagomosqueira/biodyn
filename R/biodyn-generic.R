@@ -1,14 +1,3 @@
-#' Creates a list of biodyn
-#'
-#' @description Creates a list of biodyn biomass dynamic model classes.
-#' @return list of biodyn objects
-#' @export
-#' @examples
-#' \dontrun{biodyns()}
-setGeneric('biodyns', function(object, ...) standardGeneric('biodyns'))
-
-setGeneric('biodyn',   function(model,params,...)  standardGeneric('biodyn'))
-
 if (!isGeneric('msy'))     setGeneric('msy',      function(object,params,...) standardGeneric('msy'))
 if (!isGeneric('fmsy'))    setGeneric('fmsy',     function(object,params,...) standardGeneric('fmsy'))
 if (!isGeneric('bmsy'))    setGeneric('bmsy',     function(object,params,...) standardGeneric('bmsy'))
@@ -26,15 +15,10 @@ if (!isGeneric('harvest')) setGeneric('harvest',  function(object,params,...) st
 #if (!isGeneric('tac'))     
   setGeneric('tac',      function(object, harvest, ...) standardGeneric('tac'))
 
-setGeneric('fit',   function(object,index,...)     standardGeneric('fit'))
-
 if (!isGeneric('diags'))    setGeneric('diags',     function(object,method,...) standardGeneric('diags'))
 if (!isGeneric('diags<-'))  
   setGeneric('diags<-',   function(object,value)      standardGeneric('diags<-'))
 
 if (!isGeneric('plot'))  
   setGeneric('plot',   function(x,y)      standardGeneric('plot'))
-  
-#setGeneric('kobe',       function(object,method,...)    standardGeneric('kobe'))
-if (!isGeneric('kobePhase')) setGeneric('kobePhase',  function(object,...)           standardGeneric('kobePhase'))
-          
+            

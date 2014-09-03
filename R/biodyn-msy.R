@@ -11,7 +11,7 @@ utils::globalVariables(c('data.x','data.y','X..x'))
 #' @param \code{params}, an \code{FLPar} object with model parameters
 #' @return an \code{FLPar} object with value(s) of MSY
 #' 
-#' @seealso \code{\link{bmsy}}, \code{\link{fmsy}} and  \code{\link{refpts}}
+#' @seealso \code{\link{bmsy}}, \code{\link{fmsy}} 
 #'
 #' @aliases msy,biodyn,missing-method  msy,biodyn,numeric-method msy,character,FLPar-method msy,factor,FLPar-method
 #'  
@@ -32,15 +32,15 @@ setMethod('msy',   signature(object='biodyn',    params='numeric'), function(obj
 #'
 #' Calculates $F_{MSY}$ given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
 #'
-#' @param  \code{object}, an object of class \code{biodyn} or
-#' @param  \code{object}, a string or factor that species the model
+#' @param \code{object}, an object of class \code{biodyn} or
+#' @param \code{object}, a string or factor that species the model
 #' @param \code{params}, an \code{FLPar} object with model parameters
 #'
-#' @aliases fmsy,fmsy-method,biodyn,missing-method  fmsy,biodyn,numeric-method fmsy,character,FLPar-method fmsy,factor,FLPar-method
+#' @aliases fmsy,fmsy-method fmsy,biodyn,missing-method  fmsy,biodyn,numeric-method fmsy,character,FLPar-method fmsy,factor,FLPar-method
 #' 
 #' @return an \code{FLPar} object with value(s) of $F_{MSY}$
 #' 
-#' @seealso \code{\link{msy}}, \code{\link{bmsy}} and  \code{\link{refpts}}
+#' @seealso \code{\link{msy}}, \code{\link{bmsy}} 
 #' 
 #' @export
 #' @docType methods
@@ -95,11 +95,13 @@ setMethod('bmsy',  signature(object='biodyn',    params='numeric'), function(obj
 #'
 #' @return an \code{FLPar} object with value(s) of $F_{MSY}$
 #' 
-#' @seealso \code{\link{msy}}, \code{\link{bmsy}} and  \code{\link{refpts}}
+#' @seealso \code{\link{msy}}, \code{\link{bmsy}} 
 #' 
 #' @export
 #' @docType methods
 #' @rdname refpts
+#'
+#' @aliases refpts refpts-method  refpts,biodyn,missing-method  refpts,factor,FLPar-method
 #'
 #' @examples
 #' \dontrun{
@@ -310,7 +312,7 @@ fnY=function(x,bd,year=range(bd)['maxyear']){
 
 fnJ=function(x,bd,year=range(bd)['maxyear']){
   if (is.numeric(year)) year=ac(year)
-  bd@params[biodyn:::activeParams(bd)]=x
+  bd@params[biodyn::activeParams(bd)]=x
   c(stock  =stock(  bd[,'2008'])/refpts(bd)['bmsy'],
     harvest=harvest(bd[,'2008'])/refpts(bd)['fmsy'],
     catch  =catch(  bd[,'2008'])/refpts(bd)[ 'msy'])}  
@@ -318,11 +320,11 @@ fnJ=function(x,bd,year=range(bd)['maxyear']){
 
 refJacobian=function(bd,year=range(bd)['maxyear']){
 
-  x0=bd@params[biodyn:::activeParams(bd)]
+  x0=bd@params[biodyn::activeParams(bd)]
   
   res <- jacobian(func=fnJ, x=x0, bd=swon)
   
-  nms=dimnames(bd@params[biodyn:::activeParams(bd)])[[1]]
+  nms=dimnames(bd@params[biodyn::activeParams(bd)])[[1]]
   
   res=FLPar(array(t(res),dim=c(length(nms),3,1),dimnames=list('params'=nms,' '=c('stock','harvest','catch'),iter=1)))
   
@@ -330,14 +332,14 @@ refJacobian=function(bd,year=range(bd)['maxyear']){
 
 relVar=function(bd,year=range(bd)['maxyear']){
   
-  nms=dimnames(bd@params[biodyn:::activeParams(bd)])[[1]]
+  nms=dimnames(bd@params[biodyn::activeParams(bd)])[[1]]
   res=refJacobian(bd,year=year)
   cov=bd@vcov[nms,nms]
   
   
   res.=as.data.frame(res)
   
-  FLCore:::iter(cov,1)[lower.tri(iter(cov,1)[drop=T])] =NA
+  FLCore::iter(cov,1)[lower.tri(iter(cov,1)[drop=T])] =NA
   cov.=as.data.frame(cov)
   cov.=cov.[!is.na(cov.$data),]
   

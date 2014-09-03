@@ -64,18 +64,14 @@ fit                     fit
 fmsy                    Fishing Mortality at Maximum Sustainable Yield.
 fwd                     Forward Projections
 hcr                     HCR
-hcrPlot                 hcrPlot
 is.biodyn               Checks class type
-kobePhase               kobePhase
 msy                     Maximum Sustainable Yield.
 pella                   pella
 plot                    Create a 'ggplot' plot
 plotSP                  Create a 'ggplot' plot
 power                   power
-refpts                  Maximum Sustainable Yield reference points
 setControl<-            control
 setParams<-             setParams<-
-tac                     tac ,
 }
 
 }

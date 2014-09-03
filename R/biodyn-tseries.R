@@ -1,6 +1,5 @@
 #' tseries
-#' @description 
-#' A utility method to create a data.frame with time series of Performance Measures i.e.
+#' @description A utility method to create a data.frame with time series of Performance Measures i.e.
 #' stock biomass, SSB, recruitment, F, harvest rate
 #'            
 #' @param stk    \code{object} 
@@ -9,12 +8,11 @@
 #'
 #' @return a \code{data.frame} 
 #'  
-#' @export
+#' @aliases tseries,FLStock,missing  
+#'  
 #' @docType methods
 #' @rdname tseries
-#' 
-#' @seealso \code{\link{kobe}}, \code{\link{mseBiodyn}}
-#' 
+#'  
 #' @examples
 #'  \dontrun{tseries(ple4,FLBRP(ple4))}
 #'    
@@ -38,13 +36,13 @@ tseriesFn2=function(stk,brp,proxy='msy'){
                harvest=(catch(stk)/stock(stk))%/%(refpts(brp)[proxy,'yield']/refpts(brp)[proxy,'biomass']))
   
   model.frame(res,drop=T)}
-
-setMethod('tseries', signature(object='FLStock',refpts='FLBRP'), 
-  function(object,refpts,proxy='msy',...) {
-
-  res=tseriesFn2(object,refpts,proxy)
-    
-  return(res)})
+# 
+# setMethod('tseries', signature(object='FLStock',refpts='FLBRP'), 
+#   function(object,refpts,proxy='msy',...) {
+# 
+#   res=tseriesFn2(object,refpts,proxy)
+#     
+#   return(res)})
 
 setMethod('tseries', signature(object='FLStock',refpts='missing'), 
           function(object,refpts,...) {

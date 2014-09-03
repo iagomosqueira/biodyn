@@ -2,6 +2,10 @@
 \docType{methods}
 \name{setParams<-}
 \alias{setParams<-}
+\alias{setParams<-,biodyn,FLPar-method}
+\alias{setParams<-,biodyn,FLQuant-method}
+\alias{setParams<-,biodyn,FLQuants-method}
+\alias{setParams<-,biodyn,data.frame-method}
 \title{setParams<-}
 \usage{
 setParams(object) <- value

@@ -31,7 +31,6 @@ setMethod('stock', signature(object='biodyn'),
 #' Calculates the surplus production for a biomass dynamic model given a level of stock biomass
 #' 
 #' @param  \code{object}, an object of class \code{biodyn} 
-#'
 #' @param \code{biomass}, stock biomaas, may be a \code{numerix},  \code{FLQuant} or missing. In the latte case the stock slot will be used.
 #'
 #' @return an \code{FLPar} object
@@ -42,13 +41,14 @@ setMethod('stock', signature(object='biodyn'),
 #' @docType methods
 #' @rdname sp
 #'
+#' @aliases computeSP,biodyn,FLQuant-method  computeSP,biodyn,missing-method  computeSP,biodyn,numeric-method
 #' @examples
 #' \dontrun{ computeSP(bd,seq(0,params(bd)['k'])) }
 #'  
 setGeneric('computeSP',function(object,biomass,...) standardGeneric('computeSP'))
-setMethod( 'computeSP', signature(object='biodyn',   biomass='missing'),     function(object,biomass=stock(object))  biodyn:::spFn(model(object),params(object),biomass))
-setMethod( 'computeSP', signature(object='biodyn',   biomass='numeric'),     function(object,biomass)                biodyn:::spFn(model(object),params(object),biomass))
-setMethod( 'computeSP', signature(object='biodyn',   biomass='FLQuant'),     function(object,biomass)                biodyn:::spFn(model(object),params(object),biomass))
+setMethod( 'computeSP', signature(object='biodyn',   biomass='missing'),     function(object,biomass=stock(object))  spFn(model(object),params(object),biomass))
+setMethod( 'computeSP', signature(object='biodyn',   biomass='numeric'),     function(object,biomass)                spFn(model(object),params(object),biomass))
+setMethod( 'computeSP', signature(object='biodyn',   biomass='FLQuant'),     function(object,biomass)                spFn(model(object),params(object),biomass))
 
 
 # calcLogLik

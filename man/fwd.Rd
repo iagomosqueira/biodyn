@@ -2,6 +2,9 @@
 \docType{methods}
 \name{fwd}
 \alias{fwd}
+\alias{fwd,biodyn,FLQuants-method}
+\alias{fwd,biodyn,missing-method}
+\alias{fwd-method}
 \title{fwd}
 \usage{
 fwd(object, ctrl, ...)

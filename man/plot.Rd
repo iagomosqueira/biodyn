@@ -2,8 +2,21 @@
 \docType{methods}
 \name{plot,biodyn,missing-method}
 \alias{plot,biodyn,missing-method}
-\title{plot}
+\alias{plot,biodyns,missing}
+\alias{plot,biodyns,missing-method}
+\title{plot(biodyn)}
 \usage{
+\S4method{plot}{biodyn,missing}(x, y, probs = c(0.95, 0.5, 0.05),
+  size = c(0.5, 1, 0.5), lty = c(2, 1, 2), worm = NA,
+  facet = facet_wrap(~qname, scale = "free", ncol = 1), fn = list(Stock =
+  function(x) stock(x), Harvest = function(x) harvest(x), Yield = function(x)
+  catch(x)), ...)
+
+\S4method{plot}{biodyns,missing}(x, y, probs = c(0.95, 0.5, 0.05),
+  size = c(0.5, 1, 0.5), lty = c(2, 1, 2), facet = facet_wrap(~qname,
+  scale = "free", ncol = 1), fn = list(Stock = function(x) stock(x), Harvest =
+  function(x) harvest(x), Yield = function(x) catch(x)), ...)
+
 \S4method{plot}{biodyn,missing}(x, y, probs = c(0.95, 0.5, 0.05),
   size = c(0.5, 1, 0.5), lty = c(2, 1, 2), worm = NA,
   facet = facet_wrap(~qname, scale = "free", ncol = 1), fn = list(Stock =
@@ -55,9 +68,23 @@
 an \code{ggplot2} object
 }
 \description{
+Basic plot for biodyn.
+
+plot() method for biodyns
+
 Creates a \code{ggplot2} object that plots time series of biomass, harvest rate and catch. The basic object can then be modified by adding ggpot2 layers.
 }
 \examples{
+\dontrun{
+  bd=simBiodyn()
+  bd=fwd(bd,harvest=rlnorm(100,harvest(bd)[,-1]))
+  plot(bd)
+  }
+\dontrun{
+  data(bd)
+  bds <- biodyns(runA=bd, runB=bd)
+  plot(bds)
+  }
 \dontrun{
 refpts('logistic',FLPar(msy=100,k=500))
 }

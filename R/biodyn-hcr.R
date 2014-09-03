@@ -13,7 +13,8 @@ utils::globalVariables('laply')
 #' @export
 #' @docType methods
 #' @rdname tac
-#'
+#' @aliases tac tac-method tac,biodyn-method
+#' 
 #' @examples
 #' \dontrun{
 #' tac('logistic',FLPar(msy=100,k=500))
@@ -48,7 +49,7 @@ setMethod( 'tac', signature(object='biodyn'),
 #' @param  \code{fmin}, an object of class \code{FLPar}
 #' @param  \code{blim}, an object of class \code{FLPar}
 #' 
-#' @seealso \code{\link{hcr}},  \code{\link{hcrPlot}}
+#' @seealso \code{\link{hcr}}
 #' 
 #' @export
 #' @docType methods
@@ -79,7 +80,7 @@ hcrParam=function(ftar,btrig,fmin,blim){
   if (nits==1) res=FLPar(  array(c(ftar,btrig,fmin,blim),c(4,nits),dimnames=list(params=c('ftar','btrig','fmin','blim'),iter=seq(nits)))) else
                res=FLPar(t(array(c(ftar,btrig,fmin,blim),c(nits,4),dimnames=list(iter=seq(nits),params=c('ftar','btrig','fmin','blim')))))
   
-  units(res)='harvest'
+  #units(res)='harvest'
   return(res)}
   #return(as(res,'FLQuant'))}
   
@@ -94,6 +95,8 @@ hcrParam=function(ftar,btrig,fmin,blim){
 #' @param  \code{tac} \code{logical} should return value be TAC rather than F?
 #' @param  \code{bndF} \code{vector} with bounds (i.e.min and max values) on iter-annual variability on  F
 #' @param  \code{bndTac} \code{vector} with bounds (i.e. min and max values) on iter-annual variability on TAC
+#' 
+#' @aliases hcr,biodyn-method
 #' 
 #' @return \code{FLPar} object with value(s) for F or TAC if tac==TRUE
 #' 
@@ -135,16 +138,16 @@ setMethod('hcr', signature(object='biodyn'),
   ## Calc F
   # bug
   #val=(SSB%*%a) %+% b
-  stk=FLCore:::apply(stock(object)[,ac(stkYrs)],6,mean)
+  stk=FLCore::apply(stock(object)[,ac(stkYrs)],6,mean)
   
   rtn=(stk%*%a)  
-  rtn=FLCore:::sweep(rtn,2:6,b,'+')
+  rtn=FLCore::sweep(rtn,2:6,b,'+')
 
   fmin=as(params['fmin'],'FLQuant')
   ftar=as(params['ftar'],'FLQuant')
   for (i in seq(dims(object)$iter)){
-    FLCore:::iter(rtn,i)[]=max(FLCore:::iter(rtn,i),FLCore:::iter(fmin,i))
-    FLCore:::iter(rtn,i)[]=min(FLCore:::iter(rtn,i),FLCore:::iter(ftar,i))} 
+    FLCore::iter(rtn,i)[]=max(FLCore::iter(rtn,i),FLCore::iter(fmin,i))
+    FLCore::iter(rtn,i)[]=min(FLCore::iter(rtn,i),FLCore::iter(ftar,i))} 
   
   rtn=window(rtn,end=max(hcrYrs))
   #dimnames(rtn)$year=min(hcrYrs)  
@@ -156,7 +159,7 @@ setMethod('hcr', signature(object='biodyn'),
   ## F
   if (!is.null(bndF)){  
 
-      ref=FLCore:::apply(harvest(object)[,ac(refYrs-1)],6,mean)
+      ref=FLCore::apply(harvest(object)[,ac(refYrs-1)],6,mean)
     
       rtn[,ac(min(hcrYrs))]=qmax(rtn[,ac(min(hcrYrs))],ref*bndF[1])
       rtn[,ac(min(hcrYrs))]=qmin(rtn[,ac(min(hcrYrs))],ref*bndF[2])
@@ -176,7 +179,7 @@ setMethod('hcr', signature(object='biodyn'),
    ## TAC
    if (tac){
      
-      ref=FLCore:::apply(catch(object)[,ac(refYrs)],6,mean)
+      ref=FLCore::apply(catch(object)[,ac(refYrs)],6,mean)
 
       object=window(object, end=max(as.numeric(hcrYrs)))
       object=fwd(object,harvest=harvest(object)[,ac(min(as.numeric(hcrYrs)-1))])
@@ -201,7 +204,6 @@ setMethod('hcr', signature(object='biodyn'),
   
   return(rtn)})
 
-##############################################################
 #' hcrPlot
 #'
 #' Calculates break pointts for a hockey stick HCR
@@ -211,10 +213,11 @@ setMethod('hcr', signature(object='biodyn'),
 #' 
 #' @return a \code{FLPar} object with value(s) for HCR
 #' 
-#' @seealso \code{\link{hcr}},  \code{\link{msy}},  \code{\link{bmsy}}, \code{\link{fmsy}} and  \code{\link{refpts}}
+#' @seealso \code{\link{hcr}},  \code{\link{msy}},  \code{\link{bmsy}}, \code{\link{fmsy}} 
 #' 
 #' @export
 #' @rdname hcrPlot
+#' @aliases hcrPlot-method  hcrPlot,biodyn-method
 #'
 #' @examples
 #' \dontrun{

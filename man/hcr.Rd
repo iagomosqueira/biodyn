@@ -2,6 +2,7 @@
 \docType{methods}
 \name{hcr}
 \alias{hcr}
+\alias{hcr,biodyn-method}
 \title{hcr}
 \usage{
 hcr(object, ...)

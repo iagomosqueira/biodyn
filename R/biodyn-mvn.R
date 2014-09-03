@@ -2,8 +2,7 @@ utils::globalVariables('llply')
 
 #' mvn
 #' 
-#' @description 
-#' Takes a fitted biodyn object and uses the covariance matrix (in the \code{vcov} slot)  and the
+#' @description Takes a fitted biodyn object and uses the covariance matrix (in the \code{vcov} slot)  and the
 #' parameter estimates (\code{params} slot) to use Monte Carlo simulation to generate new 
 #' parameters
 #'      

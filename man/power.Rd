@@ -2,6 +2,9 @@
 \docType{methods}
 \name{powerAnalysis}
 \alias{powerAnalysis}
+\alias{powerAnalysis,biodyn,biodyn-method}
+\alias{powerAnalysis,biodyn,missing-method}
+\alias{powerAnalysis-method}
 \title{power}
 \usage{
 powerAnalysis(object, ref, ...)

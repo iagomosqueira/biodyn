@@ -3,10 +3,9 @@ utils::globalVariables(c('calcR','fwdWindow','interval', 'nits',
                          'dbWriteTable'))
 
 #' runMSE
-#' @description 
-#' Runs a full MSE using an \code{FLStock} object as the Operating Model and \code{biodyn} as the Mangement Procedure
+#' @description Runs a full MSE using an \code{FLStock} object as the Operating Model and \code{biodyn} as the Mangement Procedure
 #'           
-#' @aliases mseBiodyn
+#' @aliases runMSE
 #' 
 #' @param om an \code{FLStock} objectl 
 #' @param brp an \code{FLBRP} object that holds the biological parameters for use in the projections
@@ -25,7 +24,7 @@ utils::globalVariables(c('calcR','fwdWindow','interval', 'nits',
 #' @docType methods
 #' @rdname runMSE
 #' 
-#' @seealso \code{\link{biodyn}}, \code{\link{mseBiodyn}}
+#' @seealso \code{\link{biodyn}}
 #' 
 #' @examples
 #' \dontrun{
@@ -44,7 +43,7 @@ runMSE=function(om,brp,srDev,uDev,
                          dimnames=list(year=range['min']:(range['max']+range['interval']-1),iter=seq(nits)))
   
   ## Add stochastcity
- # om =fwd(om,f=fbar(FLCore:::iter(om,1))[,ac(2:(range['min'])],sr=brp,sr.residuals=srDev)
+ # om =fwd(om,f=fbar(FLCore::iter(om,1))[,ac(2:(range['min'])],sr=brp,sr.residuals=srDev)
   om =fwd(om,f=lgt, sr=brp,sr.residuals=srDev)
   
   ## save projection for comparison

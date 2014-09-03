@@ -14,7 +14,7 @@ combineFlr=function(...){
   
   nits=0
   for (i in seq(length(its))){
-     FLCore:::iter(res,its[[i]]+nits)=object[[i]]
+     FLCore::iter(res,its[[i]]+nits)=object[[i]]
      nits=max(its[[i]])}
 
   res}

@@ -1,77 +1,3 @@
-utils::globalVariables('validParams')
-models=factor(c('fox',      'schaefer',
-                'pellat',   'gulland',
-                'fletcher', 'shepherd',
-                'logistic', 'genfit'))
-
-modelParams=function(mdl) {
-  if (is.factor(mdl)) mdl=as.character(mdl)
-  list(fox       =c('r','k'),
-       schaefer  =c('r','k'),
-       pellat    =c('r','k','p'),
-       shepherd  =c('r','k','m'),
-       gulland   =c('r','k'),
-       fletcher  =c('k','msy','p'),
-       logistic  =c('k','msy'),
-       genfit    =c('r','k','p'))[[mdl]]}
-
-defaultParams<-function(object) {
-  params(object)<-FLPar(as.numeric(NA),dimnames=list(params=c(validParams(model(object)),'b0','q','sigma'),iter=1:dims(object)$iter))
-  
-  unt<-NULL
-  if ('r'     %in% dimnames(params(object))$params){
-    params(object)['r',    ]<-0.5
-    unt<-c(unt,'')}
-  if ('k'     %in% dimnames(params(object))$params){
-    params(object)['k',    ]<-mean(catch(object))*10
-    unt<-c(unt,units(catch(object)))}
-  if ('p'     %in% dimnames(params(object))$params){
-    params(object)['p',    ]<-2
-    unt<-c(unt,'')}
-  if ('msy'   %in% dimnames(params(object))$params){
-    params(object)['msy',  ]<-mean(catch(object))
-    unt<-c(unt,units(catch(object)))}
-  if ('b0'    %in% dimnames(params(object))$params){
-    params(object)['b0',   ]<-1
-    unt<-c(unt,'')}
-  if ('m'     %in% dimnames(params(object))$params){
-    params(object)['m',    ]<-0.5
-    unt<-c(unt,'')}
-  if ('q'     %in% dimnames(params(object))$params){
-    params(object)['q',    ]<-1.0
-    unt<-c(unt,'')}
-  if ('sigma' %in% dimnames(params(object))$params){
-    params(object)['sigma',]<-0.3
-    unt<-c(unt,'')}
-  
-  units(params(object))<-unt
-  
-  invisible(params(object))}
-
-# setParams<-function(model='pellat',its=1)
-#   return(FLPar(as.numeric(NA),dimnames=list(params=c(validParams(model),'b0','q','sigma'),iter=its)))
-
-getParams<-function(params,nm){
-  if (nm %in% dimnames(params)$params)
-    return(c(params[nm,]))
-  else
-    return(rep(as.numeric(NA),length=dims(params)$iter))}
-
-
-validity<-function(object) {
-  return(TRUE)
-  ## Catch must be continous
-  yrs<-dimnames(catch(object))$year
-  
-  if (!all(yrs == ac(dims(catch(object))$minyear:dims(catch(object))$maxyear)))
-      return('years in catch not continous')
-
-  # range
-  dims <-dims(object)
-  range<-as.list(object@range)
-
-  return(TRUE)}
-
 #' biodyn class
 #'
 #' @description A class to represent a biomass dynamic stock assessment model. 
@@ -80,6 +6,9 @@ validity<-function(object) {
 #' 
 #' @return biodyn object
 #' @export
+#' @aliases biodyn,character,FLPar biodyn,character,missing-method biodyn,factor,FLPar-method
+#' biodyn,factor,missing-method biodyn,missing,missing-method
+#' 
 #' @examples
 #' \dontrun{biodyn()}
  setClass('biodyn', representation(

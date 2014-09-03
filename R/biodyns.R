@@ -1,5 +1,19 @@
+#' biodyns
+#' @description Create a list with biodyn objects
+#' @name biodyns
+#' @param object biodyn object or a list of biodyn objects
+#' @return biodyns object
+#' @export
+#' @rdname biodyns
+#' 
+#' @aliases biodyns,biodyn-method  biodyns,list-method  biodyns,missing-method
+#' 
+#' @examples 
+#' \dontrun{
+#' biodyns(list("a"=bd,"b"=bd))
+#' }
 
-# biodyns {{{
+setGeneric('biodyns', function(object, ...) standardGeneric('biodyns'))
 biodyns <- setClass('biodyns', contains='FLComps',
                    validity=function(object) {
                      # All items are biodyn
@@ -62,4 +76,4 @@ setMethod('biodyns', signature(object='list'),
               do.call('new', args)
             )
             
-          }) # }}}
+          }) 

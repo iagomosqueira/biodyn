@@ -2,7 +2,9 @@
 \docType{methods}
 \name{tac,biodyn-method}
 \alias{hcrParam}
+\alias{tac}
 \alias{tac,biodyn-method}
+\alias{tac-method}
 \title{tac ,}
 \usage{
 \S4method{tac}{biodyn}(object, harvest, ...)
@@ -41,6 +43,6 @@ tac('logistic',FLPar(msy=100,k=500))
 \seealso{
 \code{\link{hcr}},  \code{\link{fwd}}
 
-\code{\link{hcr}},  \code{\link{hcrPlot}}
+\code{\link{hcr}}
 }
 

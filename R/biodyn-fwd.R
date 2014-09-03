@@ -109,7 +109,7 @@ iavFn=function(val,bnd,lag=1){
 
 #' fwd
 #'
-#' Projects a \code{biodyn} object (i.e. a biomass dynamic model)
+#' @description Projects a \code{biodyn} object (i.e. a biomass dynamic model)
 #' for a given future catch, harvest rate, or stock biomass. Only
 #' one of these has to be supplied as an argument.
 #'
@@ -122,6 +122,8 @@ iavFn=function(val,bnd,lag=1){
 #' @param  pe      process error term, an \code{FLQuant}
 #' @param  peMult  logical, i.e. by default equals true so multiplicative, otherwise additive
 #'
+#' @aliases fwd-method fwd,biodyn,FLQuants-method  fwd,biodyn,missing-method 
+#' 
 #' @export
 #' @docType methods
 #' @rdname fwd

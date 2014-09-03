@@ -15,6 +15,8 @@ utils::globalVariables(c('ldply','melt','variable'))
 #' @export
 #' @docType methods
 #' @rdname setParams
+#' 
+#' @aliases setParams<-,biodyn,FLPar-method  setParams<-,biodyn,FLQuant-method setParams<-,biodyn,FLQuants-method  setParams<-,biodyn,data.frame-method
 #'
 #' @examples
 #' \dontrun{
@@ -25,7 +27,7 @@ utils::globalVariables(c('ldply','melt','variable'))
 setGeneric('setParams<-', function(object,value)  standardGeneric('setParams<-'))
 
 setMethod('setParams<-', signature(object='biodyn',value='data.frame'), function(object,value) {
-  nms=c(biodyn:::modelParams(as.character(object@model)),'b0')
+  nms=c(modelParams(as.character(object@model)),'b0')
   object@params=object@params[nms]
 
   object@params =setQ(object,value)
@@ -39,18 +41,17 @@ setMethod('setParams<-', signature(object='biodyn',value='FLPar'), function(obje
 
 setMethod('setParams<-', signature(object='biodyn',value='FLQuant'), function(object,value) {
 
-  nms=c(biodyn:::modelParams(tolower(as.character(object@model))),'b0')
- 
-  #value=FLCore:::apply(value,2,mean)
-  object@params =setQ(object,value)
+  nms=c(modelParams(tolower(as.character(object@model))),'b0')
+  #value=FLCore::apply(value,2,mean)
+  object@params =biodyn:::setQ(object,value)
   
   return(object)})
 
 setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(object,value) {
-  nms=c(biodyn:::modelParams(as.character(object@model)),'b0')
+  nms=c(modelParams(as.character(object@model)),'b0')
   object@params=object@params[nms]
     
-  object@params =setQ(FLCore:::iter(object,1),FLQuants(lapply(value, function(x) FLCore:::apply(x,2,mean,na.rm=T))))
+  object@params =setQ(FLCore::iter(object,1),FLQuants(lapply(value, function(x) FLCore::apply(x,2,mean,na.rm=T))))
   
   nms=dimnames(params(object))$param
   n  = as.numeric(summary(substr(nms,1,1)=='q')['TRUE'])
@@ -61,10 +62,9 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(o
   
   return(object)})
 
-##############################################################
-#' control
+#' setControl<-
 #'
-#' Sets up the control slot in a biodyn object given the values in the \code{params}
+#' @description #' Sets up the control slot in a biodyn object given the values in the \code{params}
 #' slot. The starting values are set to the values in \code{params} and the min and
 #' max bounds to .1 and 10 times of these.
 #'
@@ -74,7 +74,9 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(o
 #' 
 #' @export
 #' @docType methods
-#' @rdname control
+#' @rdname setControl
+#'
+#' @aliases setControl<-,biodyn,FLPar-method  setControl<-,biodyn,FLQuant-method  setControl<-,biodyn,FLQuants-method
 #'
 #' @examples
 #' \dontrun{
@@ -84,11 +86,9 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(o
 #' control(bd)}
 #' 
 #'      
-setGeneric('setControl<-',  function(object,value) standardGeneric('setControl<-'))
-setMethod('setControl<-', signature(object='biodyn',value='FLPar'), function(object,value) {
-  
-  phase=NULL;min=0.1;max=10.0
-  
+setGeneric('setControl<-',  function(object,value,...) standardGeneric('setControl<-'))
+setMethod('setControl<-', signature(object='biodyn',value='FLPar'), function(object,value,min=0.1,max=10.0) {
+  phase=NULL
   if (dims(value)$iter>1 & dims(object@control)$iter==1)
     object@control=propagate(control(object),dims(value)$iter)
 
@@ -119,11 +119,10 @@ setMethod('setControl<-', signature(object='biodyn',value='FLPar'), function(obj
   
   return(object)})
 
-calcSigma <- function(obs,hat=rep(0,length(obs)),na.rm=T){
-  
+.calcSigma <- function(obs,hat=rep(0,length(obs)),na.rm=T){
   n  =length(obs[!is.na(obs+hat)])
   SS =sum((obs-hat)^2,na.rm=na.rm)
-  
+
   return((SS/n)^.5)}
 
 calcB0<-function(index,q,k,nyrB0=3,error='log'){
@@ -144,24 +143,23 @@ calcQ<-function(stock,index,error='log',na.rm=T){
   index<-index[seq(n)]
   if (na.rm)
     n=length(seq(n)[!is.na(index+stock)])
-  
+
   res=switch(error,
              normal={q    =sum(stock*index, na.rm=T)/sum(stock*stock, na.rm=na.rm)
-                     sigma=calcSigma(index/(q*stock))
+                     sigma=.calcSigma(index/(q*stock))
                      data.frame(q=q,sigma=sigma)
              },
              log   ={q    =exp(sum(log(index)-log(stock), na.rm=na.rm)/n)
-                     sigma=calcSigma(log(index),log(q*stock))
+                     sigma=.calcSigma(log(index),log(q*stock))
                      data.frame(q=q,sigma=sigma)},
              cv   ={res   <-sum(index/stock)
-                    sigma2<-calcSigma(res,na.rm=na.rm)
+                    sigma2<-.calcSigma(res,na.rm=na.rm)
                     q     <-(-res+(res^2+4*length(index)*sigma2*sum((index/stock)^2)))/(2*length(index)*sigma2)
                     data.frame(q=q,sigma=sigma)})
   
   return(res)}
 
 setQ=function(object,index,error='log'){
-  
   fn=function(index,stock){
     if (dims(index)$iter==1)
       dimnames(index)$iter=1
@@ -180,48 +178,49 @@ setQ=function(object,index,error='log'){
              data.frame=merge(model.frame(FLQuants('stock'=stock(object))),index,by='year',all=T))
 
   res=res[!is.na(res$iter),]
-  
+
   if (!('name' %in% names(res))) 
     names(res)[1]='name'
 
   res=res[!is.na(res$name),]
   res=ddply(res, .(name,iter), function(x,log) data.frame(calcQ(x$stock,x$index)),log='log')
   its=max(as.numeric(ac(res$iter)))
-  
+
   res.=transform(melt(res,id=c('name','iter')),params=paste(variable,name,sep=''))[,c('params','value','iter')]
   names(res.)[2]='data'
-  
+
   #bug
   res=as(res.,'FLPar')[,1]
-  #res=FLCore:::iter(res,seq(its))
+  #res=FLCore::iter(res,seq(its))
   units(res)='NA'
   res=res.[with(res.,order(iter,params)),]
   
   if (dims(object@params)$iter==1)
     object@params=propagate(object@params,its)
-  
+
   t.=rbind(object@params,FLPar(as.FLQuant(cbind(res,year=1))[,1,drop=T]))
   dmns=dimnames(t.)
   names(dmns)=c('params','iter')
   t.=FLPar(array(t.,dim=unlist(lapply(dmns,length)),dimnames=dmns))
   units(t.)='NA'
-  
+
   object@params=t.
   #object@params=FLPar(rbind(FLPar(object@params),FLPar(res)))
   
   object@params}
 
-setMethod('setControl<-', signature(object='biodyn',value='FLQuant'), function(object,value) {
+setMethod('setControl<-', signature(object='biodyn',value='FLQuant'), function(object,value,
+  min=0.1,max=10.0) {
   
-  min=0.1;max=10.0
   setParams(object)<-value
   setControl(object,min=min,max=max)<-params(object)
   
   return(object)})
 
 
-setMethod('setControl<-', signature(object='biodyn',value='FLQuants'), function(object,value) {
-  min=0.1;max=10.0
+setMethod('setControl<-', signature(object='biodyn',value='FLQuants'), 
+          function(object,value,min=0.1,max=10.0) {
+
   setParams(object)<-value
   setControl(object,min=min,max=max)<-params(object)
     
@@ -236,11 +235,8 @@ setMethod('control', signature(object='biodyn'), function(object) {
   object@control})
 
 #' controlFn
-#' @description 
-#' A utility function to help set up the \code{control} slot in \code{biodyn} 
+#' @description A utility function to help set up the \code{control} slot in \code{biodyn} 
 #'           
-#' @aliases mseBiodyn
-#' 
 #' @param om an \code{FLStock} object
 #' 
 #' @param r a \code{numeric} value with best guess
@@ -254,16 +250,14 @@ setMethod('control', signature(object='biodyn'), function(object) {
 #' @param min a \code{numeric} a multipler for the best guess  
 #' @param max \code{numeric} a multipler for the best guess
 #'
-#' @seealso \code{\link{control}} 
-#' 
 #' @return a \code{control} object
 #'  
 #' @export
 #' @docType methods
 #' @rdname controlFn
 #' 
-#' @seealso \code{\link{biodyn}}, \code{\link{mseBiodyn}}
-#' 
+#' @seealso \code{\link{biodyn}}  \code{\link{control}} 
+#'   
 #' @examples
 #' \dontrun{
 #'    }
@@ -286,11 +280,8 @@ controlFn=function(r,       k,       p=1,      b0=1,
   res}  
   
 #' priorFn
-#' @description 
-#' A utility function to help set up the \code{prior} slot in \code{biodyn}.
-#'           
-#' @aliases mseBiodyn
-#' 
+#' @description A utility function to help set up the \code{prior} slot in \code{biodyn}.
+#'            
 #' @param ...
 #' 
 #' #' @return \code{list} with om, ...
@@ -299,7 +290,7 @@ controlFn=function(r,       k,       p=1,      b0=1,
 #' @docType methods
 #' @rdname priorFn
 #' 
-#' @seealso \code{\link{biodyn}}, \code{\link{mseBiodyn}}
+#' @seealso \code{\link{biodyn}}
 #' 
 #' @examples
 #' \dontrun{
@@ -311,7 +302,7 @@ priorFn=function(...){
   if ('list' %in% is(args[[1]]))
     args=args[[1]]
   
-  res=biodyn:::biodyn()@priors
+  res=biodyn::biodyn()@priors
   
   for (i in dimnames(res)$params[dimnames(res)$params %in% names(args)]){
     if ('weight' %in% names(args[[i]])) res[i,c('weight')]=args[[i]]['weight']

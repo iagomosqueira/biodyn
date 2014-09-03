@@ -7,6 +7,20 @@ utils::globalVariables('alply')
 diagsFn=function(res){
   res$residualLag <- c(res$residual[-1],NA)
   
+  qqLine <- function(x,y){ 
+    qtlx <- quantile(x, prob=c(0.25,0.75), na.rm=T)
+    qtly <- quantile(y, prob=c(0.25,0.75), na.rm=T)
+    
+    a <- (qtly[1]- qtly[2]) / (qtlx[1] - qtlx[2])
+    b <- qtly[1] - qtlx[1] * a
+    
+    res <- c(a,b)
+    
+    names(res) <- NULL
+    names(res) <- c("a","b")
+    
+    return(res)}
+  
   try({qq.     <- qqnorm(res$residual,plot.it=FALSE,na.rm=T)
        res$qqx <- qq.$x
        res$qqy <- qq.$y
@@ -73,7 +87,7 @@ setPella=function(obj, exeNm='pella', dir=tempdir()) {
 
   bd.        =obj[[1]]
  
-  nms=c( biodyn:::modelParams('pellat'),'b0')
+  nms=c(modelParams('pellat'),'b0')
   if (length(unique(idx$name))>0)
     nmIdx=paste(c('q','sigma'), rep(unique(idx$name),each=length(unique(idx$name))),sep='')
   else  
@@ -85,7 +99,7 @@ setPella=function(obj, exeNm='pella', dir=tempdir()) {
   ctl        = alply(ctl,1)
   names(ctl) = nms
 
-  biodyn:::writeADMB(ctl, paste(dir, '/', exeNm, '.ctl', sep=''),FALSE)
+  writeADMB(ctl, paste(dir, '/', exeNm, '.ctl', sep=''),FALSE)
   
   cat('# q ####################\n', file=paste(dir, '/', exeNm, '.ctl', sep=''),append=TRUE)
 
@@ -95,7 +109,7 @@ setPella=function(obj, exeNm='pella', dir=tempdir()) {
   ctl           = alply(t(matrix(ctl,dim(ctl))),1)
   names(ctl)    = c('phase','lower','upper','guess')
   
-  biodyn:::writeADMB(ctl, paste(dir, '/', exeNm, '.ctl', sep=''),TRUE)
+  writeADMB(ctl, paste(dir, '/', exeNm, '.ctl', sep=''),TRUE)
   
   cat('# sigma ################\n', file=paste(dir, '/', exeNm, '.ctl', sep=''),append=TRUE)
   ctl           = bd.@control[nmIdx[grep('s',nmIdx)],]
@@ -103,7 +117,7 @@ setPella=function(obj, exeNm='pella', dir=tempdir()) {
   ctl           = alply(t(matrix(ctl,dim(ctl))),1)
   names(ctl)    = c('phase','lower','upper','guess')
 
-  biodyn:::writeADMB(ctl, paste(dir, '/', exeNm, '.ctl', sep=''),TRUE)
+  writeADMB(ctl, paste(dir, '/', exeNm, '.ctl', sep=''),TRUE)
   
   # prr file
   prr = bd.@priors[c(nms,c('msy','bmsy','fmsy'),nmIdx),] 
@@ -112,7 +126,7 @@ setPella=function(obj, exeNm='pella', dir=tempdir()) {
   writeADMB(prr, paste(dir, '/', exeNm, '.prr', sep=''))
    
   # write data
-  ctc = as.list(model.frame(bd.[['catch']], drop=TRUE))
+  ctc = as.list(model.frame(FLQuants("catch"=bd.@catch), drop=TRUE))
   ctc = c(nYrs=length(ctc[[1]]), ctc)
   res = c(ctc, c(nIdxYrs=dim(idx)[1], nIdx=length(unique(idx$name)), idx))
   
@@ -156,7 +170,7 @@ getPella=function(obj, exeNm='pella') {
   obj@objFn['rss']=t3[length(t3)-1]
   
   us=paste('u',seq(length(dimnames(params(obj))$params[grep('q',dimnames(params(obj))$params)])),sep='')
-  obj@ll=FLPar(biodyn:::readADMB('lls.txt'),dimnames=list(params=us,iter=1))
+  obj@ll=FLPar(readADMB('lls.txt'),dimnames=list(params=us,iter=1))
   
   # stock biomass
   obj@stock[,1:dim(t1)[1]] = unlist(c(t1['stock'])) 
@@ -164,7 +178,7 @@ getPella=function(obj, exeNm='pella') {
   return(obj)} 
 
 #FLParBug sim@control['r','val',1]=c(.5,.6)
-#exe(object, exeNm='biodyn', dir=tempdir(), set=biodyn:::set, get=biodyn:::set, cmdOps=paste('-maxfn 500'))
+#exe(object, exeNm='biodyn', dir=tempdir(), set=biodyn::set, get=biodyn::set, cmdOps=paste('-maxfn 500'))
   
 activeParams=function(obj) dimnames(obj@control)$params[c(obj@control[,'phase']>-1)]
 
@@ -184,16 +198,19 @@ activeParams=function(obj) dimnames(obj@control)$params[c(obj@control[,'phase']>
 #' @docType methods
 #' @rdname fit
 #'
+#' @aliases fit fit-method fit,biodyn,FLQuant-method   fit,biodyn,FLQuantJK-method  fit,biodyn,FLQuants-method
+#' 
 #' @examples
 #' \dontrun{
 #' data(bd)
 #' bd=fit(bd,swonIndex)
 #' }
+setGeneric('fit',   function(object,index,...)     standardGeneric('fit'))
 setMethod('fit',signature(object='biodyn',index='FLQuant'),
           function(object,index=index,exeNm='pella',package='biodyn', 
                    dir=tempdir(),
-                   set=biodyn:::setPella,
-                   get=biodyn:::getPella,cmdOps=paste('-maxfn 500 -iprint 0'))
+                   set=setPella,
+                   get=getPella,cmdOps=paste('-maxfn 500 -iprint 0'))
    fitPella(object,index=index,exeNm=exeNm,package=package, 
             dir=dir,
             set=set,
@@ -219,7 +236,7 @@ setMethod('fit',signature(object='biodyn',index='FLQuantJK'),
             
             index =as.FLQuant(index)
 
-            object=biodyn:::fitPella(object,index=index,exeNm=exeNm,package=package, 
+            object=biodyn::fitPella(object,index=index,exeNm=exeNm,package=package, 
                      dir=dir,
                      set=set,
                      get=get,cmdOps=cmdOps)
@@ -274,12 +291,12 @@ fitPella=function(object,index=index,exeNm='pella',package='biodyn',
   if (its>1){
    
       ## these are all results, so doesnt loose anything
-      bd@stock  =FLCore:::iter(bd@stock,  1)
-      bd@params =FLCore:::iter(bd@params, 1)
-      bd@objFn  =FLCore:::iter(bd@objFn,  1)
-      bd@vcov   =FLCore:::iter(bd@vcov,   1)
-      bd@ll     =FLCore:::iter(bd@ll,     1)
-      bd@hessian=FLCore:::iter(bd@hessian,1)
+      bd@stock  =FLCore::iter(bd@stock,  1)
+      bd@params =FLCore::iter(bd@params, 1)
+      bd@objFn  =FLCore::iter(bd@objFn,  1)
+      bd@vcov   =FLCore::iter(bd@vcov,   1)
+      bd@ll     =FLCore::iter(bd@ll,     1)
+      bd@hessian=FLCore::iter(bd@hessian,1)
       bd@mng    =FLPar(a=1)
       bd@mngVcov=FLPar(a=1,a=1)
       
@@ -289,7 +306,7 @@ fitPella=function(object,index=index,exeNm='pella',package='biodyn',
       pnms   <- getSlots(class(bd))
       pnames <- names(pnms)[pnms == 'FLPar']
       for(i in pnames){
-        slot(bd, i)=FLCore:::iter(slot(bd, i),1)
+        slot(bd, i)=FLCore::iter(slot(bd, i),1)
         slot(bd, i) <- propagate(slot(bd, i), its)}
       
       #bd=propagate(bd,its)      
@@ -300,10 +317,10 @@ fitPella=function(object,index=index,exeNm='pella',package='biodyn',
   cpue=object[[2]]
   bd2 =object[[1]]
   for (i in seq(its)){     
-     object[[2]] = FLCore:::iter(cpue,i) 
+     object[[2]] = FLCore::iter(cpue,i) 
   
      for (s in names(slts)[-(7:8)]){      
-        slot(object[[1]],s) = FLCore:::iter(slot(bd2,s),i) 
+        slot(object[[1]],s) = FLCore::iter(slot(bd2,s),i) 
         }  
 
      object[[1]]=set(object,exeNm,dir)
@@ -316,7 +333,7 @@ fitPella=function(object,index=index,exeNm='pella',package='biodyn',
      object[[1]]=getPella(object[[1]], exeNm)
      
      for (s in names(slts)[slts=='FLQuant']){
-         FLCore:::iter(slot(bd,s),i) = slot(object[[1]],s)
+         FLCore::iter(slot(bd,s),i) = slot(object[[1]],s)
          } 
      
      if (its<=1){
@@ -329,7 +346,7 @@ fitPella=function(object,index=index,exeNm='pella',package='biodyn',
    
        ## vcov
        if (file.exists(paste(dir,'admodel.cov',sep='/')))
-         try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- biodyn:::cv(paste(dir,'admodel.hes',sep='/')), silent=TRUE) 
+         try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- biodyn::cv(paste(dir,'admodel.hes',sep='/')), silent=TRUE) 
        #if (file.exists(paste(dir,'admodel.cov',sep='/'))){
        #   x<-file(paste(dir,'admodel.cov',sep='/'),'rb')
        #   nopar<-readBin(x,'integer',1)
@@ -340,14 +357,14 @@ fitPella=function(object,index=index,exeNm='pella',package='biodyn',
        if (file.exists(paste(dir,'pella.hst',sep='/')))
          try(bd@profile<-admbProfile(paste(dir,'pella.hst',sep='/'))$profile)
        }
-     
+         
      bd@params@.Data[  ,i] = object[[1]]@params
      bd@control@.Data[,,i] = object[[1]]@control
      #bd@objFn@.Data[   ,i] = object[[1]]@objFn
 
      #FLParBug
      bd@ll@.Data[,i][] = unlist(c(object[[1]]@ll))
-    
+
      if (file.exists('pella.std')){
        err1=try(mng.<-read.table('pella.std',header=T)[,-1])
     
@@ -369,15 +386,15 @@ fitPella=function(object,index=index,exeNm='pella',package='biodyn',
        try(if (is(err2)!='try-error') bd@mngVcov@.Data[,,i][]=unlist(c(mngVcov.)))
        }}
   }
-  
+
   units(bd@mng)='NA'
   
   bd=fwd(bd,catch=catch(bd)[,rev(dimnames(catch(bd))$year)[1]])
-   
+
   if (length(grep('-mcmc',cmdOps))>0 & length(grep('-mcsave',cmdOps))>0){
     #'-mcmc 100000 -mcsave 100'
      setMCMC=function(obj,dir){
-       ps=biodyn:::read.psv(paste(dir,'pella.psv',sep='/'))
+       ps=biodyn::read.psv(paste(dir,'pella.psv',sep='/'))
 
        dmns=list(params=activeParams(obj),iter=seq(dim(ps)[1]))
 
@@ -402,12 +419,11 @@ fitPella=function(object,index=index,exeNm='pella',package='biodyn',
     bd@params[dims(par)$params,]=par
     bd@stock=propagate(bd@stock,dim(params(bd))[2])
     bd=fwd(bd,catch=catch(bd))  
-   
-     
-     attributes(bd@params)[['mcmc']]  =mcmc
-     attributes(bd@params)[['mcsave']]=mcsave 
+
+    attributes(bd@params)[['mcmc']]  =mcmc
+    attributes(bd@params)[['mcsave']]=mcsave 
     }
-    
+     
   if (its<=1) bd@diags=getDiags()
   
   setwd(oldwd)
@@ -432,7 +448,7 @@ admbCor=function(fl='pella.cor'){
   res=scan(fl,sep='\n',what=as.character(),quiet=TRUE)[-1]
   res=maply(res, str_trim)
   res=strsplit(res, ' +')
-  
+     
   nms=laply(res,function(x) x[2])[-1]
   hat=laply(res,function(x) as.numeric(x[3]))[-1]
   sd =laply(res,function(x) as.numeric(x[4]))[-1]
@@ -460,14 +476,14 @@ admbCor=function(fl='pella.cor'){
 
 getDiags=function(fl='pella.rep'){
   skip=grep('Model',scan(fl,sep='\n',what=as.character(),quiet=TRUE))
-  
+      
   res=read.table(fl,skip=skip,header=TRUE)
   res=transform(res,residual=log(index/hat))
   res=diagsFn(res)
   
   res$harvest=res$catch/res$stock
   res$stock  =res$stock.
-  
+   
   res[,-7]}
 
 calcElasticity=function(bd,mn=3,rg=5){
@@ -497,7 +513,7 @@ calcElasticity=function(bd,mn=3,rg=5){
       
     return(log(smy))}
   
-  parNms=c(biodyn:::modelParams(model(bd)),'b0')
+  parNms=c(modelParams(model(bd)),'b0')
 
   jbn=jacobian(elasFn,log(c(bd@params[parNms])),dmns=parNms,bd=bd,mn=mn,rg=rg)
   
@@ -548,7 +564,7 @@ calcSS=function(x) daply(x@diags, .(name),
 
 fitFn=function(file){
 
-  res=biodyn:::admbFit(file)
+  res=admbFit(file)
 
   #est        
   hat =FLPar(array(c(res$est),dim     =c(length(res$names),1),

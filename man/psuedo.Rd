@@ -2,6 +2,8 @@
 \docType{methods}
 \name{psuedo}
 \alias{psuedo}
+\alias{psuedo,biodyn,FLQuant-method}
+\alias{psuedo-method}
 \title{psuedo}
 \usage{
 psuedo(object, catch, ...)
