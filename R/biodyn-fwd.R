@@ -7,7 +7,7 @@
 
 utils::globalVariables('finite')
 
-spFn=function(mdl,params,biomass=0) {
+prdFn=function(mdl,params,biomass=0) {
   if (!is.FLQuant(biomass)) biomass=FLQuant(biomass)  
   
   if (dims(params)$iter==1 & dims(biomass)$iter >1) params =propagate(params,dims(biomass)$iter)
@@ -113,14 +113,16 @@ iavFn=function(val,bnd,lag=1){
 #' for a given future catch, harvest rate, or stock biomass. Only
 #' one of these has to be supplied as an argument.
 #'
-#' @param  \code{object}, an object of class \code{biodyn} or  \code{biodyns}
-#' @param  catch   an \code{FLQuant} or \code{FLQuants} containing future catches
-#' @param  harvest an \code{FLQuant} or \code{FLQuants} containing future harvest
-#' @param  stock   an \code{FLQuant} or \code{FLQuants} containing future stock    
-#' @param  minF    minimum harvest, \code{FLQuant} or single numeric value    
-#' @param  maxF    maximum harvest, \code{FLQuant} or single numeric value
-#' @param  pe      process error term, an \code{FLQuant}
-#' @param  peMult  logical, i.e. by default equals true so multiplicative, otherwise additive
+#' @param object an object of class \code{biodyn} or  \code{biodyns}
+#' @param ctrl missing
+# @param catch   an \code{FLQuant} or \code{FLQuants} containing future catches
+# @param harvest an \code{FLQuant} or \code{FLQuants} containing future harvest
+# @param stock   an \code{FLQuant} or \code{FLQuants} containing future stock    
+# @param minF    minimum harvest, \code{FLQuant} or single numeric value    
+# @param maxF    maximum harvest, \code{FLQuant} or single numeric value
+# @param pe      process error term, an \code{FLQuant}
+# @param peMult  logical, i.e. by default equals true so multiplicative, otherwise additive
+#' @param ... any other parameters
 #'
 #' @aliases fwd-method fwd,biodyn,FLQuants-method  fwd,biodyn,missing-method 
 #' 
@@ -254,10 +256,10 @@ fwdFn=function(object,
     
          ## sp & process error
          if (!is.null(pe)) {    
-            if (peMult) sp.=computeSP(object,object@stock[, ac(y)])%*%pe[, ac(y)] 
-            else        sp.=computeSP(object,object@stock[, ac(y)])%+%pe[, ac(y)]
-         } else sp.=computeSP(object,object@stock[, ac(y)])
-         #} else sp.=computeSP(object,object@stock[, ac(y)]*(1-ptYr)+object@stock[, ac(y+1)]*(ptYr))
+            if (peMult) sp.=computePrd(object,object@stock[, ac(y)])%*%pe[, ac(y)] 
+            else        sp.=computePrd(object,object@stock[, ac(y)])%+%pe[, ac(y)]
+         } else sp.=computePrd(object,object@stock[, ac(y)])
+         #} else sp.=computePrd(object,object@stock[, ac(y)]*(1-ptYr)+object@stock[, ac(y+1)]*(ptYr))
          
           ## targets, if lag<0 then the targets are relative 
           if (hcrTrgt)

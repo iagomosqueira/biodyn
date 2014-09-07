@@ -10,6 +10,7 @@ utils::globalVariables(c('calcR','fwdWindow','interval', 'nits',
 #' @param om an \code{FLStock} objectl 
 #' @param brp an \code{FLBRP} object that holds the biological parameters for use in the projections
 #' @param range a \code{vector} the starting and end years for the projections, and the interval for running the MP
+#' @param srDev  a \code{FLQuant} with recruitment deviates
 #' @param uDev an \code{FLQuant} with stock recruitment residuals
 #' @param hcr a \code{vector} with HCR options
 #' @param ctrl  a \code{vector} with HCR options
@@ -28,6 +29,7 @@ utils::globalVariables(c('calcR','fwdWindow','interval', 'nits',
 #' 
 #' @examples
 #' \dontrun{
+#' simBiodyn()
 #'    }
 runMSE=function(om,brp,srDev,uDev,
                 range=c(min=range(om)[max],max=range(om)[max]+30,interval=3),

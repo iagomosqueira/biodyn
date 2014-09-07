@@ -6,11 +6,13 @@
 calcK(msy, r = 0.6, p = 1, params = FLPar(r = r, p = p))
 }
 \arguments{
-\item{\code{msy},}{a guess for $MSY$}
+\item{msy}{a guess for $MSY$}
 
-\item{\code{r},}{a guess for $r$ the population growth rate}
+\item{r}{a guess for $r$ the population growth rate}
 
-\item{\code{p},}{a guess for $p$ the shape parameter}
+\item{p}{a guess for $p$ the shape parameter}
+
+\item{params}{provide $r$ and $p$ as \code{FLPar}}
 }
 \value{
 an \code{FLPar} object with an estimate for $k$

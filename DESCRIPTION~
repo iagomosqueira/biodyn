@@ -3,13 +3,17 @@ Title: Biomass Dynamic Model
 Version: 0.0.1
 Author: Laurence Kell
 Description: implements a biomass dynamic model class
+VignetteBuilder: R.rsp
 Depends:
     R(>= 3.0.1),
     FLCore(>= 2.2)
 Imports:
-    FLBRP,
-    ggplotFL(>= 0.2),
     plyr
+Suggests:
+    methods,
+    R.rsp,
+    diags,
+    kobe
 Maintainer: Laurence Kell <laurie.kell@iccat.int>
 License: GPL-2
 LazyLoad: Yes

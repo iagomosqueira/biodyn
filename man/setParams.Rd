@@ -11,7 +11,9 @@
 setParams(object) <- value
 }
 \arguments{
-\item{\code{object},}{an object of class \code{biodyn}}
+\item{object}{an object of class \code{biodyn}}
+
+\item{value}{\code{params}}
 }
 \description{
 Sets up the param slot in a biodyn object given an index

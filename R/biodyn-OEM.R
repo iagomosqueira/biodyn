@@ -18,7 +18,7 @@ survey=function(object,timing=FLQuant(0,dimnames=dimnames(m(object))),wt=stock.w
             stop('Correct units (f or hr) not specified in the harvest slot')
       
       if (sd>0){
-           if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sdlog=sd),sd=sd) else 
+           if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sd=sd),sd=sd) else 
                      res=apply(res,2:6,function(x,sd) rlnorm(1,x,sdlog=sd),sd=sd)
            }
         
@@ -44,7 +44,7 @@ u=function(object,partialf=FLQuant(1,dimnames=dimnames(m(object))),wt=catch.wt(o
               stop('Correct units (f or hr) not specified in the harvest slot')
           
           if (sd>0){
-            if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sdlog=sd),sd=sd) else 
+            if (!log) res=apply(res,2:6,function(x,sd) rnorm( 1,x,sd=sd),sd=sd) else 
                       res=apply(res,2:6,function(x,sd) rlnorm(1,x,sdlog=sd),sd=sd)}
           
           res} 

@@ -3,7 +3,7 @@
 \name{plotMSE}
 \alias{plotMSE}
 \alias{plotMSE,biodyn,FLStock,FLBRP-method}
-\title{Create a \code{ggplot2} plot}
+\title{plotMSE}
 \usage{
 plotMSE(x, y, z, ...)
 }
@@ -13,6 +13,8 @@ plotMSE(x, y, z, ...)
 \item{y,}{an object of class \code{FLStock}}
 
 \item{z,}{an object of class \code{FLBRP}}
+
+\item{...}{other arguments}
 }
 \value{
 an \code{ggplot2} object
@@ -28,6 +30,6 @@ refpts('logistic',FLPar(msy=100,k=500))
 }
 }
 \seealso{
-\code{\link{plotSP}}
+\code{\link{plotPrd}}
 }
 

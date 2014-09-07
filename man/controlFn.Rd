@@ -8,8 +8,6 @@ controlFn(r, k, p = 1, b0 = 1, phaseR = 1, phaseK = 1, phaseP = -1,
   phaseB0 = -1, min = 0.5, max = 2)
 }
 \arguments{
-\item{om}{an \code{FLStock} object}
-
 \item{r}{a \code{numeric} value with best guess}
 
 \item{k}{a \code{numeric} value with best guess}
@@ -38,6 +36,7 @@ A utility function to help set up the \code{control} slot in \code{biodyn}
 }
 \examples{
 \dontrun{
+simBiodyn()
    }
 }
 \seealso{

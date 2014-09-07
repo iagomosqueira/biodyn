@@ -8,11 +8,11 @@
 tseries(object, refpts, ...)
 }
 \arguments{
-\item{stk}{\code{object}}
+\item{object}{\code{biodyn}}
 
 \item{refpts}{\code{FLBRP}}
 
-\item{proxy}{\code{character} with name of reference point in refpts(brp), by default 'msy'.}
+\item{...}{other arguments}
 }
 \value{
 a \code{data.frame}

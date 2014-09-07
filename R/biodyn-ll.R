@@ -20,7 +20,7 @@ calcLogLik<-function(obs,hat=rep(0,length(obs)),error='log',type=1){
   se<-calcSigma(obs,hat,error=error)
   
   if (type==1) return(logl(se,obs,hat)) else
-    if (type==2) return(-sum(dnorm(obs, hat, se, log=(error=='log'), na.rm=TRUE))) else
+    if (type==2) return(-sum(dnorm(obs, hat, se, log=(error=='log')))) else
       if (type==3) return(sum((obs-hat)^2))}
 
 

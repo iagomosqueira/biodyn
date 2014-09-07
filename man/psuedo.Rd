@@ -9,12 +9,11 @@
 psuedo(object, catch, ...)
 }
 \arguments{
-\item{\code{object}}{of class \code{biodyn}}
+\item{object}{of class \code{biodyn}}
 
-\item{\code{catch}}{of class \code{FLQuant} with the catch time series.}
+\item{catch}{of class \code{FLQuant} with the catch time series.}
 
-\item{\code{cov}}{parameter variance covariance matrix for simulation of estimation error,
-by default uses the vcov slot in \code{biodyn}}
+\item{...}{other arguments}
 }
 \value{
 \code{biodyn} with estimates of stock based on catch time series

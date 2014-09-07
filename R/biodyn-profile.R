@@ -5,13 +5,16 @@ utils::globalVariables('maply')
 #'
 #' Profiles biodyn  
 #'
-#' @param   \code{fitted}, an object of class \code{biodyn}
-#' @param   \code{index}, an \code{FLQuant}, \code{FLQuants} or  \code{data.frame} object with CPUE indices
-#' @param   \code{cmdOps}, a character string giving ADMB options see \url{http://www.admb-project.org/documentation/manuals/ADMBrefcard-A4.pdf/view}
-#'
+#' @param fitted an object of class \code{biodyn}
+#' @param index an \code{FLQuant}, \code{FLQuants} or  \code{data.frame} object with CPUE indices
+#' @param which parameters to fix
+#' @param range relative values to fix over
+#' @param fn returned values
+#' @param run logical, run the profile if TRUE, if FALSE set control slot and return original object
+#'     
 #' @export
 #' @docType methods
-#' @rdname fit
+#' @rdname profile
 #'
 #' @examples
 #' \dontrun{
@@ -40,14 +43,18 @@ setMethod('profile', signature(fitted='biodyn'),
       function(fitted,index,
                    which,
                    range=seq(0.5,1.5,length.out=21),
-                   fn   =function(x) cbind(model.frame(params(x)),ll=model.frame(x@ll)[,1],model.frame(refpts(x))[,-4],
+                   fn   =function(x) cbind(model.frame(params(x)),
+                                           ll=model.frame(x@ll),
+                                           model.frame(refpts(x))[,-4],
                                            stock  =c(stock(  x)[,ac(range(x)['maxyear'])]%/%bmsy(x)),
                                            harvest=c(harvest(x)[,ac(range(x)['maxyear'])]%/%fmsy(x))),
                    run  =TRUE,...){
-  
-        if (dims(index)$maxyear>=dims(stock(fitted))$maxyear) stop('index years greater in length than stock')
+        
+        for (i in seq(length(index)))
+          if (dims(index[[i]])$maxyear>=dims(stock(fitted))$maxyear) stop('index years greater in length than stock')
+        
         if (dims(fitted)$iter>1) stop('can only be done for a single iter')
-                 
+        
         if (dim(fitted@control)[3]==1){
            fitted@control=propagate(fitted@control,length(range)^length(which))
           
@@ -66,8 +73,10 @@ setMethod('profile', signature(fitted='biodyn'),
           
         if (!run) return(fitted)
         
-        res=fit(fitted,index)
-        
+        f=fitted
+        f@catch=propagate(f@catch,dim(f@control)[3])
+        res=fit(f,index)
+        res@catch=iter(res@catch,1)
         rtn=fn(res)
         
         return(rtn)})

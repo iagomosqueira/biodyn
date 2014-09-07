@@ -4,9 +4,11 @@ utils::globalVariables('laply')
 #' 
 #' Calculates the Total Allowable Catch for a given harvest rate and stock biomass
 #'
-#' @param  \code{object}, an object of class \code{biodyn} or
-#' @param  \code{harvest}, an \code{FLQuant} object with harvest rate
-#' @return \code{FLQuant} object with TAC value(s)
+#' @param  object an object of class \code{biodyn} or
+#' @param  harvest an \code{FLQuant} object with harvest rate
+#' @param ... other arguments
+#' 
+#' @return FLQuant object with TAC value(s)
 #' 
 #' @seealso \code{\link{hcr}},  \code{\link{fwd}}
 #' 
@@ -26,7 +28,7 @@ setMethod( 'tac', signature(object='biodyn'),
              #maxY =max(as.numeric(yrs))
           
              #stock(object)=window(stock(object),end=maxY)
-             #stock(object)[,ac(maxY)]=stock(object)[,ac(maxY-1)]-catch(object)[,ac(maxY-1)]+computeSP(object,stock(object)[,ac(maxY-1)])
+             #stock(object)[,ac(maxY)]=stock(object)[,ac(maxY-1)]-catch(object)[,ac(maxY-1)]+computePrd(object,stock(object)[,ac(maxY-1)])
              
              #catch(object)=propagate(catch(object),dims(object)$iter)  
              #harvest      =window(harvest,start=dims(object)$year-1)
@@ -44,16 +46,16 @@ setMethod( 'tac', signature(object='biodyn'),
 #' 
 #' Combines reference points into the HCR breakpts
 #'
-#' @param  \code{ftar}, an object of class \code{FLPar}
-#' @param  \code{btrig}, an object of class \code{FLPar}
-#' @param  \code{fmin}, an object of class \code{FLPar}
-#' @param  \code{blim}, an object of class \code{FLPar}
+#' @param ftar an object of class \code{FLPar}
+#' @param btrig an object of class \code{FLPar}
+#' @param fmin an object of class \code{FLPar}
+#' @param blim an object of class \code{FLPar}
 #' 
 #' @seealso \code{\link{hcr}}
 #' 
 #' @export
 #' @docType methods
-#' @rdname tac
+#' @rdname hcrParam
 #'
 #' @examples
 #' \dontrun{
@@ -88,14 +90,15 @@ hcrParam=function(ftar,btrig,fmin,blim){
 #' 
 #' Harvest Control Rule, calculates F, or Total Allowable Catch (TAC) based on a hockey stock harvest control rule.
 #'
-#' @param  \code{object} an object of class \code{biodyn} or
-#' @param  \code{params} \code{FLPar} object with hockey stick HCR parameters, see hcrParam
-#' @param  \code{yrs} numeric vector with yrs for HCR prediction
-#' @param  \code{refYrs} numeric vector with years used to for stock/ssb in HCR
-#' @param  \code{tac} \code{logical} should return value be TAC rather than F?
-#' @param  \code{bndF} \code{vector} with bounds (i.e.min and max values) on iter-annual variability on  F
-#' @param  \code{bndTac} \code{vector} with bounds (i.e. min and max values) on iter-annual variability on TAC
-#' 
+#' @param object an object of class \code{biodyn} or
+#' @param ... other parameters, i.e.
+#' params \code{FLPar} object with hockey stick HCR parameters, see hcrParam
+#' yrs numeric vector with yrs for HCR prediction
+#' refYrs numeric vector with years used to for stock/ssb in HCR
+#' tac \code{logical} should return value be TAC rather than F?
+#' bndF \code{vector} with bounds (i.e.min and max values) on iter-annual variability on  F
+#' bndTac \code{vector} with bounds (i.e. min and max values) on iter-annual variability on TAC
+#'  
 #' @aliases hcr,biodyn-method
 #' 
 #' @return \code{FLPar} object with value(s) for F or TAC if tac==TRUE
@@ -208,19 +211,21 @@ setMethod('hcr', signature(object='biodyn'),
 #'
 #' Calculates break pointts for a hockey stick HCR
 #'
-#' @param  \code{object} an object of class \code{biodyn} or
-#' @param  \code{params} \code{FLPar} object with hockey stock HCR parameters
+#' @param object an object of class \code{biodyn} or
+#' @param params \code{FLPar} object with hockey stock HCR parameters
+#' @param maxB  =1
+#' @param rel   =TRUE
 #' 
 #' @return a \code{FLPar} object with value(s) for HCR
 #' 
 #' @seealso \code{\link{hcr}},  \code{\link{msy}},  \code{\link{bmsy}}, \code{\link{fmsy}} 
 #' 
-#' @export
 #' @rdname hcrPlot
 #' @aliases hcrPlot-method  hcrPlot,biodyn-method
 #'
 #' @examples
 #' \dontrun{
+#' simBiodyn()
 #' }
 setMethod('hcrPlot', signature(object='biodyn'),
  function(object,params=FLPar(ftar=0.7, btrig=0.7, fmin=0.01, blim=0.20),maxB=1,rel=TRUE){

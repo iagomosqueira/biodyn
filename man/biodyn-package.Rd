@@ -1,13 +1,11 @@
-\name{biodyn-package}
-\alias{biodyn-package}
+\name{   biodyn-package}
+\alias{  biodyn-package}
 \docType{package}
-\title{
-Biomass Dynamic Model
-}
-\description{
-Implements a biomass dynamic model as an R class for fish stock abundance. The class can be used to fit catch and catch per unit effort to estimate stock abundance. It also has methods for evaluating the goodness of fit, estimating reference points and for modelling harvest control rules.
+\title{  Biomass Dynamic Model}
 
-}
+\description{
+Implements a biomass dynamic model as an R class for fish stock abundance. The class can be used to fit catch and catch per unit effort to estimate stock abundance. It also has methods for evaluating the goodness of fit, estimating reference points and for modelling harvest control rules.}
+
 \details{
 \tabular{ll}{
 Package: \tab biodyn\cr
@@ -18,8 +16,6 @@ ggplot2,
 kobe,
 diags,
 FLCore(>= 2.2),
-FLash,
-FLAdvice,
 ggplotFL\cr
 Collate: \tab 
 'biodyn-class.R'
@@ -133,4 +129,5 @@ Maintainer: Laurence Kell <laurie.kell@iccat.int>
 ~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
 }
 \examples{
+biodyn()
 }

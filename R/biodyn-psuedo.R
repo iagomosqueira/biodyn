@@ -4,10 +4,9 @@
 #' Simulates a \code{biodyn} assessment for a catch series, given the parameter estimates  in the \code{param} 
 #' slot and their variance covariance matrix 
 #' 
-#' @param   \code{object} of class \code{biodyn} 
-#' @param   \code{catch} of class \code{FLQuant} with the catch time series.
-#' @param   \code{cov} parameter variance covariance matrix for simulation of estimation error, 
-#' by default uses the vcov slot in \code{biodyn} 
+#' @param object of class \code{biodyn} 
+#' @param catch of class \code{FLQuant} with the catch time series.
+#' @param ... other arguments
 #' 
 #' @return \code{biodyn} with estimates of stock based on catch time series
 #' 

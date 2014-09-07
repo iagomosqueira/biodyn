@@ -5,12 +5,12 @@ utils::globalVariables(c('ldply','melt','variable'))
 #if (!isGeneric('control<-'))  
   setGeneric('control<-',   function(object,value)      standardGeneric('control<-'))
 
-##############################################################
 #' setParams<-
 #'
 #' Sets up the param slot in a biodyn object given an index
 #'
-#' @param  \code{object}, an object of class \code{biodyn}
+#' @param object an object of class \code{biodyn}
+#' @param value \code{params}
 #'
 #' @export
 #' @docType methods
@@ -43,7 +43,7 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuant'), function(ob
 
   nms=c(modelParams(tolower(as.character(object@model))),'b0')
   #value=FLCore::apply(value,2,mean)
-  object@params =biodyn:::setQ(object,value)
+  object@params =setQ(object,value)
   
   return(object)})
 
@@ -64,11 +64,13 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(o
 
 #' setControl<-
 #'
-#' @description #' Sets up the control slot in a biodyn object given the values in the \code{params}
+#' @description Sets up the control slot in a biodyn object given the values in the \code{params}
 #' slot. The starting values are set to the values in \code{params} and the min and
 #' max bounds to .1 and 10 times of these.
 #'
-#' @param  \code{object}, an object of class \code{biodyn}
+#' @param object an object of class \code{biodyn}
+#' @param value CPUE as \code{FLQuant} or \code{FLQuants}
+#' @param ... any other parameter
 #'
 #' @seealso \code{\link{controlFn}}
 #' 
@@ -81,12 +83,11 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(o
 #' @examples
 #' \dontrun{
 #' data(bd)
-#' control(bd) <-params(bd)
+#' setControl(bd) <-params(bd)
 #' params(bd)
 #' control(bd)}
-#' 
-#'      
-setGeneric('setControl<-',  function(object,value,...) standardGeneric('setControl<-'))
+#'  
+setGeneric('setControl<-',  function(object,...,value) standardGeneric('setControl<-'))
 setMethod('setControl<-', signature(object='biodyn',value='FLPar'), function(object,value,min=0.1,max=10.0) {
   phase=NULL
   if (dims(value)$iter>1 & dims(object@control)$iter==1)
@@ -236,8 +237,6 @@ setMethod('control', signature(object='biodyn'), function(object) {
 
 #' controlFn
 #' @description A utility function to help set up the \code{control} slot in \code{biodyn} 
-#'           
-#' @param om an \code{FLStock} object
 #' 
 #' @param r a \code{numeric} value with best guess
 #' @param k a \code{numeric} value with best guess      
@@ -260,6 +259,7 @@ setMethod('control', signature(object='biodyn'), function(object) {
 #'   
 #' @examples
 #' \dontrun{
+#' simBiodyn()
 #'    }
 ## utility function for setting control object
 controlFn=function(r,       k,       p=1,      b0=1,
@@ -282,7 +282,7 @@ controlFn=function(r,       k,       p=1,      b0=1,
 #' priorFn
 #' @description A utility function to help set up the \code{prior} slot in \code{biodyn}.
 #'            
-#' @param ...
+#' @param ... any other parameter
 #' 
 #' #' @return \code{list} with om, ...
 #'  

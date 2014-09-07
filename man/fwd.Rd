@@ -10,21 +10,11 @@
 fwd(object, ctrl, ...)
 }
 \arguments{
-\item{\code{object},}{an object of class \code{biodyn} or  \code{biodyns}}
+\item{object}{an object of class \code{biodyn} or  \code{biodyns}}
 
-\item{catch}{an \code{FLQuant} or \code{FLQuants} containing future catches}
+\item{ctrl}{missing}
 
-\item{harvest}{an \code{FLQuant} or \code{FLQuants} containing future harvest}
-
-\item{stock}{an \code{FLQuant} or \code{FLQuants} containing future stock}
-
-\item{minF}{minimum harvest, \code{FLQuant} or single numeric value}
-
-\item{maxF}{maximum harvest, \code{FLQuant} or single numeric value}
-
-\item{pe}{process error term, an \code{FLQuant}}
-
-\item{peMult}{logical, i.e. by default equals true so multiplicative, otherwise additive}
+\item{...}{any other parameters}
 }
 \description{
 Projects a \code{biodyn} object (i.e. a biomass dynamic model)

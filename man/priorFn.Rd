@@ -7,7 +7,9 @@
 priorFn(...)
 }
 \arguments{
-\item{...}{#'}
+\item{...}{any other parameter
+
+#'}
 }
 \value{
 \code{list} with om, ...

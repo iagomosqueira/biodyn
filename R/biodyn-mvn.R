@@ -6,9 +6,13 @@ utils::globalVariables('llply')
 #' parameter estimates (\code{params} slot) to use Monte Carlo simulation to generate new 
 #' parameters
 #'      
-#' @param object, a \code{biodyn} object
-#' @param n, \code{numeric} with number of \code{iter} to create
-#' @param fwd, \code{logical} do you want to simuate historic time series of stock biomass?, default is \code{FALSE} 
+#' @param object a \code{biodyn} object
+#' @param n \code{numeric} with number of \code{iter} to create
+#' @param nms the parameters for Monte Carlo simulation
+#' @param params actual parameters
+#' @param fwd \code{logical} do you want to simuate historic time series of stock biomass?, default is \code{FALSE} 
+#' 
+#' 
 #' @return \code{biodyn} with simuated time series 
 #' @export
 #' @docType methods

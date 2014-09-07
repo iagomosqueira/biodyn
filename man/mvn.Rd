@@ -8,11 +8,15 @@ mvn(object, n, nms = dimnames(object@control[object@control[, "phase", ] > 0,
   ])$params, fwd = FALSE, params = TRUE)
 }
 \arguments{
-\item{object,}{a \code{biodyn} object}
+\item{object}{a \code{biodyn} object}
 
-\item{n,}{\code{numeric} with number of \code{iter} to create}
+\item{n}{\code{numeric} with number of \code{iter} to create}
 
-\item{fwd,}{\code{logical} do you want to simuate historic time series of stock biomass?, default is \code{FALSE}}
+\item{nms}{the parameters for Monte Carlo simulation}
+
+\item{params}{actual parameters}
+
+\item{fwd}{\code{logical} do you want to simuate historic time series of stock biomass?, default is \code{FALSE}}
 }
 \value{
 \code{biodyn} with simuated time series

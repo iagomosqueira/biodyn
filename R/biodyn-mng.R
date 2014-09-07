@@ -3,8 +3,9 @@
 #'
 #' Estimates parameters in a \code{biodyn} class by fitting catch to CPUE indeices
 #' 
-#' @param   \code{object}, an object of class \code{biodyn}
-#' @param   \code{test}, a \code{data.frame} with 3 columns \code{param,q,lower.tail} for the choice of parameter, the desired qunatile and teh tail of the distribution for the test.
+#' @param object an object of class \code{biodyn}
+#' @param ref a \code{data.frame} with 3 columns \code{param,q,lower.tail} for the choice of parameter, the desired qunatile and teh tail of the distribution for the test.
+#' @param ... other arguments
 #'
 #' @return an \code{FLPar} object with probability of being greater (lower.tail=FALSE) or less (lower.tail=TRUE) then q
 #'

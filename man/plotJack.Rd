@@ -7,10 +7,12 @@
 plotJack(x, y, ncol = 1)
 }
 \arguments{
-\item{\code{x},}{an object of class \code{biodyn} that has been jack knifed, i.e. by
+\item{x}{an object of class \code{biodyn} that has been jack knifed, i.e. by
 providing a jack knifed CPUE series to fit}
 
-\item{\code{y}}{the original \code{biodyn} object}
+\item{y}{the original \code{biodyn} object}
+
+\item{ncol}{number of colums in plot panel}
 }
 \value{
 an \code{ggplot2} object

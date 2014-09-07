@@ -7,20 +7,24 @@
 \alias{setControl<-,biodyn,FLQuants-method}
 \title{setControl<-}
 \usage{
-setControl(object) <- value
+setControl(object, ...) <- value
 }
 \arguments{
-\item{\code{object},}{an object of class \code{biodyn}}
+\item{object}{an object of class \code{biodyn}}
+
+\item{value}{CPUE as \code{FLQuant} or \code{FLQuants}}
+
+\item{...}{any other parameter}
 }
 \description{
-#' Sets up the control slot in a biodyn object given the values in the \code{params}
+Sets up the control slot in a biodyn object given the values in the \code{params}
 slot. The starting values are set to the values in \code{params} and the min and
 max bounds to .1 and 10 times of these.
 }
 \examples{
 \dontrun{
 data(bd)
-control(bd) <-params(bd)
+setControl(bd) <-params(bd)
 params(bd)
 control(bd)}
 }

@@ -9,6 +9,8 @@ biodyn(model, params, ...)
 \item{model}{a factor or string that specifies the model type, has to be one of 'fox', 'schaefer', 'pellat', 'gulland', 'fletcher', 'shepherd', 'logistic', 'genfit'}
 
 \item{params}{model parameters}
+
+\item{...}{any other parameter}
 }
 \value{
 biodyn object

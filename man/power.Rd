@@ -10,9 +10,11 @@
 powerAnalysis(object, ref, ...)
 }
 \arguments{
-\item{\code{object},}{an object of class \code{biodyn}}
+\item{object}{an object of class \code{biodyn}}
 
-\item{\code{test},}{a \code{data.frame} with 3 columns \code{param,q,lower.tail} for the choice of parameter, the desired qunatile and teh tail of the distribution for the test.}
+\item{ref}{a \code{data.frame} with 3 columns \code{param,q,lower.tail} for the choice of parameter, the desired qunatile and teh tail of the distribution for the test.}
+
+\item{...}{other arguments}
 }
 \value{
 an \code{FLPar} object with probability of being greater (lower.tail=FALSE) or less (lower.tail=TRUE) then q

@@ -6,9 +6,10 @@ utils::globalVariables(c('data.x','data.y','X..x'))
 #'
 #' Calculates MSY given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
 #'
-#' @param  \code{object}, an object of class \code{biodyn} or
-#' @param  \code{object}, a string or factor that species the model
-#' @param \code{params}, an \code{FLPar} object with model parameters
+#' @param object an object of class \code{biodyn} or a string or factor that species the model
+#' @param params an \code{FLPar} object with model parameters
+#' @param ... any other parameters
+#' 
 #' @return an \code{FLPar} object with value(s) of MSY
 #' 
 #' @seealso \code{\link{bmsy}}, \code{\link{fmsy}} 
@@ -32,9 +33,9 @@ setMethod('msy',   signature(object='biodyn',    params='numeric'), function(obj
 #'
 #' Calculates $F_{MSY}$ given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
 #'
-#' @param \code{object}, an object of class \code{biodyn} or
-#' @param \code{object}, a string or factor that species the model
-#' @param \code{params}, an \code{FLPar} object with model parameters
+#' @param object an object of class \code{biodyn} or a string or factor that species the model
+#' @param params an \code{FLPar} object with model parameters
+#' @param ... any other parameters
 #'
 #' @aliases fmsy,fmsy-method fmsy,biodyn,missing-method  fmsy,biodyn,numeric-method fmsy,character,FLPar-method fmsy,factor,FLPar-method
 #' 
@@ -60,10 +61,10 @@ setMethod('fmsy',  signature(object='biodyn',    params='numeric'), function(obj
 #'
 #' Calculates $B_{MSY}$ given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
 #'
-#' @param  \code{object}, an object of class \code{biodyn} or
-#' @param  \code{object}, a string or factor that species the model
-#' @param \code{params}, an \code{FLPar} object with model parameters
-#' 
+#' @param object an object of class \code{biodyn} or a string or factor that species the model
+#' @param params an \code{FLPar} object with model parameters
+#' @param ... any other parameters
+#'  
 #' @aliases bmsy,biodyn,missing-method  bmsy,biodyn,numeric-method bmsy,character,FLPar-method bmsy,factor,FLPar-method
 #' 
 #' @return an \code{FLPar} object with value(s) of $MSY$, $B_{MSY}$ and $B_{MSY}$
@@ -89,9 +90,8 @@ setMethod('bmsy',  signature(object='biodyn',    params='numeric'), function(obj
 #'
 #' Calculates $MSY$, $B_{MSY}$ and $F_{MSY}$ given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
 #'
-#' @param \code{object}, an object of class \code{biodyn} or
-#' @param \code{object}, a string or factor that species the model
-#' @param \code{params}, an \code{FLPar} object with model parameters
+#' @param object an object of class \code{biodyn} or a string or factor that species the model
+#' @param params an \code{FLPar} object with model parameters
 #'
 #' @return an \code{FLPar} object with value(s) of $F_{MSY}$
 #' 
@@ -258,9 +258,10 @@ bmsyFn=function(object,params,probs=0.5) {
 #'
 #' Calculates $k$ given msy, r and K for a Pella-Tomlinson biomass dynamic model
 #'
-#' @param  \code{msy}, a guess for $MSY$
-#' @param  \code{r}, a guess for $r$ the population growth rate
-#' @param \code{p}, a guess for $p$ the shape parameter
+#' @param msy a guess for $MSY$
+#' @param r a guess for $r$ the population growth rate
+#' @param p a guess for $p$ the shape parameter
+#' @param params provide $r$ and $p$ as \code{FLPar}
 #'
 #' @return an \code{FLPar} object with an estimate for $k$
 #' 
@@ -312,7 +313,7 @@ fnY=function(x,bd,year=range(bd)['maxyear']){
 
 fnJ=function(x,bd,year=range(bd)['maxyear']){
   if (is.numeric(year)) year=ac(year)
-  bd@params[biodyn::activeParams(bd)]=x
+  bd@params[activeParams(bd)]=x
   c(stock  =stock(  bd[,'2008'])/refpts(bd)['bmsy'],
     harvest=harvest(bd[,'2008'])/refpts(bd)['fmsy'],
     catch  =catch(  bd[,'2008'])/refpts(bd)[ 'msy'])}  
@@ -320,11 +321,11 @@ fnJ=function(x,bd,year=range(bd)['maxyear']){
 
 refJacobian=function(bd,year=range(bd)['maxyear']){
 
-  x0=bd@params[biodyn::activeParams(bd)]
+  x0=bd@params[activeParams(bd)]
   
   res <- jacobian(func=fnJ, x=x0, bd=swon)
   
-  nms=dimnames(bd@params[biodyn::activeParams(bd)])[[1]]
+  nms=dimnames(bd@params[activeParams(bd)])[[1]]
   
   res=FLPar(array(t(res),dim=c(length(nms),3,1),dimnames=list('params'=nms,' '=c('stock','harvest','catch'),iter=1)))
   
@@ -332,7 +333,7 @@ refJacobian=function(bd,year=range(bd)['maxyear']){
 
 relVar=function(bd,year=range(bd)['maxyear']){
   
-  nms=dimnames(bd@params[biodyn::activeParams(bd)])[[1]]
+  nms=dimnames(bd@params[activeParams(bd)])[[1]]
   res=refJacobian(bd,year=year)
   cov=bd@vcov[nms,nms]
   

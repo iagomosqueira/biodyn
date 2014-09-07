@@ -8,19 +8,15 @@
 hcr(object, ...)
 }
 \arguments{
-\item{\code{object}}{an object of class \code{biodyn} or}
+\item{object}{an object of class \code{biodyn} or}
 
-\item{\code{params}}{\code{FLPar} object with hockey stick HCR parameters, see hcrParam}
-
-\item{\code{yrs}}{numeric vector with yrs for HCR prediction}
-
-\item{\code{refYrs}}{numeric vector with years used to for stock/ssb in HCR}
-
-\item{\code{tac}}{\code{logical} should return value be TAC rather than F?}
-
-\item{\code{bndF}}{\code{vector} with bounds (i.e.min and max values) on iter-annual variability on  F}
-
-\item{\code{bndTac}}{\code{vector} with bounds (i.e. min and max values) on iter-annual variability on TAC}
+\item{...}{other parameters, i.e.
+params \code{FLPar} object with hockey stick HCR parameters, see hcrParam
+yrs numeric vector with yrs for HCR prediction
+refYrs numeric vector with years used to for stock/ssb in HCR
+tac \code{logical} should return value be TAC rather than F?
+bndF \code{vector} with bounds (i.e.min and max values) on iter-annual variability on  F
+bndTac \code{vector} with bounds (i.e. min and max values) on iter-annual variability on TAC}
 }
 \value{
 \code{FLPar} object with value(s) for F or TAC if tac==TRUE

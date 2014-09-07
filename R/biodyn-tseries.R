@@ -2,10 +2,10 @@
 #' @description A utility method to create a data.frame with time series of Performance Measures i.e.
 #' stock biomass, SSB, recruitment, F, harvest rate
 #'            
-#' @param stk    \code{object} 
+#' @param object \code{biodyn} 
 #' @param refpts \code{FLBRP}
-#' @param proxy  \code{character} with name of reference point in refpts(brp), by default 'msy'.
-#'
+#' @param ... other arguments
+#' 
 #' @return a \code{data.frame} 
 #'  
 #' @aliases tseries,FLStock,missing  

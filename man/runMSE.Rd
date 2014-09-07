@@ -16,6 +16,8 @@ runMSE(om, brp, srDev, uDev, range = c(min = range(om)[max], max =
 
 \item{range}{a \code{vector} the starting and end years for the projections, and the interval for running the MP}
 
+\item{srDev}{a \code{FLQuant} with recruitment deviates}
+
 \item{uDev}{an \code{FLQuant} with stock recruitment residuals}
 
 \item{hcr}{a \code{vector} with HCR options}
@@ -35,6 +37,7 @@ Runs a full MSE using an \code{FLStock} object as the Operating Model and \code{
 }
 \examples{
 \dontrun{
+simBiodyn()
    }
 }
 \seealso{

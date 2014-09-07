@@ -25,30 +25,30 @@ setMethod('stock', signature(object='biodyn'),
              
             (1-when)*stock(object)[,yrs1]+when*stock(object)[,yrs2]})
 
-##############################################################
-#' Calculates surplus production
+#' computePrd
 #'
 #' Calculates the surplus production for a biomass dynamic model given a level of stock biomass
 #' 
-#' @param  \code{object}, an object of class \code{biodyn} 
-#' @param \code{biomass}, stock biomaas, may be a \code{numerix},  \code{FLQuant} or missing. In the latte case the stock slot will be used.
+#' @param object an object of class \code{biodyn} 
+#' @param biomass stock biomaas, may be a \code{numerix},  \code{FLQuant} or missing. In the latte case the stock slot will be used.
+#' @param ... other arguments
 #'
 #' @return an \code{FLPar} object
 #' 
-#' @seealso \code{\link{plotSP}}
+#' @seealso \code{\link{plotPrd}}
 #' 
 #' @export
 #' @docType methods
 #' @rdname sp
 #'
-#' @aliases computeSP,biodyn,FLQuant-method  computeSP,biodyn,missing-method  computeSP,biodyn,numeric-method
+#' @aliases computePrd,biodyn,FLQuant-method  computePrd,biodyn,missing-method  computePrd,biodyn,numeric-method
 #' @examples
-#' \dontrun{ computeSP(bd,seq(0,params(bd)['k'])) }
+#' \dontrun{ computePrd(bd,seq(0,params(bd)['k'])) }
 #'  
-setGeneric('computeSP',function(object,biomass,...) standardGeneric('computeSP'))
-setMethod( 'computeSP', signature(object='biodyn',   biomass='missing'),     function(object,biomass=stock(object))  spFn(model(object),params(object),biomass))
-setMethod( 'computeSP', signature(object='biodyn',   biomass='numeric'),     function(object,biomass)                spFn(model(object),params(object),biomass))
-setMethod( 'computeSP', signature(object='biodyn',   biomass='FLQuant'),     function(object,biomass)                spFn(model(object),params(object),biomass))
+setGeneric('computePrd',function(object,biomass,...) standardGeneric('computePrd'))
+setMethod( 'computePrd', signature(object='biodyn',   biomass='missing'),     function(object,biomass=stock(object))  prdFn(model(object),params(object),biomass))
+setMethod( 'computePrd', signature(object='biodyn',   biomass='numeric'),     function(object,biomass)                prdFn(model(object),params(object),biomass))
+setMethod( 'computePrd', signature(object='biodyn',   biomass='FLQuant'),     function(object,biomass)                prdFn(model(object),params(object),biomass))
 
 
 # calcLogLik
@@ -93,5 +93,5 @@ calcLogLik<-function(obs,hat=rep(0,length(obs)),error='log',type=1){
   se<-calcSigma(obs,hat)
   
   if (type==1) return(loglFn(se,obs,hat)) else
-    if (type==2) return(-sum(dnorm(obs, hat, se, log=(error=='log'), na.rm=TRUE))) else
+    if (type==2) return(-sum(dnorm(obs, hat, se, log=(error=='log')))) else
       if (type==3) return(sum((obs-hat)^2))}

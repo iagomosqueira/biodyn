@@ -6,49 +6,18 @@
 \alias{fit,biodyn,FLQuantJK-method}
 \alias{fit,biodyn,FLQuants-method}
 \alias{fit-method}
-\alias{profile,biodyn-method}
 \title{fit}
 \usage{
 fit(object, index, ...)
-
-\S4method{profile}{biodyn}(fitted, index, which, range = seq(0.5, 1.5,
-  length.out = 21), fn = function(x) cbind(model.frame(params(x)), ll =
-  model.frame(x@ll)[, 1], model.frame(refpts(x))[, -4], stock = c(stock(x)[,
-  ac(range(x)["maxyear"])]\%/\%bmsy(x)), harvest = c(harvest(x)[,
-  ac(range(x)["maxyear"])]\%/\%fmsy(x))), run = TRUE, ...)
 }
 \arguments{
-\item{\code{object},}{an object of class \code{biodyn}}
+\item{object}{an object of class \code{biodyn}}
 
-\item{\code{index},}{an \code{FLQuant}, \code{FLQuants} or  \code{data.frame} object with CPUE indices}
+\item{index}{an \code{FLQuant}, \code{FLQuants} or  \code{data.frame} object with CPUE indices}
 
-\item{\code{cmdOps},}{a character string giving ADMB options see \url{http://www.admb-project.org/documentation/manuals/ADMBrefcard-A4.pdf/view}}
-
-\item{\code{fitted},}{an object of class \code{biodyn}}
-
-\item{\code{index},}{an \code{FLQuant}, \code{FLQuants} or  \code{data.frame} object with CPUE indices}
-
-\item{\code{cmdOps},}{a character string giving ADMB options see \url{http://www.admb-project.org/documentation/manuals/ADMBrefcard-A4.pdf/view}}
-
-\item{...}{additional parameters. See documentation on individual
-    methods.}
-
-\item{fitted}{the original fitted model object.}
+\item{...}{other arguments}
 }
 \description{
 Estimates parameters in a \code{biodyn} class by fitting catch to CPUE indices
-
-Profiles biodyn
-}
-\examples{
-\dontrun{
-data(bd)
-bd=fit(bd,swonIndex)
-}
-\dontrun{
-library(aspic)
-library(biodyn)
-data(asp)
-}
 }
 

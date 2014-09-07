@@ -9,9 +9,13 @@
   fmin = 0.01, blim = 0.2), maxB = 1, rel = TRUE)
 }
 \arguments{
-\item{\code{object}}{an object of class \code{biodyn} or}
+\item{object}{an object of class \code{biodyn} or}
 
-\item{\code{params}}{\code{FLPar} object with hockey stock HCR parameters}
+\item{params}{\code{FLPar} object with hockey stock HCR parameters}
+
+\item{maxB}{=1}
+
+\item{rel}{=TRUE}
 }
 \value{
 a \code{FLPar} object with value(s) for HCR
@@ -21,6 +25,7 @@ Calculates break pointts for a hockey stick HCR
 }
 \examples{
 \dontrun{
+simBiodyn()
 }
 }
 \seealso{

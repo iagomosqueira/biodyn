@@ -1,8 +1,11 @@
 #' biodyn Class
 #' @description Creates an object of the biodyn class representing a biomass dynamic stock assessment model.
 #' @name biodyn
+#' 
 #' @param model a factor or string that specifies the model type, has to be one of 'fox', 'schaefer', 'pellat', 'gulland', 'fletcher', 'shepherd', 'logistic', 'genfit'
 #' @param params model parameters
+#' @param ... any other parameter
+#' 
 #' @return biodyn object
 #' @export
 #' @examples 
@@ -109,7 +112,7 @@ setMethod('biodyn', signature(model='character',params='missing'),
             biodyn(model=factor(model,levels=models),min=min,max=max,catch=catch,stock=stock,...))
 
 setMethod('biodyn', signature(model='missing',params='missing'),
-          function(model,params,min=0.1,max=10.0,catch=catch,stock=stock,...) {
+          function(model,params,min=0.1,max=10.0,catch=catch,stock=stock,msy=NULL,...) {
             args = list(...)
                
             res=new('biodyn')
@@ -133,13 +136,15 @@ setMethod('biodyn', signature(model='missing',params='missing'),
 is.biodyn = function(x)
   return(inherits(x, 'biodyn'))
 
-#' Simulates a \code{biodyn} object
+#' simBiodyn
 #'
 #' @description Creates a biodyn object with known properties
-#' @param model
-#' @param params
-#' @param harvest
-#' @param bounds
+#' 
+#' @param model character corresponding to model
+#' @param params surplus production parameters
+#' @param harvest \code{FLQuant} with harvest rate
+#' @param bounds on \code{control}
+#' @param ... other arguments
 #' 
 #' @export
 #' @rdname simBiodyn

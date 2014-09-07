@@ -12,11 +12,11 @@
 fmsy(object, params, ...)
 }
 \arguments{
-\item{\code{object},}{an object of class \code{biodyn} or}
+\item{object}{an object of class \code{biodyn} or a string or factor that species the model}
 
-\item{\code{object},}{a string or factor that species the model}
+\item{params}{an \code{FLPar} object with model parameters}
 
-\item{\code{params},}{an \code{FLPar} object with model parameters}
+\item{...}{any other parameters}
 }
 \value{
 an \code{FLPar} object with value(s) of $F_{MSY}$

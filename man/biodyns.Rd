@@ -10,6 +10,8 @@ biodyns(object, ...)
 }
 \arguments{
 \item{object}{biodyn object or a list of biodyn objects}
+
+\item{...}{any other parameter}
 }
 \value{
 biodyns object

@@ -11,11 +11,9 @@
 \S4method{refpts}{character,FLPar}(object = factor(object), params = params)
 }
 \arguments{
-\item{\code{object},}{an object of class \code{biodyn} or}
+\item{object}{an object of class \code{biodyn} or a string or factor that species the model}
 
-\item{\code{object},}{a string or factor that species the model}
-
-\item{\code{params},}{an \code{FLPar} object with model parameters}
+\item{params}{an \code{FLPar} object with model parameters}
 }
 \value{
 an \code{FLPar} object with value(s) of $F_{MSY}$

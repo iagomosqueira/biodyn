@@ -2,15 +2,18 @@
 \name{kobe}
 \alias{kobe}
 \alias{kobe,biodyn,missing-method}
+\alias{kobe,biodyns,ANY-method}
 \alias{kobe,biodyns,missing-method}
 \title{kobe}
 \usage{
 kobe(object, method, ...)
 }
 \arguments{
-\item{object}{}
+\item{object}{biodyn object}
 
-\item{method}{}
+\item{method}{missing}
+
+\item{...}{other arguments}
 }
 \value{
 data.frame or list of data.frames
@@ -21,6 +24,7 @@ to FMSY
 }
 \examples{
 \dontrun{
+simBiodyn()
 }
 }
 
