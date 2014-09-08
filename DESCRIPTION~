@@ -13,7 +13,8 @@ Suggests:
     methods,
     R.rsp,
     diags,
-    kobe
+    kobe,
+    FLBRP
 Maintainer: Laurence Kell <laurie.kell@iccat.int>
 License: GPL-2
 LazyLoad: Yes
