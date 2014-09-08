@@ -20,7 +20,7 @@ simBiodyn(model = "pellat", params = FLPar(r = 0.5, k = 1000, p = 1, b0 = 1,
 \item{...}{other arguments}
 }
 \value{
-TRUE or FALSE
+biodyn object with simulated time series
 }
 \description{
 Creates a biodyn object with known properties

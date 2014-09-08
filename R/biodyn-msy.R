@@ -92,22 +92,23 @@ setMethod('bmsy',  signature(object='biodyn',    params='numeric'), function(obj
 #'
 #' @param object an object of class \code{biodyn} or a string or factor that species the model
 #' @param params an \code{FLPar} object with model parameters
+#' @param ... any other arguments
 #'
 #' @return an \code{FLPar} object with value(s) of $F_{MSY}$
 #' 
 #' @seealso \code{\link{msy}}, \code{\link{bmsy}} 
 #' 
 #' @export
-#' @docType methods
 #' @rdname refpts
 #'
-#' @aliases refpts refpts-method  refpts,biodyn,missing-method  refpts,factor,FLPar-method
+#' @aliases refpts refpts-method  refpts,biodyn,missing-method  refpts,factor,FLPar-method   refpts,character,FLPar-method refpts,ANY
 #'
 #' @examples
 #' \dontrun{
 #' refpts('logistic',FLPar(msy=100,k=500))
 #' } 
 
+setGeneric('refpts',   function(object,params,...) standardGeneric('refpts'))
 setMethod('refpts', signature(object='character', params='FLPar'),   function(object=factor(object), params=params)          refptsFn(object, params))
 setMethod('refpts', signature(object='factor',    params='FLPar'),   function(object=       object,  params=params)          refptsFn(object, params))
 setMethod('refpts', signature(object='biodyn',    params='missing'), function(object)  {  model=model(object)
@@ -268,13 +269,13 @@ bmsyFn=function(object,params,probs=0.5) {
 #' @seealso \code{\link{msy}} and \code{\link{bmsy}} 
 #' 
 #' @export
-#' @rdname calcK
+#' @rdname K
 #'
 #' @examples
 #' \dontrun{
-#'  calcK(5000,r=.6,p=1.0)
+#'  K(5000,r=.6,p=1.0)
 #'  }
-calcK <- function(msy,r=.6,p=1,params=FLPar(r=r,p=p)){
+K <- function(msy,r=.6,p=1,params=FLPar(r=r,p=p)){
   res=msy/(params['r']*(1/(1+params['p']))^(1/params['p']+1))
   
   dimnames(res)$params='k'

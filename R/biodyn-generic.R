@@ -1,7 +1,7 @@
 if (!isGeneric('msy'))     setGeneric('msy',      function(object,params,...) standardGeneric('msy'))
 if (!isGeneric('fmsy'))    setGeneric('fmsy',     function(object,params,...) standardGeneric('fmsy'))
 if (!isGeneric('bmsy'))    setGeneric('bmsy',     function(object,params,...) standardGeneric('bmsy'))
-if (!isGeneric('refpts'))  setGeneric('refpts',   function(object,params,...) standardGeneric('refpts'))
+# if (!isGeneric('refpts'))  setGeneric('refpts',   function(object,params,...) standardGeneric('refpts'))
 if (!isGeneric('refptSE')) setGeneric('refptSE',  function(object,params,...) standardGeneric('refptSE'))
 
 if (!isGeneric('harvest')) setGeneric('harvest',  function(object,params,...) standardGeneric('harvest'))

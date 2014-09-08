@@ -164,8 +164,8 @@ setMethod('plotPrd',signature(x='biodyn',biomass='missing'),
           function(x,biomass,...) plotPrdfn(x,biomass=FLQuant(seq(0,max(params(x)['k']),length.out=101)),...))
 setMethod('plotPrd',signature(x='biodyn',biomass='FLQuant'),  
           function(x,biomass,...) plotPrdfn(x,biomass,...))
-setMethod('plotPrd',signature(x='biodyn',biomass='FLBRP'),  
-          function(x,biomass,II=FALSE,...) plotProdfn(bd=x,brp=biomass,II=II,...))
+# setMethod('plotPrd',signature(x='biodyn',biomass='FLBRP'),  
+#           function(x,biomass,II=FALSE,...) plotProdfn(bd=x,brp=biomass,II=II,...))
 
 plotPrdfn=function(x,biomass=FLQuant(seq(0,max(params(x)['k']),length.out=101)),...) {
   if ((dims(x)$iter>1 | dims(params(x))$iter>1) & dims(biomass)$iter==1) 
@@ -219,8 +219,8 @@ setMethod('plotEql',signature(x='biodyn',biomass='missing'),
           function(x,biomass,...) plotEqlfn(x,biomass=FLQuant(seq(0,max(params(x)['k']),length.out=101)),...))
 setMethod('plotEql',signature(x='biodyn',biomass='FLQuant'),  
           function(x,biomass,...) plotEqlfn(x,biomass,...))
-setMethod('plotEql',signature(x='biodyn',biomass='FLBRP'),  
-          function(x,biomass,II=FALSE,...) plotProdfn(bd=x,brp=biomass,II=II,...))
+# setMethod('plotEql',signature(x='biodyn',biomass='FLBRP'),  
+#           function(x,biomass,II=FALSE,...) plotProdfn(bd=x,brp=biomass,II=II,...))
 
 plotEqlfn=function(x,biomass=FLQuant(seq(0,max(params(x)['k']),length.out=101)),...) {
   if ((dims(x)$iter>1 | dims(params(x))$iter>1) & dims(biomass)$iter==1) 
@@ -284,8 +284,8 @@ plotProdfn=function(bd,brp,II=FALSE){
 #' refpts('logistic',FLPar(msy=100,k=500))
 #' }
 setGeneric('plotMSE', function(x,y,z,...) standardGeneric('plotMSE'))
-setMethod('plotMSE',signature(x='biodyn',y='FLStock',z='FLBRP'),  
-          function(x,y,z,...) plotMSEfn(x,y,z,...))
+# setMethod('plotMSE',signature(x='biodyn',y='FLStock',z='FLBRP'),  
+#           function(x,y,z,...) plotMSEfn(x,y,z,...))
 
 
 ## compares age and biomass based time series      

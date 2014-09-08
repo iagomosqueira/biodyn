@@ -8,8 +8,7 @@ Depends:
     R(>= 3.0.1),
     FLCore(>= 2.2)
 Imports:
-    plyr,
-    FLBRP
+    plyr
 Suggests:
     methods,
     R.rsp,

@@ -1,13 +1,32 @@
 #' biodyn class
 #'
-#' @description A class to represent a biomass dynamic stock assessment model. 
-#' There are slots for data, parameters and residuals and methods for calculating 
-#' reference points and other derived quantities.
+#' @description A class that implement a biomass dynamic stock assessment model. 
 #' 
-#' @return biodyn object
+#' @details 
+#' The Class is intended to be used as part of an MSE and includes methods for diagnostics, calculating  reference points and other quantities used when providing management advice.
+#' 
+#' @slot name    {A \code{character} with the name of the stock}
+#' @slot desc    {A \code{character} providing a fuller description of the object}       
+#' @slot range   {A \code{numeric} vector containing the quant and year ranges}
+#' @slot model   {A \code{factor} giving name of production function, for now this is only `pellat`}
+#' @slot catch   {An \code{FLQuant} with total catch by year}        
+#' @slot stock   {An \code{FLQuant} which will hold the estimated stock by yaer}       
+#' @slot control {An \code{FLPar} which sets initial guess (val) and bounds (min and max) for each parameter. The phase allows a parameter to be fixed if less <0 and for paramters to be estimated sequentially}       
+#' @slot priors  {An \code{array} which sets penalties for parameters}         
+#' @slot params  {An \code{FLPar} with parameter estmates}
+#' @slot vcov    {An \code{FLPar} with the covariance matrix of the parameter estimates} 
+#' @slot hessian {An \code{FLPar} with the hessian of the estimated parameters} 
+#' @slot mng     {\code{FLPar} with derived quatities of management interest}
+#' @slot mngVcov {An \code{FLPar} with the variance matrix of management quanties}
+#' @slot diags   {A \code{data.frame} with residuals and covariates from fit of CPUE to stock }     
+#' @slot objFn   {\code{FLPar} with objective function} 
+#' @slot ll      {\code{FLPar} with negative log likelihood by data component}
+#' @slot profile {\code{data.frame} not yet implemented} 
+#' 
+#' 
+#' All slots in the class have accessor and replacement methods that provide validation and protection of their data.
+#' 
 #' @export
-#' @aliases biodyn,character,FLPar-method biodyn,character,missing-method biodyn,factor,FLPar-method
-#' biodyn,factor,missing-method biodyn,missing,missing-method
 #' 
 #' @importFrom plyr ddply ldply
 #' @import FLCore
