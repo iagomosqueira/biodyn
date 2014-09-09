@@ -8,9 +8,7 @@ Depends:
     R(>= 3.0.1),
     FLCore(>= 2.2)
 Imports:
-    plyr,
-    reshape,
-    ggplot2
+    plyr
 Suggests:
     methods,
     R.rsp,

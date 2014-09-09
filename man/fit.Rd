@@ -17,6 +17,6 @@ fit(object, index, ...)
 \item{...}{other arguments}
 }
 \description{
-Estimates parameters in a \code{biodyn} class by fitting catch to CPUE indices
+Estimates parameters \code{biodyn} class by fitting catch and CPUE indices
 }
 

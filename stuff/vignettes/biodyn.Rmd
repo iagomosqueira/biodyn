@@ -126,6 +126,7 @@ bd=window(bd,end=49)
 ```
 
 ```{r, fig.margin=TRUE, fig.height=6, fig.width=4,fig.cap="Monte Carlo simuation time series with confidence intervals and a single simulation"}
+library(reshape)
 bd=fwd(bd,harvest=rlnorm(200,log(harvest(bd)[,-1]),.2))
 plot(bd,worm=3)+
   theme(legend.position="bottom")

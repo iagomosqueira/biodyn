@@ -9,19 +9,19 @@
 biodyns(object, ...)
 }
 \arguments{
-\item{object}{biodyn object or a list of biodyn objects}
+\item{object}{\code{biodyn} object or a \code{list} of \code{biodyn} objects}
 
-\item{...}{any other parameter}
+\item{...}{additional \code{biodyn} objects}
 }
 \value{
-biodyns object
+\code{biodyns} object
 }
 \description{
 Create a list with biodyn objects
 }
 \examples{
 \dontrun{
-biodyns(list("a"=bd,"b"=bd))
+biodyns(biodyn())
 }
 }
 

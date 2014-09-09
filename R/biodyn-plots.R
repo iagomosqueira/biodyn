@@ -32,6 +32,8 @@ whooow  =function(x,fn,probs)
 #' @param fn  functions
 #' @param facet facet for panels
 #'
+#' @importFrom reshape cast
+#' 
 #' @return an \code{ggplot2} object
 #' 
 #' @seealso \code{\link{plotPrd}}, \code{\link{plotEql}}
