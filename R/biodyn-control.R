@@ -13,7 +13,6 @@ utils::globalVariables(c('ldply','melt','variable'))
 #' @param value \code{params}
 #'
 #' @export
-#' @docType methods
 #' @rdname setParams
 #' 
 #' @aliases setParams<-,biodyn,FLPar-method  setParams<-,biodyn,FLQuant-method setParams<-,biodyn,FLQuants-method  setParams<-,biodyn,data.frame-method
@@ -75,7 +74,7 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(o
 #' @seealso \code{\link{controlFn}}
 #' 
 #' @export
-#' @docType methods
+
 #' @rdname setControl
 #'
 #' @aliases setControl<-,biodyn,FLPar-method  setControl<-,biodyn,FLQuant-method  setControl<-,biodyn,FLQuants-method
@@ -252,7 +251,6 @@ setMethod('control', signature(object='biodyn'), function(object) {
 #' @return a \code{control} object
 #'  
 #' @export
-#' @docType methods
 #' @rdname controlFn
 #' 
 #' @seealso \code{\link{biodyn}}  \code{\link{control}} 
@@ -287,7 +285,7 @@ controlFn=function(r,       k,       p=1,      b0=1,
 #' #' @return \code{list} with om, ...
 #'  
 #' @export
-#' @docType methods
+
 #' @rdname priorFn
 #' 
 #' @seealso \code{\link{biodyn}}

@@ -22,7 +22,6 @@ utils::globalVariables(c('calcR','fwdWindow','interval', 'nits',
 #' also write to a MYSQL database
 #'  
 #' @export
-#' @docType methods
 #' @rdname runMSE
 #' 
 #' @seealso \code{\link{biodyn}}

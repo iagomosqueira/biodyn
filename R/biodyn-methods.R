@@ -38,7 +38,6 @@ setMethod('stock', signature(object='biodyn'),
 #' @seealso \code{\link{plotPrd}}
 #' 
 #' @export
-#' @docType methods
 #' @rdname sp
 #'
 #' @aliases computePrd,biodyn,FLQuant-method  computePrd,biodyn,missing-method  computePrd,biodyn,numeric-method

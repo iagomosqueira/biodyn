@@ -10,7 +10,6 @@
 # #' @param facet facet for plots
 # #'
 # #' @aliases plot,biodyn,missing-method
-# #' @docType methods
 # #' @rdname plot
 # #' 
 # #' @examples

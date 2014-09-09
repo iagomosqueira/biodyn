@@ -127,7 +127,6 @@ iavFn=function(val,bnd,lag=1){
 #' @aliases fwd-method fwd,biodyn,FLQuants-method  fwd,biodyn,missing-method 
 #' 
 #' @export
-#' @docType methods
 #' @rdname fwd
 #'
 #' @examples

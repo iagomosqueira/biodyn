@@ -99,13 +99,8 @@ hcrSBT2=function(adult,juve,yrAdult,yrJuve,refJuve=-(1:5),tac,tarCatch,eb=0.25,e
 #       '\t rBit:',    mean(rBit),'\n')
 
   dmns=dimnames(tac)
-print(dmns$year)
-print(lag)
-print(interval)
-print(as.integer(dmns$year)+lag+seq(interval)-1)
-
-dmns$year=as.character(as.integer(dmns$year)+lag+seq(interval)-1)
-dmns$iter=dimnames(adult)$iter
+  dmns$year=as.character(as.integer(dmns$year)+lag+seq(interval)-1)
+  dmns$iter=dimnames(adult)$iter
   
   res=FLQuant(rep(c(res),each=interval),dimnames=dmns)
     

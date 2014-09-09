@@ -88,7 +88,6 @@ setPella=function(obj, exeNm='pella', dir=tempdir()) {
   bd.        =obj[[1]]
  
   nms=c(modelParams('pellat'),'b0')
-print(unique(idx$name))  
   if (length(unique(idx$name))>0)
     nmIdx=paste(c('q','sigma'), rep(unique(idx$name),each=length(unique(idx$name))),sep='')
   else  
@@ -123,9 +122,6 @@ print(unique(idx$name))
   # prr file
   prr = bd.@priors[c(nms,c('msy','bmsy','fmsy'),nmIdx),] 
   prr = alply(prr,1)
-
-print(names(prr))
-print(dimnames(bd.@priors)$params)
 
   names(prr) = dimnames(bd.@priors)$params
   writeADMB(prr, paste(dir, '/', exeNm, '.prr', sep=''))
@@ -192,15 +188,13 @@ activeParams=function(obj) dimnames(obj@control)$params[c(obj@control[,'phase']>
 
 #' fit
 #'
-#' Estimates parameters in a \code{biodyn} class by fitting catch to CPUE indices
+#' Estimates parameters \code{biodyn} class by fitting catch and CPUE indices
 #' 
-#'
 #' @param   object an object of class \code{biodyn}
 #' @param   index an \code{FLQuant}, \code{FLQuants} or  \code{data.frame} object with CPUE indices
 #' @param   ... other arguments
 #'
 #' @export
-#' @docType methods
 #' @rdname fit
 #'
 #' @aliases fit fit-method fit,biodyn,FLQuant-method   fit,biodyn,FLQuantJK-method  fit,biodyn,FLQuants-method

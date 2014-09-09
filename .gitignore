@@ -8,3 +8,5 @@ NAMESPACE~
 collate.R
 collate.R~
 .Rbuildignore~
+^\stuff\vignettes\out$
+^\stuff\vignettes\cache$

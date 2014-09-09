@@ -66,10 +66,10 @@
 #' biodyns
 #' @description Create a list with biodyn objects
 #' @name biodyns
-#' @param object biodyn object or a list of biodyn objects
-#' @param ... any other parameter
+#' @param object \code{biodyn} object or a \code{list} of \code{biodyn} objects
+#' @param ... additional \code{biodyn} objects
 #' 
-#' @return biodyns object
+#' @return \code{biodyns} object
 #' @export
 #' @rdname biodyns
 #' 
@@ -77,7 +77,7 @@
 #' 
 #' @examples 
 #' \dontrun{
-#' biodyns(list("a"=bd,"b"=bd))
+#' biodyns(biodyn())
 #' }
 
 setGeneric('biodyns', function(object, ...) standardGeneric('biodyns'))

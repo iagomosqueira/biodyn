@@ -37,7 +37,6 @@ whooow  =function(x,fn,probs)
 #' @seealso \code{\link{plotPrd}}, \code{\link{plotEql}}
 #' 
 #' @export
-#' @docType methods
 #' @rdname plot
 #' 
 #'
@@ -150,7 +149,6 @@ setMethod('plot', signature(x='biodyns', y='missing'),
 #' @seealso \code{\link{plotMSE}}, \code{\link{plotEql}}
 #' 
 #' @export
-#' @docType methods
 #' @rdname plotPrd
 #'
 #' @aliases plotPrd,biodyn,FLBRP-method plotPrd,biodyn,FLQuant-method plotPrd,biodyn,missing-method
@@ -205,7 +203,6 @@ plotProdfn=function(bd,brp,II=FALSE){
 #' @seealso \code{\link{plotPrd}}\code{\link{plotMSE}}
 #' 
 #' @export
-#' @docType methods
 #' @rdname plotEql
 #'
 #' @aliases plotEql,biodyn,FLBRP-method plotEql,biodyn,FLQuant-method plotEql,biodyn,missing-method
@@ -274,7 +271,6 @@ plotProdfn=function(bd,brp,II=FALSE){
 #' @seealso \code{\link{plotPrd}}
 #' 
 #' @export
-#' @docType methods
 #' @rdname plotMSE
 #'
 #' @aliases plotMSE,biodyn,FLStock,FLBRP-method
@@ -333,7 +329,6 @@ plotMSEfn=function(mp,om,brp){
 #' @return an \code{ggplot2} object
 #' 
 #' @export
-#' @docType methods
 #' @rdname plotJack
 #'
 #' @examples

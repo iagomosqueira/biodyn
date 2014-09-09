@@ -10,7 +10,6 @@
 #'  
 #' @aliases tseries,FLStock,missing  
 #'  
-#' @docType methods
 #' @rdname tseries
 #'  
 #' @examples

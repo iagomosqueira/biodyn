@@ -1,10 +1,10 @@
 \name{   biodyn-package}
 \alias{  biodyn-package}
 \docType{package}
-\title{  Biomass Dynamic Model}
+\title{  Biomass Dynamic Stock Assessment Model}
 
 \description{
-Implements a biomass dynamic model as an R class for fish stock abundance. The class can be used to fit catch and catch per unit effort to estimate stock abundance. It also has methods for evaluating the goodness of fit, estimating reference points and for modelling harvest control rules.}
+A package for running biomass dynamic stock fish assessments. The \code{biodyn} class can be used to fit catch and catch per unit effort to estimate stock abundance. It also has methods for evaluating the goodness of fit, estimating reference points and for modelling harvest control rules as part of Management Strategy Evaluation.}
 
 \details{
 \tabular{ll}{
@@ -45,27 +45,50 @@ Built: \tab R 2.15.3; ; 2013-03-25 16:42:17 UTC; unix\cr
 
 Index:
 \preformatted{
-biodyn                  Biomass Dynamic Model Class
-biodyn-class            Class '"biodyn"'
-biodyn-package          Biomass Dynamic Model 
-biodyns                 Creates a list of biodyn
-bmsy                    Biomass at Maximum Sustainable Yield.
-K                       Calculate Carrying Capacity
-computeSP               Calculates surplus production
-control<-               control
-fit                     fit
-fmsy                    Fishing Mortality at Maximum Sustainable Yield.
-fwd                     Forward Projections
-hcr                     HCR
-is.biodyn               Checks class type
-msy                     Maximum Sustainable Yield.
-pella                   pella
-plot                    Create a 'ggplot' plot
-plotSP                  Create a 'ggplot' plot
-power                   power
-setControl<-            control
-setParams<-             setParams<-
+  
+biodyn              Biomass Dynamic Model Class
+biodyn-class        Class '"biodyn"'
+biodyn-package      Implements a Biomass Dynamic Stock Assessment Model 
+biodyns             List of biodyn objects
+is.biodyn   
+    
+simBiodyn   
+
+msy                 Maximum Sustainable Yield.
+fmsy                Fishing Mortality at Maximum Sustainable Yield.
+bmsy                Biomass at Maximum Sustainable Yield.
+refpts              MSY, BMSY and FMSY
+
+plot                Time series
+plotEql             Equilibrium values
+plotJack            Time series with uncertainty estimated by Jack Knife
+plotMSE             Plots summary from MSE
+plotPrd             Production function
+
+K                   Calculate Carrying Capacity from msy and r
+computePrd   
+    
+fit   
+setControl<-   
+setParams<-   
+priorFn   
+profile   
+    
+fwd   
+hcr   
+hcrParam   
+tac   
+
+kobe   
+    
+powerAnalysis   
+    
+mvn   
+psuedo   
+runMSE   
+controlFn   
 }
+
 
 }
 \author{

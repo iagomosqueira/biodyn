@@ -15,7 +15,6 @@ utils::globalVariables('llply')
 #' 
 #' @return \code{biodyn} with simuated time series 
 #' @export
-#' @docType methods
 #' @rdname mvn
 #' 
 #' @examples

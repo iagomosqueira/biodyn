@@ -13,7 +13,6 @@ utils::globalVariables('maply')
 #' @param run logical, run the profile if TRUE, if FALSE set control slot and return original object
 #'     
 #' @export
-#' @docType methods
 #' @rdname profile
 #'
 #' @examples
@@ -49,7 +48,7 @@ setMethod('profile', signature(fitted='biodyn'),
                                            stock  =c(stock(  x)[,ac(range(x)['maxyear'])]%/%bmsy(x)),
                                            harvest=c(harvest(x)[,ac(range(x)['maxyear'])]%/%fmsy(x))),
                    run  =TRUE,...){
-        
+        if (is.FLQuant(index)) index=FLQuants(index)
         for (i in seq(length(index)))
           if (dims(index[[i]])$maxyear>=dims(stock(fitted))$maxyear) stop('index years greater in length than stock')
         

@@ -3,10 +3,10 @@
 \alias{simBiodyn}
 \title{simBiodyn}
 \usage{
-simBiodyn(model = "pellat", params = FLPar(r = 0.5, k = 1000, p = 1, b0 = 1,
-  q = 1, sigma = 0.3), harvest = FLQuant(FLQuant(c(seq(0, 1.5, length.out =
-  30), rev(seq(0.5, 1.5, length.out = 15))[-1], rep(0.5, 5))) * fmsy(model,
-  params)), bounds = c(0.1, 10), ...)
+simBiodyn(model = "pellat", params = FLPar(r = 0.5, k = 1000, p = 1, b0 =
+  1), harvest = FLQuant(FLQuant(c(seq(0, 1.5, length.out = 30), rev(seq(0.5,
+  1.5, length.out = 15))[-1], rep(0.5, 5))) * fmsy(model, params)),
+  bounds = c(0.1, 10), ...)
 }
 \arguments{
 \item{model}{character corresponding to model}

@@ -13,7 +13,6 @@ utils::globalVariables('laply')
 #' @seealso \code{\link{hcr}},  \code{\link{fwd}}
 #' 
 #' @export
-#' @docType methods
 #' @rdname tac
 #' @aliases tac tac-method tac,biodyn-method
 #' 
@@ -54,7 +53,6 @@ setMethod( 'tac', signature(object='biodyn'),
 #' @seealso \code{\link{hcr}}
 #' 
 #' @export
-#' @docType methods
 #' @rdname hcrParam
 #'
 #' @examples
@@ -106,7 +104,6 @@ hcrParam=function(ftar,btrig,fmin,blim){
 #' @seealso \code{\link{bmsy}}, \code{\link{fmsy}}, \code{\link{fwd}} and \code{\link{hcrParam}}
 #' 
 #' @export
-#' @docType methods
 #' @rdname hcr
 #'
 #' @examples

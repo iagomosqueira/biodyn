@@ -17,7 +17,6 @@ utils::globalVariables(c('data.x','data.y','X..x'))
 #' @aliases msy,biodyn,missing-method  msy,biodyn,numeric-method msy,character,FLPar-method msy,factor,FLPar-method
 #'  
 #' @export
-#' @docType methods
 #' @rdname msy
 #'
 #' @examples \dontrun{ msy('logistic',FLPar(msy=100,k=500))}
@@ -44,7 +43,6 @@ setMethod('msy',   signature(object='biodyn',    params='numeric'), function(obj
 #' @seealso \code{\link{msy}}, \code{\link{bmsy}} 
 #' 
 #' @export
-#' @docType methods
 #' @rdname fmsy
 #'
 #' @examples
@@ -72,7 +70,6 @@ setMethod('fmsy',  signature(object='biodyn',    params='numeric'), function(obj
 #' @seealso \code{\link{msy}}, \code{\link{fmsy}} and  \code{\link{bmsy}}
 #' 
 #' @export
-#' @docType methods
 #' @rdname bmsy
 #'
 #' @examples

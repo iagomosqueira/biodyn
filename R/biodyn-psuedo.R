@@ -1,8 +1,7 @@
-##############################################################
 #' psuedo
 #'
-#' Simulates a \code{biodyn} assessment for a catch series, given the parameter estimates  in the \code{param} 
-#' slot and their variance covariance matrix 
+#' Simulates a \code{biodyn} object for a catch series, given the parameter estimates  in the \code{param} 
+#' slot and variance covariance matrix 
 #' 
 #' @param object of class \code{biodyn} 
 #' @param catch of class \code{FLQuant} with the catch time series.
@@ -11,7 +10,6 @@
 #' @return \code{biodyn} with estimates of stock based on catch time series
 #' 
 #' @export
-#' @docType methods
 #' @rdname psuedo
 #'
 #' @aliases psuedo-method psuedo,biodyn,FLQuant-method

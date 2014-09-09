@@ -12,7 +12,6 @@
 #' @aliases powerAnalysis-method powerAnalysis,biodyn,biodyn-method  powerAnalysis,biodyn,missing-method
 #' 
 #' @export
-#' @docType methods
 #' @rdname power
 #'
 setGeneric('powerAnalysis',  function(object,ref,...) signature(object,ref)) 
