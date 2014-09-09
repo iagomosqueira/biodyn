@@ -5,7 +5,6 @@ date: "August 13th, 2014"
 output: rmarkdown::tufte_handout
 ---
 
-
 ```{r knitr_init, echo=FALSE, results="asis"}
 library(knitr)
 
@@ -86,12 +85,12 @@ biodyn has slots for the catch,  parameter estimates, fitted stock biomass and r
 
 There are various ways of creating a new object, the first way is to use the class creator
 
-```{r,eval=FALSE}
+```{r}
 bd =biodyn()
 ```
 
 Supplying the catch helps to set the dimensions
-```{r,eval=FALSE}
+```{r}
 bd=biodyn(catch=FLQuant(100,dimnames=list(year=1990:2010)))
 ```
 
@@ -121,21 +120,19 @@ bd=simBiodyn()
 Plotting can be used to examine an object, explore data, check outputs, diagnose problems, and summarise results. biodyn uses ggplot2 as this allows a variety of basic plots to be provided as part of the package and these to be modified and new plots developed as required.
 
 ## Time Series
-```{r, fig.margin=TRUE, figure.width=4, figure.height=6, fig.cap="Simulated CPUE series"}
+```{r, fig.margin=TRUE, fig.width=4, fig.height=8, fig.cap="Time series"}
 bd=simBiodyn()
 bd=window(bd,end=49)
-
-
-plot(bd)
 ```
 
-```{r, fig.margin=TRUE, echo=FALSE, eval=FALSE, figure.height=4, fig.cap="Simulated CPUE series"}
-x=fwd(x,harvest=rlnorm(200,log(harvest(x)[,-1]),.2))
-plot(x,worm=3)
+```{r, fig.margin=TRUE, fig.height=6, fig.width=4,fig.cap="Monte Carlo simuation time series with confidence intervals and a single simulation"}
+bd=fwd(bd,harvest=rlnorm(200,log(harvest(bd)[,-1]),.2))
+plot(bd,worm=3)+
+  theme(legend.position="bottom")
 ```
 
-```{r, fig.margin=TRUE, echo=FALSE, eval=FALSE, fig.cap="Simulated CPUE series"}
-plotEql(x)
+```{r, fig.margin=TRUE, fig.height=6, fig.width=4, echo=FALSE, fig.cap="Simulated CPUE series"}
+biodyn:::plotEql(bd)
 ```
 
 
@@ -166,7 +163,7 @@ plotMSE()
 
 \newthought{Fitting to data} can be done using either maximum likelihood or by running Monte Carlo Markov Chain (MCMC) simulations. 
 
-It is alway good to check estimated values with the true ones. Therefore we simulate a stock with know parameters and exploitation history 
+When first using a stock assessment it helps to be able to check estimated values with the true ones. Therefore we simulate a stock with know parameters and exploitation history 
 
 ```{r, echo=TRUE, fig.margin=TRUE, fig.height=4, fig.cap="Simulated stock"}
 bd=simBiodyn()
@@ -202,6 +199,8 @@ The params slot holds the fitted parameters. But before fitting the control slot
 setControl(bd)=params(bd)
   
 bd@control
+
+save(bd,cpue,file="/home/laurie/Desktop/bd.RData")
 ```
 
 ## Maximum Likelihood
@@ -269,7 +268,7 @@ ggplot(with(rsdl, data.frame(obs=stdz(index),hat=stdz(hat))))+
 
 The residuals are plotted against year along with a lowess smoother to see if the proxy for the stock doesnt agree with the estimated stock trend,
 
-```{r-rsdl3,fig.height=2, fig.margin=TRUE, fig.cap="Residuals by year, with lowess smoother"}
+```{r-rsdl3,fig.height=3, fig.margin=TRUE, fig.cap="Residuals by year, with lowess smoother"}
 dat=transform(subset(rsdl,!is.na(residual), residual=stdz(residual,na.rm=T)))
 ggplot(aes(year,residual),data=dat)  +
   geom_hline(aes(yintercept=0))      +
@@ -282,7 +281,7 @@ ggplot(aes(year,residual),data=dat)  +
 
 It is also assumed that variance does not vary with the mean, this assumption can be checked by plotting the residuals against the fitted values. 
 
-```{r-rsdl6,fig.height=2, fig.margin=TRUE, fig.cap="Plot of residuals against fitted value, to check variance relationship."}
+```{r-rsdl6,fig.height=3, fig.margin=TRUE, fig.cap="Plot of residuals against fitted value, to check variance relationship."}
 ggplot(aes(hat, residual),data=subset(rsdl,!is.na(hat) & !is.na(residual)))   +
   geom_hline(aes(yintercept=0))         +
   geom_point()                          +
@@ -313,20 +312,20 @@ Likelihood profiles are useful to check that you are actually at a global soluti
 The control slot can be used to produce a profile, i.e. fix a parameter or parameters for a range of values and then find the maximum likelihood by estimating the other parameters.
 
 1D
-```{r,eval=FALSE}
-res=profile(bdHat,which='r',fixed=c('b0','p'),cpue,range=seq(0.97,1.03,.002))
-ggplot(res)+geom_line(aes(r,ll))
+```{r}
+res=profile(bdHat,which='r',fixed=c('b0','p'),cpue,range=seq(0.97,1.03,.005))
+ggplot(res)+geom_line(aes(r,ll.u1))
 ```
 
 2D
-```{r,eval=FALSE}
-res=profile(bdHat,which=c('r','k'),fixed=c('b0','p'),cpue,range=seq(0.97,1.03,.002))
-ggplot(res, aes(r, k, z=ll))+ 
+```{r}
+res=profile(bdHat,which=c('r','k'),fixed=c('b0','p'),cpue,range=seq(0.97,1.03,.02))
+ggplot(res, aes(r, k, z=ll.u1))+ 
   stat_contour(aes(colour = ..level..), size = 1)
 ```
 
 likelihood components
-```{r,eval=FALSE}
+```{r}
 library(biodyn)
 library(ggplot2)
 library(plyr)
@@ -346,11 +345,12 @@ bd@control[3:4,"phase"]=-1
 bd=fit(bd,index=FLQuants("1"=cpue,"2"=cpue2))
 
 prfl=profile(bd,which='r',fixed=c('b0','p'),index=FLQuants("1"=cpue,"2"=cpue2),range=seq(0.97,1.03,.002))
-ggplot(res)+geom_line(aes(r,ll))
+prfl=transform(prfl,ll=ll.u1+ll.u2)
+ggplot(prfl)+geom_line(aes(r,ll))
 ```
 
 Profile Slot
-```{r,eval=FALSE,echo=FALSE}
+```{r,echo=FALSE,eval=FALSE}
 bd2=fit(bdHat,cpue,cmdOps="-lprof")
 save(bd2,bdHat,cpue,file="/home/laurie/Desktop/bd2.RData")
 prf=subset(bd@profile, param %in% c("bbmsy","ffmsy"))
@@ -374,11 +374,12 @@ There are various ways to estimate undercertainty in parameter estimates and qua
 
 Fitting using maximum likelihood provides the covariance matrix for the parameters. We can use this to conduct a Monte Carlo simulation of the parameter estimates to derive uncertainty in derived quantities.
 
-```{r,figure.height=6, fig.margin=TRUE}
+```{r,fig.height=6, fig.margin=TRUE}
 save(bdHat,cpue,file="/home/laurie/Desktop/bdHat.RData")
 sims[["Vcov"]]=mvn(bdHat,500,nms=c("r","k"),fwd=TRUE)
 
-plot(sims[["Vcov"]])
+plot(sims[["Vcov"]])+
+  theme(legend.position="bottom")
 
 save(sims, file="/home/laurie/Desktop/sims.RData")
 ```
@@ -387,7 +388,7 @@ save(sims, file="/home/laurie/Desktop/sims.RData")
 
 The Bootstrap can be used to simulate CPUE series replicates and the model refitted.
 
-```{r, eval=FALSE, fig.height=4}
+```{r, fig.height=4}
 cpueSim=bdHat@diags[,c("year","hat")]
 names(cpueSim)[2]="data"
 cpueSim=as.FLQuant(cpueSim)
@@ -398,7 +399,7 @@ cpueSim=rlnorm(100,log(cpueSim),0.25)
 
 cpueSim[cpueSim==0]=NA
 
-plot(sims[["CPUE"]])
+plot(cpueSim)
 
 sims[["CPUE"]]=fit(propagate(bdHat,100),cpueSim)
 ```
@@ -421,7 +422,8 @@ Monte Carlo Markov Chain
 ```{r, fig.height=4, fig.margin=TRUE, fig.cap="Plot predicted stock trend by index"}
 sims[["MCMC"]]=fit(bdHat,cpue,cmdOps=c("-mcmc 100000, -mcsave 50000"))
 
-plot(sims[["MCMC"]])
+plot(sims[["MCMC"]])+
+  theme(legend.position="bottom")
 ```
 
 Diagnostics need to be run to make sure that the results have actually estimated a stationary distribution.
@@ -539,7 +541,8 @@ for (i in seq(29,49,3))
   bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1:3)$hvt)
 simHCR[["3"]]=bd
 save(simHCR,file="/home/laurie/Desktop/sims.RData")
-plot(simHCR)
+plot(simHCR)+
+  theme(legend.position="bottom")
 ```
 
 ```{r,fig.margin=TRUE}
@@ -548,7 +551,8 @@ for (i in seq(29,49,1))
   bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1,bndF=c(0.9,1.1))$hvt)
 simHCR[["bound F"]]=bd
 
-plot(simHCR)
+plot(simHCR)+
+  theme(legend.position="bottom")
 ```
 
 ```{r,fig.margin=TRUE}
@@ -557,7 +561,8 @@ for (i in seq(29,49,1))
   bd=fwd(bd,catch=hcr(bd,refYrs=i,yrs=i+1,tac=T,bndTac=c(0.9,1.1))$tac)
 simHCR[["bound TAC"]]=bd
 
-plot(simHCR)
+plot(simHCR)+
+  theme(legend.position="bottom")
 ```
 
 ```{rhcr-ts,fig.width=6,fig.height=8}
@@ -672,7 +677,7 @@ You can arrange for figures to span across the entire page by using the `fig.ful
 qplot(wt, mpg, data=mtcars, colour=factor(cyl))
 ```
 
-Note the use of the `fig.width` and `fig.height` chunk options to establish the proportions of the figure. Full width figures look much better if their height is minimized.
+Note the use of the `fig.width` and `fig.height` chunk options to establish the proportions of the fig. Full width figures look much better if their height is minimized.
 
 ## Main Column Figures
 
@@ -685,7 +690,7 @@ qplot(factor(cyl), mpg, data = mtcars, geom = "boxplot")
 # Robustness
 
 # MSE
-```{r,eval=FALSE}
+```{r}
 biodyn:::mseBiodyn
 ```
 
@@ -702,7 +707,7 @@ You can arrange for figures to span across the entire page by using the `fig.ful
 qplot(wt, mpg, data=mtcars, colour=factor(cyl))
 ```
 
-Note the use of the `fig.width` and `fig.height` chunk options to establish the proportions of the figure. Full width figures look much better if their height is minimized.
+Note the use of the `fig.width` and `fig.height` chunk options to establish the proportions of the fig. Full width figures look much better if their height is minimized.
 
 ## Main Column Figures
 
