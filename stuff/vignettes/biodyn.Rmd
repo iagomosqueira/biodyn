@@ -18,7 +18,7 @@ library(knitr)
 options(max.print="75")
 opts_chunk$set(fig.path="out/",
                echo =TRUE,
-               cache=TRUE,
+               cache=FALSE,
                cache.path="cache/",
                prompt=FALSE,
                tidy=TRUE,
@@ -132,7 +132,7 @@ plot(bd,worm=3)+
   theme(legend.position="bottom")
 ```
 
-```{r, fig.margin=TRUE, fig.height=6, fig.width=4, echo=FALSE, fig.cap="Simulated CPUE series"}
+```{r, fig.margin=TRUE, eval=FALSE, fig.height=6, fig.width=4, echo=FALSE, fig.cap="Simulated CPUE series"}
 biodyn:::plotEql(bd)
 ```
 
@@ -189,14 +189,14 @@ bd=biodyn(catch=catch(bd),msy=mean(catch(bd)))
 ```
 
 The constructor also calculates the stock based on the initial parameters and catch and this allows catchability and the CV of the fit of the CPUE index to be calculated.
-```{r,fig.margin=TRUE}
+```{r,fig.margin=TRUE,fig.width=4,fig.height=6}
 setParams( bd)=cpue
 params(bd)
 ```
 
 The params slot holds the fitted parameters. But before fitting the control slot has to be provided with initial guesses, upper and lower bounds (min and max) and any difficult to estimate parameters to be fixed, i.e. setting the phase of $B_0$ and p to be 1. Parameters can be estimated sequentially by setting phase >0. 
 
-```{r,fig.margin=TRUE}
+```{r,fig.margin=TRUE,fig.width=4,fig.height=6}
 setControl(bd)=params(bd)
   
 bd@control
@@ -217,7 +217,7 @@ save(bdHat,cpue,file="/home/laurie/Desktop/bdHat.RData")
 ```
 
 Since the true parameters are known then we can check the fits. 
-```{r}
+```{r,fig.margin=TRUE,fig.width=4,fig.height=6}
 params(bdHat)
 params(bdHat)/params(bd)
 ```
@@ -313,41 +313,43 @@ Likelihood profiles are useful to check that you are actually at a global soluti
 The control slot can be used to produce a profile, i.e. fix a parameter or parameters for a range of values and then find the maximum likelihood by estimating the other parameters.
 
 1D
-```{r}
+```{r, fig.margin=TRUE, fig.cap="Likelihood profile for r"}
 res=profile(bdHat,which='r',fixed=c('b0','p'),cpue,range=seq(0.97,1.03,.005))
 ggplot(res)+geom_line(aes(r,ll.u1))
 ```
 
 2D
-```{r}
+```{r, eval=FALSE, fig.margin=TRUE, fig.cap="Likelihood profile for r"}
 res=profile(bdHat,which=c('r','k'),fixed=c('b0','p'),cpue,range=seq(0.97,1.03,.02))
 ggplot(res, aes(r, k, z=ll.u1))+ 
   stat_contour(aes(colour = ..level..), size = 1)
 ```
 
 likelihood components
-```{r}
+```{r, fig.margin=TRUE, fig.cap="Likelihood profile by data conmponent, i.e. CPUE series"}
 library(biodyn)
 library(ggplot2)
 library(plyr)
 library(reshape)
 
-bd=simBiodyn()
-bd=window(bd,end=49)
-cpue =(stock(bd)[,-dims(bd)$year]+
-      stock(bd)[,-1])/2
-cpue1=rlnorm(1,log(cpue),.2)
-cpue2=rlnorm(1,log(cpue),.2)
-setParams(bd) =FLQuants("1"=cpue1,"2"=cpue2)
+bd  =simBiodyn()
+bd  =window(bd,end=49)
+Us  =FLQuants("Unbiased"     =rlnorm(1,log((stock(bd)[,-dims(bd)$year]+
+                                            stock(bd)[,-1]))/2,0.2),
+              "Increase in q"=rlnorm(1,log((stock(bd)[,-dims(bd)$year]+
+                                            stock(bd)[,-1])*
+                                     cumprod(rep(1.02,48))/2),0.2))
+setParams(bd) =Us
 setControl(bd)=params(bd)
 
 bd@control[3:4,"phase"]=-1
 
-bd=fit(bd,index=FLQuants("1"=cpue,"2"=cpue2))
+bd=fit(bd,index=Us)
 
-prfl=profile(bd,which='r',fixed=c('b0','p'),index=FLQuants("1"=cpue,"2"=cpue2),range=seq(0.97,1.03,.002))
-prfl=transform(prfl,ll=ll.u1+ll.u2)
-ggplot(prfl)+geom_line(aes(r,ll))
+prfl=profile(bd,which='r',fixed=c('b0','p'),index=Us,range=seq(0.99,1.12,.002))
+prfl=melt(prfl[,c("r","ll.u1","ll.u2")],id="r")
+ggplot(prfl)+geom_line(aes(r,value,group=variable,col=variable))+
+  facet_wrap(~variable,scale="free")
 ```
 
 Profile Slot
@@ -378,18 +380,13 @@ Fitting using maximum likelihood provides the covariance matrix for the paramete
 ```{r,fig.height=6, fig.margin=TRUE}
 save(bdHat,cpue,file="/home/laurie/Desktop/bdHat.RData")
 sims[["Vcov"]]=mvn(bdHat,500,nms=c("r","k"),fwd=TRUE)
-
-plot(sims[["Vcov"]])+
-  theme(legend.position="bottom")
-
-save(sims, file="/home/laurie/Desktop/sims.RData")
 ```
 
 ## The Bootstrap 
 
 The Bootstrap can be used to simulate CPUE series replicates and the model refitted.
 
-```{r, fig.height=4}
+```{r, fig.height=4, fig.margin=TRUE, fig.cap="Bootstrapped CPUE series"}
 cpueSim=bdHat@diags[,c("year","hat")]
 names(cpueSim)[2]="data"
 cpueSim=as.FLQuant(cpueSim)
@@ -420,11 +417,8 @@ plotJack(sims[["Jack Knife"]],bdHat)
 ## MCMC
 
 Monte Carlo Markov Chain
-```{r, fig.height=4, fig.margin=TRUE, fig.cap="Plot predicted stock trend by index"}
-sims[["MCMC"]]=fit(bdHat,cpue,cmdOps=c("-mcmc 100000, -mcsave 50000"))
-
-plot(sims[["MCMC"]])+
-  theme(legend.position="bottom")
+```{r}
+sims[["MCMC"]]=fit(bdHat,cpue,cmdOps=c("-mcmc 1000000, -mcsave 5000"))
 ```
 
 Diagnostics need to be run to make sure that the results have actually estimated a stationary distribution.
@@ -433,18 +427,14 @@ Diagnostics need to be run to make sure that the results have actually estimated
 acf(c(params(sims[["MCMC"]])["r"]))
 ```
 
-## Comparison
-
-```{r,fig.margin=TRUE}
-```
 \newpage
 
 # Reference Points
 
 The Precautionary Approach requires stock status to be estimated relative to reference points. The covariance matrix can be used to estimate uncertainty in derived quantities, i.e. those used for management such as $F:F_{MSY}$. These can be found in the mng slot.
 
-```{r}
-head(bdHat@mng)
+```{r,eval=FALSE}
+bdHat@mng
 ```
 
 The variance matrix is in the mngVcov slot
@@ -453,33 +443,24 @@ bdHat@mngVcov
 ```
 
 These can be used to simulate joint distributions
-```{r,fig.margin=TRUE}
+```{r,fig.margin=TRUE,fig.width=4,fig.height=6}
 currentState   =bdHat@mng[c("bbmsy","ffmsy"),"hat",drop=T]
 currentStateVar=bdHat@mngVcov[c("bbmsy","ffmsy"),
                            c("bbmsy","ffmsy"),drop=T]
 
-mvrnorm(10,currentState,currentStateVar)
+refs=mvrnorm(100,currentState,currentStateVar)
 
-ggplot(data=as.data.frame(mvrnorm(100,currentState,currentStateVar)),
-       aes(bbmsy,ffmsy))+geom_point()+
-  geom_hline(aes(yintercept=1))+
-  geom_vline(aes(xintercept=1))+
-  xlab(expression(B:B[MSY]))+
-  ylab(expression(F:F[MSY]))
+ggplot(data=as.data.frame(refs))+
+   geom_density(aes(x=bbmsy,y = ..count..))
 ```
 \newpage
 
 # Advice Plots
-```{r,fig.margin=TRUE}
-library(kobe)
- setGeneric('kobe',          function(object,method,...)    standardGeneric('kobe'))
-
-source('~/Desktop/flr/pkgs/biodyn/R/biodyn-kobe.R')
-```
 
 ## Marginal Density for Stock/BMSY
-```{r-7}
-df=kobe(sims)
+```{r-7,fig.fullwidth=TRUE, fig.width=4, fig.height=8,fig.cap="Densities of Stock/BMSY from different methods for estimating uncertainty."}
+source('~/Desktop/flr/git/biodyn/R/biodyn-kobe.R')
+df=kobe(sims[-1])
 ggplot(subset(df,year==49)) + 
   geom_density(aes(x=stock, y=..count..), position = "stack",fill="red") +
   geom_vline(aes(xintercept=1))          +
@@ -488,16 +469,17 @@ ggplot(subset(df,year==49)) +
 ```
 
 ## Marginal Density for Harvest/FMSY
-```{r-8}
+```{r-8,fig.fullwidth=TRUE, fig.width=4, fig.height=8,fig.cap="Densities of Harvest/FMSY from different methods for estimating uncertainty."}
+
 ggplot(subset(df,year==49)) + 
   geom_density(aes(x=harvest, y=..count..), position = "stack",fill="red") +
   geom_vline(aes(xintercept=1))          +
-  facet_wrap(~.id,scale="free_y",ncol=1)+
-  scale_x_continuous(limits=c(0,1.5))
+  facet_wrap(~.id,scale="free_y",ncol=1)
+  #scale_x_continuous(limits=c(0,1.5))
 ```
 
 ## Kobe Phase Plot
-```{r-9}
+```{r-9,fig.margin=TRUE,fig.width=4, fig.height=8,fig.caption="Kobe Phase Plots" }
 library(kobe)
 kobePhase()+
   geom_point(aes(stock,harvest),data=subset(df,year==49))+
@@ -508,7 +490,7 @@ kobePhase()+
 
 Once stock parameters and status has been estimated then projections need to be conducted to inform management.
 
-```{r, fig.margin=TRUE, fig.cap=""}
+```{r, fig.margin=TRUE,fig.width=4, fig.height=8,fig.cap="Projection"}
 harvest=rlnorm(1,log(harvest(bdHat))[,-dims(bdHat)$year],.1)
 bdHat     =fwd(bdHat,harvest=harvest)
 
@@ -518,7 +500,7 @@ plot(bdHat)
 
 # Harvest Control Rules
 
-\newthought{In his later books}[^books_be] use the `\newthought` 
+\newthought{DD}
 
 Use simulated data
 ```{r-9b}
@@ -526,37 +508,29 @@ bd   =simBiodyn()
 ```
 
 
-```{r,fig.margin=TRUE}
-## simulate HCRs, annual, tri-annula, F bound, TAC bound
+To run annual, tri-annual, F bound and TAC bounded HCRs
+```{r,fig.margin=TRUE,fig.width=4,fig.height=6}
 bd=window(bd,end=29)
 for (i in seq(29,49,1))
   bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1)$hvt)
 simHCR=biodyns("1"=bd)
-
-plot(bd)
 ```
 
-```{r,fig.margin=TRUE}
+```{r,fig.margin=TRUE,fig.width=4,fig.height=6}
 bd=window(bd,end=29)
 for (i in seq(29,49,3))
   bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1:3)$hvt)
 simHCR[["3"]]=bd
-save(simHCR,file="/home/laurie/Desktop/sims.RData")
-plot(simHCR)+
-  theme(legend.position="bottom")
 ```
 
-```{r,fig.margin=TRUE}
+```{r,fig.margin=TRUE,fig.width=4,fig.height=6}
 bd=window(bd,end=29)
 for (i in seq(29,49,1))
   bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1,bndF=c(0.9,1.1))$hvt)
 simHCR[["bound F"]]=bd
-
-plot(simHCR)+
-  theme(legend.position="bottom")
 ```
 
-```{r,fig.margin=TRUE}
+```{r,fig.margin=TRUE,fig.width=4,fig.height=6,fig.cap="Plots of projections",cache=FALSE}
 bd=window(bd,end=30)
 for (i in seq(29,49,1))
   bd=fwd(bd,catch=hcr(bd,refYrs=i,yrs=i+1,tac=T,bndTac=c(0.9,1.1))$tac)
@@ -581,7 +555,7 @@ p.+geom_hline(aes(yintercept=X1),data=
                       data.frame(refpts(bd))),col="red")
 ```
 
-```{rhcrI,fig.width=5,fig.height=5}
+```{rhcrI,fig.fullwidth=TRUE,fig.width=6,fig.height=6}
 
 kb=ldply(simHCR[c(1)],function(x,sd=.1)
   model.frame(mcf(FLQuants(stock  =rlnorm(100,log(stock(  x)%/%bmsy(x)),sd),
@@ -610,7 +584,7 @@ print(kobePhase(subset(kb,year%in%i))+
 ```
 
 
-```{rhcrII,fig.width=5,fig.height=5,cache=FALSE}
+```{rhcrII,fig.fullwidth = TRUE,fig.width=6,fig.height=6}
 library(FLCore)
 library(plyr)
 library(kobe)
@@ -665,57 +639,11 @@ p.+geom_hline(aes(yintercept=X1),data=
 biodyn:::mseBiodyn
 ```
 
-[^tufte_latex]: https://code.google.com/p/tufte-latex/
-[^books_be]: http://www.edwardtufte.com/tufte/books_be
-
-
-
-## Full Width Figures
-
-You can arrange for figures to span across the entire page by using the `fig.fullwidth` chunk option. 
-
-```{r, fig.width = 10, fig.height = 2, fig.fullwidth = TRUE, fig.cap = "Full width figure"}
-qplot(wt, mpg, data=mtcars, colour=factor(cyl))
-```
-
-Note the use of the `fig.width` and `fig.height` chunk options to establish the proportions of the fig. Full width figures look much better if their height is minimized.
-
-## Main Column Figures
-
-Besides margin and full width figures, you can of course also include figures constrained to the main column.
-
-```{r, fig.cap = "Another figure"}
-qplot(factor(cyl), mpg, data = mtcars, geom = "boxplot")
-```
-
 # Robustness
 
 # MSE
 ```{r}
 biodyn:::mseBiodyn
-```
-
-[^tufte_latex]: https://code.google.com/p/tufte-latex/
-[^books_be]: http://www.edwardtufte.com/tufte/books_be
-
-
-
-## Full Width Figures
-
-You can arrange for figures to span across the entire page by using the `fig.fullwidth` chunk option. 
-
-```{r, fig.width = 10, fig.height = 2, fig.fullwidth = TRUE, fig.cap = "Full width figure"}
-qplot(wt, mpg, data=mtcars, colour=factor(cyl))
-```
-
-Note the use of the `fig.width` and `fig.height` chunk options to establish the proportions of the fig. Full width figures look much better if their height is minimized.
-
-## Main Column Figures
-
-Besides margin and full width figures, you can of course also include figures constrained to the main column.
-
-```{r, fig.cap = "Another figure"}
-qplot(factor(cyl), mpg, data = mtcars, geom = "boxplot")
 ```
 
 # Sidenotes
@@ -738,8 +666,6 @@ xtable(head(mtcars[,1:6]), caption = "First rows of mtcars")
 ```
 
 
-
-
-
-
+[^tufte_latex]: https://code.google.com/p/tufte-latex/
+[^books_be]: http://www.edwardtufte.com/tufte/books_be
 
