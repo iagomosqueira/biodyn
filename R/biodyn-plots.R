@@ -33,6 +33,7 @@ whooow  =function(x,fn,probs)
 #' @param facet facet for panels
 #'
 #' @importFrom reshape cast
+#' @import ggplot2
 #' 
 #' @return an \code{ggplot2} object
 #' 
@@ -57,7 +58,7 @@ setMethod('plot', signature(x='biodyn', y='missing'),
     fn   =list('Stock'  =function(x) stock(x), 
               'Harvest'=function(x) harvest(x),
               'Yield'  =function(x) catch(x)),
-    facet=facet_wrap(~qname,scale='free',ncol=1),...){
+    facet=facet_wrap(~qname,scales='free',ncol=1),...){
     
       ## contains iters
       if (dims(x)$iter>=length(probs)){  
@@ -104,7 +105,7 @@ setMethod('plot', signature(x='biodyn', y='missing'),
     
 setMethod('plot', signature(x='biodyns', y='missing'),
   function(x, y, probs=c(0.95,0.75,0.50,0.25,0.05),type=7,na.rm=FALSE,
-    facet=facet_wrap(~qname,scale='free',ncol=1),
+    facet=facet_wrap(~qname,scales='free',ncol=1),
            fn=list('Stock'  =function(x) stock(x), 
                    'Harvest'=function(x) harvest(x),
                    'Yield'  =function(x) catch(x)),...)
@@ -237,7 +238,7 @@ plotEqlfn=function(x,biomass=FLQuant(seq(0,max(params(x)['k']),length.out=101)),
                   transform(res,x=stock,  y=yield)[,-(7:9)]))
   
     p=ggplot(res)+geom_line(aes(x,y))+
-      facet_wrap(~pnl,scale="free",ncol=1)+    
+      facet_wrap(~pnl,scales="free",ncol=1)+    
       xlab('') + ylab('')
   
   p} 
@@ -314,7 +315,7 @@ plotMSEfn=function(mp,om,brp){
   ggplot(subset(rbind(cbind(What='OM',rbind(omAbs,omRel)),
                       cbind(What='MP',rbind(mpAbs,mpRel))),qname!='ssb'))+
     geom_line(aes(year,data,group=What,col=What))+
-    facet_wrap(qname~Type,scale='free',ncol=2)  }
+    facet_wrap(qname~Type,scales='free',ncol=2)  }
 
 ##############################################################
 #' plotJack
@@ -369,7 +370,7 @@ plotJack=function(x,y,ncol=1){
   
   # basic plot data vs. year
   p=ggplot(data=df, aes(x=year, y=jack.mean))+
-    facet_wrap(~qname,ncol=ncol,scale='free_y')+
+    facet_wrap(~qname,ncol=ncol,scales='free_y')+
     geom_ribbon(aes(x=year, ymin=jack.mean-2*jack.se, 
                     ymax=jack.mean+2*jack.se),
                 fill='blue', alpha = .20)+

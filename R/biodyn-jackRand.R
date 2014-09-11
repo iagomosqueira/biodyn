@@ -1,31 +1,34 @@
-#' rand
+#' randJack
 #'
 #' Simulates a \code{biodyn} object for a catch series, given the parameter estimates  in the \code{param} 
 #' slot and variance covariance matrix 
 #' http://young.physics.ucsc.edu/jackboot.pdf
 #' 
-#' @param object of class \code{biodyn} 
-#' @param catch of class \code{FLQuant} with the catch time series.
+#' @param n  \code{numeric} with number of simulations 
+#' @param object \code{biodyn} 
 #' @param ... other arguments
 #' 
 #' @return \code{biodyn} with estimates of stock based on catch time series
 #' 
 #' @export
-#' @rdname rand
+#' @rdname randJack
 #'
-#' @aliases rand-method rand,biodyn,FLQuant-method
+#' @aliases randJack-method randJack,numeric,biodyn-method
 #'
 #' @examples
 #' \dontrun{
 #' bd=simBiodyn()
 #' cpue=(stock(bd)[,-dims(bd)$year]+stock(bd)[,-1])/2
+#' setParams(bd)=cpue
+#' setControl(bd)=params(bd)
 #' cpue=rlnorm(1,log(cpue),.2)
+#' bd  =fit(bd,cpue)
 #' bd  =fit(bd,jackknife(cpue))
-#' bd  =jackRand(100,object)
+#' bd  =randJack(100,bd)
 #' }
-setGeneric('jackRand',   function(n,object,...)    standardGeneric('jackRand'))
+setGeneric('randJack',   function(n,object,...)    standardGeneric('randJack'))
 
-jackRand<-function(n,object){
+randJack<-function(n,object){
   res=jackSummary(params(object))
   
   vcov=as.matrix(vcov(object)[,,1,drop=T])
@@ -56,5 +59,5 @@ jackRand<-function(n,object){
   
   return(object)}
 
-setMethod('rand', signature(n="numeric",object='biodyn'),  
-          function(n,object) jackRand(n,object))
+setMethod('randJack', signature(n="numeric",object='biodyn'),  
+          function(n,object) randJack(n,object))

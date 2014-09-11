@@ -30,6 +30,7 @@
 #' 
 #' @importFrom plyr ddply ldply
 #' @import FLCore
+#' @import methods
 #' 
 #' @examples
 #' \dontrun{biodyn()}

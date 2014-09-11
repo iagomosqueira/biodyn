@@ -8,7 +8,7 @@
 \S4method{plot}{biodyn,missing}(x, y, probs = c(0.95, 0.75, 0.5, 0.25, 0.05),
   na.rm = FALSE, type = 7, worm = NULL, fn = list(Stock = function(x)
   stock(x), Harvest = function(x) harvest(x), Yield = function(x) catch(x)),
-  facet = facet_wrap(~qname, scale = "free", ncol = 1), ...)
+  facet = facet_wrap(~qname, scales = "free", ncol = 1), ...)
 }
 \arguments{
 \item{x}{an object of class \code{biodyn}}

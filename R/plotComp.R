@@ -15,7 +15,7 @@ whooow  =function(x,fn,probs)
           
 # plotComp {{{
 plotComp = function(x, fn=NULL, probs=c(0.75,0.50,0.25), size=c(0.5,1.0,0.5),
-  lty=c(2,1,2), facet=facet_wrap(~qname, scale='free'),worm=NA) {
+  lty=c(2,1,2), facet=facet_wrap(~qname, scales='free'),worm=NA) {
 
   if (dims(x)$iter>=length(probs)){  
     res = whooow(x,fn,probs)
@@ -41,7 +41,7 @@ plotComp = function(x, fn=NULL, probs=c(0.75,0.50,0.25), size=c(0.5,1.0,0.5),
 
 # plotComps {{{
 plotComps = function(x, fn=NULL, probs=c(0.75,0.50,0.25), size=c(0.5,1.0,0.5),
-  lty=c(2,1,2), facet=facet_wrap(~qname,scale='free')) {
+  lty=c(2,1,2), facet=facet_wrap(~qname,scales='free')) {
 
   x=x[seq(length(x))]
   

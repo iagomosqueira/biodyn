@@ -304,7 +304,7 @@ df=kobe(sims)
 ggplot(subset(df,year==49)) + 
   geom_density(aes(x=stock, y=..count..), position = "stack",fill="red") +
   geom_vline(aes(xintercept=1))          +
-  facet_wrap(~.id,scale="free_y",ncol=1)
+  facet_wrap(~.id,scales="free_y",ncol=1)
   #scale_x_continuous(limits=c(0.5,1.5))
 
 
@@ -312,7 +312,7 @@ ggplot(subset(df,year==49)) +
 ggplot(subset(df,year==49)) + 
   geom_density(aes(x=harvest, y=..count..), position = "stack",fill="red") +
   geom_vline(aes(xintercept=1))          +
-  facet_wrap(~.id,scale="free_y",ncol=1)+
+  facet_wrap(~.id,scales="free_y",ncol=1)+
   scale_x_continuous(limits=c(0,1.5))
 
 

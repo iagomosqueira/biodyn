@@ -1,11 +1,13 @@
 Package: biodyn
 Title: Biomass Dynamic Model
-Version: 0.0.1
+Version: 0.0.2
 Author: Laurence Kell
 Description: implements a biomass dynamic model class
 Depends:
     R(>= 3.0.1),
-    FLCore(>= 2.2)
+    methods,
+    FLCore(>= 2.2),
+    ggplot2
 Imports:
     plyr,
     reshape

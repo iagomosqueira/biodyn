@@ -63,7 +63,7 @@ setMethod('profile', signature(fitted='biodyn'),
            for (i in seq(length(which))){
                fitted@control[which[i],'val']=     params(fitted)[which[i]]*sq[,i]
                fitted@control[which[i],'min']=min(fitted@control[which[i],'val'])*range[1]
-               fitted@control[which[i],'max']=max(fitted@control[which[i],'val'])*range[2]}
+               fitted@control[which[i],'max']=max(fitted@control[which[i],'val'])*range[2]*2}
 
            fitted@control[which,'phase']=-1
            }
