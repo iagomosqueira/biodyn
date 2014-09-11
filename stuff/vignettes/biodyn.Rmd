@@ -480,7 +480,7 @@ ggplot(data=as.data.frame(refs))+
 ```
 
 ## Marginal Density for Stock/BMSY
-```{r-7,fig.fullwidth=TRUE, fig.width=6, fig.height=8,fig.cap="Densities of Stock/BMSY from different methods for estimating uncertainty."}
+```{r-7,fig.fullwidth=TRUE, fig.width=4, fig.height=6,fig.cap="Densities of Stock/BMSY from different methods for estimating uncertainty."}
 source('~/Desktop/flr/git/biodyn/R/biodyn-kobe.R')
 df=kobe(sims[-1])
 ggplot(subset(df,year==49))+ 
@@ -566,78 +566,9 @@ plot(simHCR)+
 ```
 
 
-```{rhcrII,fig.margin=TRUE,fig.width=6,fig.height=6}
-library(FLCore)
-library(plyr)
-library(kobe)
-library(ggplot2)
+# Stochasticity
 
-kb=ldply(simHCR[1:2],function(x,sd=.1)
-  model.frame(mcf(FLQuants(stock  =stock(  x)%/%bmsy(x),
-                           harvest=harvest(x)%/%fmsy(x)))))
-kb=subset(kb,year%in% 29:50)
-
-pt=ldply(simHCR,function(x)
-  model.frame(mcf(FLQuants(stock  =stock(  x)%/%bmsy(x),
-                           harvest=harvest(x)%/%fmsy(x)))))
-pt =subset(pt,year%in% 1:50)
-pt.=ddply(pt,.(year,.id),with,data.frame(stock=median(stock),harvest=median(harvest)))
-
-i=40
-kobePhase(subset(kb,year%in%i))+    
-  # geom_line(aes(stock,harvest),data=hcrPlot(bd),col="brown",size=1.5)+    
-  ggtitle(paste("Year",i-29))+    
-  theme(legend.position="none",plot.background=element_rect(fill="transparent",colour=NA),
-        plot.title = element_text(lineheight=.8, face="italic"))+    
-  xlim(0,2)+ylim(0,2)+    
-  geom_point(aes(stock,harvest,col=.id,fill=.id,size=.id), shape=21)+     
-  geom_point(aes(stock,harvest,fill=.id,group=.id),
-             data=subset(pt.,year==i),shape=21,col="black",size=5)+    
-  geom_path( aes(stock,harvest,col=.id,group=.id) ,data=subset(pt, year<=i),size=1)+      
-  scale_fill_manual(  values=c("cyan1","cyan1","grey90","green","red","yellow"))+       
-  scale_size_manual(  values=c(1,3))+       
-  scale_colour_manual(values=c("cyan4","cyan4","grey20","green","red","yellow"))+      
-  coord_cartesian(xlim=c(0,2),ylim=c(0,2))
-```
-
-## Stochasticity
-
-## Process Error
-```{rhcr-ts-mc,fig.width=8,fig.height=8}
-pe=rlnorm(100,FLQuant(0,dimnames=list(year=1:50)),0.5)
-simHCR[[1]]=fwd(simHCR[[1]],harvest=harvest(simHCR[[1]])[,ac(1:50)],pe=pe)
-simHCR[[3]]=fwd(simHCR[[3]],harvest=harvest(simHCR[[3]])[,ac(1:50)],pe=pe)
-p.=plot(simHCR[c(1,3)])+    
-  theme(legend.position="bottom")+    
-  scale_colour_manual(values=c("cyan4","grey10"),
-                      labels=c("HCR","10% Constraint on Effort"))+    
-  guides(col=guide_legend(title=NULL))+    
-  scale_x_continuous(limits=c(27,50),breaks=c(30,40,50),labels=c(1,11,21))+    
-  scale_y_continuous(breaks=NULL)
-
-p.$data=transform(p.$data,qname=factor(qname,levels=c("Harvest","Yield","Stock")))
-p.+geom_hline(aes(yintercept=X1),data=
-                cbind("qname"=c("Yield","Harvest","Stock"),data.frame(refpts(bd))),col="red")
-```
-
-
-```{rhcr-ts,fig.fullwidth=TRUE,fig.width=6,fig.height=6}
-p.=plot(simHCR)+    
-  theme(legend.position="bottom")+    
-  scale_colour_manual(values=c("cyan4","grey10","red","blue"),
-                      labels=c("HCR","10% Constraint on Effort"))+    
-  guides(col=guide_legend(title=NULL))+    
-  scale_x_continuous(limits=c(27,50),breaks=c(30,40,50),labels=c(1,11,21))+    
-  scale_y_continuous(breaks=NULL)
-
-p.$data=transform(p.$data,qname=factor(qname,levels=c("Harvest","Yield","Stock")))
-p.+geom_hline(aes(yintercept=X1),data=
-                cbind("qname"=c("Yield","Harvest","Stock"),
-                      data.frame(refpts(bd))),col="red")
-```
-
-
-## Stochastic Harvest Control Rule
+Process Error and Harvest Control Rule
 ```{r-hcrII,fig.margin=TRUE,fig.width=6,fig.height=6}
 library(biodyn)
 library(plyr)
@@ -651,30 +582,37 @@ bd@stock =propagate(bd@stock, 500)
 bd=fwd(bd,harvest=harvest(bd)[,2:30],pe=pe)
 
 for (i in seq(30,48,1))
-  bd=fwd(bd,catch=hcr(bd,refYrs=i,yrs=i+1,tac=T,bndTac=c(0.9,1.1))$tac,pe=pe)
+  bd=fwd(bd,
+         catch=hcr(bd,refYrs=i,yrs=i+1,tac=T,bndTac=c(0.9,1.1))$tac,
+         pe   =pe)
 
 plot(bd)
 ```
 
 ```{r-hcrKobe,fig.margin=TRUE,fig.width=6,fig.height=6}
 trks=biodyn::kobe(bd,what="trks")
-trks=mdply(data.frame(Year=seq(33,49,3)), function(Year) subset(trks,year<=Year))
+trks=mdply(data.frame(Year=seq(33,49,3)), 
+           function(Year) subset(trks,year<=Year))
 
-pts =transform(biodyn::kobe(bd,what="pts",year=seq(33,49,3)),Year=year)[,c("stock","harvest","Year")]
+pts =transform(biodyn::kobe(bd,what="pts",year=seq(33,49,3)),
+                 Year=year)[,c("stock","harvest","Year")]
 
 kobePhase()+    
-    geom_line(aes(stock,harvest),data=biodyn:::hcrPlot(bd.),col="brown",size=1.5)+    
+    geom_line(aes(stock,harvest),data=biodyn:::hcrPlot(bd.),
+              col="brown",size=1.5)                             +    
     geom_path( aes(stock,harvest),data=subset(trks,pctl=="50%"))+
-    geom_point(aes(stock,harvest),data=subset(pts,Year>=33))  +
+    geom_point(aes(stock,harvest),data=subset(pts,Year>=33))    +
     facet_wrap(~Year)
 ```
-
+\newpage
 
 # MSE
 
 ```{r,eval=FALSE}
 biodyn:::mseBiodyn
 ```
+\newpage
+
 
 # Sidenotes
 
