@@ -325,6 +325,7 @@ The control slot can be used to produce a profile, i.e. fix a parameter or param
 1D
 ```{r1d, fig.margin=TRUE, fig.cap="Likelihood profile for r"}
 load("/home/laurie/Desktop/bdHat.RData")
+
 bdHat=fit(bdHat,cpue)
 setControl(bdHat)=params(bdHat)
 res=profile(bdHat,which='r',fixed=c('b0','p'),
