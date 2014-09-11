@@ -199,18 +199,24 @@ activeParams=function(obj) dimnames(obj@control)$params[c(obj@control[,'phase']>
 #'
 #' @aliases fit fit-method fit,biodyn,FLQuant-method   fit,biodyn,FLQuantJK-method  fit,biodyn,FLQuants-method
 #' 
-# @examples
-# \dontrun{
-#    bd=simBiodyn()
-#    bd=window(bd,end=49)
-#    cpue=(stock(bd)[,-dims(bd)$year]+stock(bd)[,-1])/2
-#    cpue2=exp(rlnorm(1,log(stock(bd)/mean(stock(bd))*cumprod(rep(1.01,49))),.2))
-#    cpue=rlnorm(1,log(cpue),.2)
-#    setParams(bd) =FLQuants("1"=cpue,"2"=cpue2)
-#    setControl(bd)=params(bd)
-#    bd@control[3:4,"phase"]=-1
-#    bd=fit(bd,index=FLQuants("1"=cpue,"2"=cpue2))
-# }
+#' @examples
+#' \dontrun{
+#'    #simulate an object with known properties
+#'    bd=simBiodyn()
+#'    bd=window(bd,end=49)
+#'    
+#'    #simulate a proxy for stock abundance
+#'    cpue=(stock(bd)[,-dims(bd)$year]+stock(bd)[,-1])/2
+#'    cpue=rlnorm(1,log(cpue),.2)
+#'    
+#'    #set parameters
+#'    setParams(bd) =cpue
+#'    setControl(bd)=params(bd)
+#'    bd@control[3:4,"phase"]=-1
+#'    
+#'    #fit
+#'    bd=fit(bd,cpue)
+#' }
 setGeneric('fit',   function(object,index,...)     standardGeneric('fit'))
 setMethod('fit',signature(object='biodyn',index='FLQuant'),
           function(object,index=index,exeNm='pella',package='biodyn', 

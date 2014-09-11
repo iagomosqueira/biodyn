@@ -131,8 +131,13 @@ iavFn=function(val,bnd,lag=1){
 #'
 #' @examples
 #' \dontrun{
-#'  bd=biodyn('logistic',FLPar(msy=1000,k=50000,b0=1),stock=FLQuant(50000,dimnames=list(year=1:50)))
-#'  bd=fwd(bd,catch=FLQuant(500,dimnames=list(year=1:50)))
+#' bd=simBidyn()
+#' harvest=rlnorm(100,log(harvest(bd))[,-dims(bd)$year],.1)
+#' 
+#' bdHat =fwd(bdHat,harvest=harvest)
+#' 
+#' plot(bdHat,worm=c(2,8))+
+#' theme(legend.position="bottom")
 #'  }
 setGeneric('fwd', function(object,ctrl,...) standardGeneric('fwd'))
 setMethod( 'fwd', signature(object='biodyn',ctrl='missing'),

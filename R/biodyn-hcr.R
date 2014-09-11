@@ -2,7 +2,8 @@ utils::globalVariables('laply')
 
 #' tac , 
 #' 
-#' Calculates the Total Allowable Catch for a given harvest rate and stock biomass
+#' Calculates the Total Allowable Catch for a \code{biodyn} object and target harvest rate
+#' by projecting the last year.
 #'
 #' @param  object an object of class \code{biodyn} or
 #' @param  harvest an \code{FLQuant} object with harvest rate
@@ -18,7 +19,7 @@ utils::globalVariables('laply')
 #' 
 #' @examples
 #' \dontrun{
-#' tac('logistic',FLPar(msy=100,k=500))
+#' tac(bd,FLQuant(0.1,dimnames=list(year=dims(bd)$maxyear)))
 #' }
 setMethod( 'tac', signature(object='biodyn'),
            function(object,harvest,...){
@@ -108,7 +109,11 @@ hcrParam=function(ftar,btrig,fmin,blim){
 #'
 #' @examples
 #' \dontrun{
-#' hcr('logistic',FLPar(msy=100,k=500))
+#' bd   =simBiodyn()
+#' 
+#' bd=window(bd,end=29)
+#' for (i in seq(29,49,1))
+#' bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1)$hvt)
 #' }
 setGeneric('hcr', function(object,...) standardGeneric('hcr'))
 setMethod('hcr', signature(object='biodyn'),

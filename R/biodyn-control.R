@@ -7,7 +7,8 @@ utils::globalVariables(c('ldply','melt','variable'))
 
 #' setParams<-
 #'
-#' Sets up the param slot in a biodyn object given an index
+#' Add parameters for catchability and sigma in the param slot given an index or indices
+#' of stock abundance as \code{FLQuant} or \code{FLQuants}. 
 #'
 #' @param object an object of class \code{biodyn}
 #' @param value \code{params}
@@ -19,8 +20,9 @@ utils::globalVariables(c('ldply','melt','variable'))
 #'
 #' @examples
 #' \dontrun{
-#' data(bd)
-#' setParams(bd) <-swonIndex
+#' bd=simBiodyn()
+#' cpue=stock(bd)
+#' setParams(bd) <-cpue
 #' setParams(bd)}
 #' 
 setGeneric('setParams<-', function(object,value)  standardGeneric('setParams<-'))
@@ -63,12 +65,12 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(o
 
 #' setControl<-
 #'
-#' @description Sets up the control slot in a biodyn object given the values in the \code{params}
-#' slot. The starting values are set to the values in \code{params} and the min and
-#' max bounds to .1 and 10 times of these.
+#' @description Sets the control slot in a biodyn object given the parameters in the \code{params}
+#' slot. The starting values \code{val} are set to those in \code{params} and the \code{min} and
+#' \code{max} bounds to .1 and 10 times these.
 #'
 #' @param object an object of class \code{biodyn}
-#' @param value CPUE as \code{FLQuant} or \code{FLQuants}
+#' @param value  \code{params} object
 #' @param ... any other parameter
 #'
 #' @seealso \code{\link{controlFn}}
@@ -81,10 +83,9 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(o
 #'
 #' @examples
 #' \dontrun{
-#' data(bd)
-#' setControl(bd) <-params(bd)
-#' params(bd)
-#' control(bd)}
+#' bd=simBiodyn()
+#' setControl(bd)=params(bd)
+#' }
 #'  
 setGeneric('setControl<-',  function(object,...,value) standardGeneric('setControl<-'))
 setMethod('setControl<-', signature(object='biodyn',value='FLPar'), function(object,value,min=0.1,max=10.0) {

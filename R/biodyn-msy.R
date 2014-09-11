@@ -30,7 +30,7 @@ setMethod('msy',   signature(object='biodyn',    params='numeric'), function(obj
 
 #' fmsy
 #'
-#' Calculates $F_{MSY}$ given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
+#' Calculates FMSY given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
 #'
 #' @param object an object of class \code{biodyn} or a string or factor that species the model
 #' @param params an \code{FLPar} object with model parameters
@@ -38,7 +38,7 @@ setMethod('msy',   signature(object='biodyn',    params='numeric'), function(obj
 #'
 #' @aliases fmsy,fmsy-method fmsy,biodyn,missing-method  fmsy,biodyn,numeric-method fmsy,character,FLPar-method fmsy,factor,FLPar-method
 #' 
-#' @return an \code{FLPar} object with value(s) of $F_{MSY}$
+#' @return an \code{FLPar} object with value(s) of FMSY
 #' 
 #' @seealso \code{\link{msy}}, \code{\link{bmsy}} 
 #' 
@@ -57,7 +57,7 @@ setMethod('fmsy',  signature(object='biodyn',    params='numeric'), function(obj
 
 #' bmsy
 #'
-#' Calculates $B_{MSY}$ given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
+#' Calculates BMSY given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
 #'
 #' @param object an object of class \code{biodyn} or a string or factor that species the model
 #' @param params an \code{FLPar} object with model parameters
@@ -65,7 +65,7 @@ setMethod('fmsy',  signature(object='biodyn',    params='numeric'), function(obj
 #'  
 #' @aliases bmsy,biodyn,missing-method  bmsy,biodyn,numeric-method bmsy,character,FLPar-method bmsy,factor,FLPar-method
 #' 
-#' @return an \code{FLPar} object with value(s) of $MSY$, $B_{MSY}$ and $B_{MSY}$
+#' @return an \code{FLPar} object with value(s) of MSY, B_MSY and B_MSY
 #' 
 #' @seealso \code{\link{msy}}, \code{\link{fmsy}} and  \code{\link{bmsy}}
 #' 
@@ -85,13 +85,13 @@ setMethod('bmsy',  signature(object='biodyn',    params='numeric'), function(obj
 ##############################################################
 #' Maximum Sustainable Yield reference points
 #'
-#' Calculates $MSY$, $B_{MSY}$ and $F_{MSY}$ given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
+#' Calculates MSY, B_MSY and F_MSY given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
 #'
 #' @param object an object of class \code{biodyn} or a string or factor that species the model
 #' @param params an \code{FLPar} object with model parameters
 #' @param ... any other arguments
 #'
-#' @return an \code{FLPar} object with value(s) of $F_{MSY}$
+#' @return an \code{FLPar} object with value(s) of F_MSY
 #' 
 #' @seealso \code{\link{msy}}, \code{\link{bmsy}} 
 #' 
@@ -256,7 +256,7 @@ bmsyFn=function(object,params,probs=0.5) {
 #'
 #' Calculates $k$ given msy, r and K for a Pella-Tomlinson biomass dynamic model
 #'
-#' @param msy a guess for $MSY$
+#' @param msy a guess for MSY
 #' @param r a guess for $r$ the population growth rate
 #' @param p a guess for $p$ the shape parameter
 #' @param params provide $r$ and $p$ as \code{FLPar}
