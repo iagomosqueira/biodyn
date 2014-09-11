@@ -325,9 +325,11 @@ The control slot can be used to produce a profile, i.e. fix a parameter or param
 1D
 ```{r1d, fig.margin=TRUE, fig.cap="Likelihood profile for r"}
 load("/home/laurie/Desktop/bdHat.RData")
+bdHat=fit(bdHat,cpue)
+setControl(bdHat)=params(bdHat)
 res=profile(bdHat,which='r',fixed=c('b0','p'),
-            cpue,range=seq(0.97,1.03,.002))
-ggplot(res)+geom_line(aes(r,ll.u1))
+            cpue,range=seq(0.95,1.03,.002))
+ggplot(subset(res,ll.u1<0))+geom_line(aes(r,ll.u1))
 ```
 
 2D
@@ -633,45 +635,43 @@ p.+geom_hline(aes(yintercept=X1),data=
                       data.frame(refpts(bd))),col="red")
 ```
 
-```{rhcrI,eval=FALSE,fig.margin=TRUE,fig.width=6,fig.height=6}
-kb=ldply(simHCR[c(1)],function(x,sd=.1)
-  model.frame(mcf(FLQuants(stock  =rlnorm(100,log(stock(  x)%/%bmsy(x)),sd),
-                           harvest=rlnorm(100,log(harvest(x)%/%fmsy(x)),sd)))))
-kb=subset(kb,year%in% 29:50)
 
-pt=ldply(simHCR[c(1)],function(x)
-  model.frame(mcf(FLQuants(stock  =stock(  x)%/%bmsy(x),
-                           harvest=harvest(x)%/%fmsy(x)))))
-pt =subset(pt,year%in% 1:50)
-pt.=ddply(pt,.(year,.id),with,data.frame(stock=median(stock),harvest=median(harvest)))
+## Stochastic Harvest Control Rule
+```{r-hcrII,fig.margin=TRUE,fig.width=6,fig.height=6}
+library(biodyn)
+library(plyr)
+library(ggplot2)
 
-i=40
-print(kobePhase(subset(kb,year%in%i))+    
-        geom_line(aes(stock,harvest),data=biodyn:::hcrPlot(bd),col="brown",size=1.5)+    
-        ggtitle(paste("Year",i-29))+    
-        theme(legend.position="none",plot.background=element_rect(fill="transparent",colour=NA),
-              plot.title = element_text(lineheight=.8, face="italic"))+     
-        xlim(0,2)+ylim(0,2)+        
-        geom_point(aes(stock,harvest,col=.id,fill=.id), shape=21, size=3)+           
-        geom_point(aes(stock,harvest,group=.id,fill=.id),  
-                   col="black", data=subset(pt.,year==i),shape=21,size=5)+          
-        geom_path( aes(stock,harvest,col=.id,group=.id) ,
-                   data=subset(pt, year<=i),size=1)+      
-        scale_fill_manual(  values=c("cyan1","green","red","yellow"))+       
-        scale_colour_manual(values=c("cyan4","green","red","yellow"))+      
-        coord_cartesian(xlim=c(0,2),ylim=c(0,2)))
+pe=rlnorm(500,FLQuant(0,dimnames=list(year=1:50)),0.5)
+
+bd=window(simBiodyn(),end=30)
+bd.=bd
+bd@stock =propagate(bd@stock, 500)
+bd=fwd(bd,harvest=harvest(bd)[,2:30],pe=pe)
+
+for (i in seq(30,48,1))
+  bd=fwd(bd,catch=hcr(bd,refYrs=i,yrs=i+1,tac=T,bndTac=c(0.9,1.1))$tac,pe=pe)
+
+plot(bd)
+```
+
+```{r-hcrKobe,fig.margin=TRUE,fig.width=6,fig.height=6}
+trks=biodyn::kobe(bd,what="trks")
+trks=mdply(data.frame(Year=seq(33,49,3)), function(Year) subset(trks,year<=Year))
+
+pts =transform(biodyn::kobe(bd,what="pts",year=seq(33,49,3)),Year=year)[,c("stock","harvest","Year")]
+
+kobePhase()+    
+    geom_line(aes(stock,harvest),data=biodyn:::hcrPlot(bd.),col="brown",size=1.5)+    
+    geom_path( aes(stock,harvest),data=subset(trks,pctl=="50%"))+
+    geom_point(aes(stock,harvest),data=subset(pts,Year>=33))  +
+    facet_wrap(~Year)
 ```
 
 
 # MSE
+
 ```{r,eval=FALSE}
-biodyn:::mseBiodyn
-```
-
-# Robustness
-
-# MSE
-```{r}
 biodyn:::mseBiodyn
 ```
 
@@ -693,7 +693,6 @@ options(xtable.comment = FALSE)
 options(xtable.booktabs = TRUE)
 xtable(head(mtcars[,1:6]), caption = "First rows of mtcars")
 ```
-
 
 [^tufte_latex]: https://code.google.com/p/tufte-latex/
 [^books_be]: http://www.edwardtufte.com/tufte/books_be

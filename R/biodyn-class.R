@@ -28,7 +28,7 @@
 #' 
 #' @export
 #' 
-#' @importFrom plyr ddply ldply
+#' @importFrom plyr ddply ldply laply
 #' @import FLCore
 #' @import methods
 #' 
