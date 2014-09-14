@@ -17,10 +17,10 @@ bmsy(object, params, ...)
 \item{...}{any other parameters}
 }
 \value{
-an \code{FLPar} object with value(s) of $MSY$, $B_{MSY}$ and $B_{MSY}$
+an \code{FLPar} object with value(s) of MSY, B_MSY and B_MSY
 }
 \description{
-Calculates $B_{MSY}$ given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
+Calculates BMSY given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
 }
 \examples{
 \dontrun{

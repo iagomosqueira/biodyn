@@ -336,43 +336,39 @@ plotMSEfn=function(mp,om,brp){
 #'
 #' @examples
 #' \dontrun{
+#' #simulate an object with known properties
+#' bd=simBiodyn()
+#' bd=window(bd,end=49)
+#' 
+#' #simulate a proxy for stock abundance
+#' cpue=(stock(bd)[,-dims(bd)$year]+stock(bd)[,-1])/2
+#' cpue=rlnorm(1,log(cpue),.2)
+#' 
+#' #set parameters
+#' setParams(bd) =cpue
+#' setControl(bd)=params(bd)
+#' control(bd)[3:4,"phase"]=-1
+#' 
+#' #fit
 #' bd=fit(bd,cpue)
-#' jk=fit(bd,jacknife(cpue))
-#' plotJack(jk,bd)
-#' }  
+#' 
+#' bdJK=fit(bd,jackknife(cpue))
+#' plotJack(bdJK)
+#' bd  =randJack(100,bd)
+#' }
 plotJack=function(x,y,ncol=1){
-  
-  js=function(x,y, ...) {
-    maxYr=max(unlist(dims(y))["year"],
-              unlist(dims(x))["year"])
-    x=window(x,end=maxYr)
-    y=window(y,end=maxYr)
-    
-    n <- dims(x)$iter 
-    
-    mnU <- apply(x, 1:5, mean)   
-    
-    SS <- apply(sweep(x, 1:5, mnU,'-')^2, 1:5, sum)
-    
-    bias <- (n - 1) * (mnU - y)
-    se <- sqrt(((n-1)/n)*SS)
-    
-    res=FLQuants(list(jack.mean=y, jack.se=se, jack.bias=bias))
-    
-    attributes(res)$jackknife=TRUE
-    
-    return(res)}
-  
+   
   df=rbind(cbind(qname='stock',  
-                 model.frame(js(stock(  x),stock(  y)),drop=TRUE)),
+                 model.frame(jackSummary(stock(  x),stock(  y)),drop=TRUE)),
            cbind(qname='harvest',
-                 model.frame(mcf(js(harvest(x),harvest(y))),drop=TRUE)))
+                 model.frame(mcf(jackSummary(harvest(x),harvest(y))),drop=TRUE)))
   
   # basic plot data vs. year
-  p=ggplot(data=df, aes(x=year, y=jack.mean))+
+  p=ggplot(data=df, aes(x=year, y=mean))+
     facet_wrap(~qname,ncol=ncol,scales='free_y')+
-    geom_ribbon(aes(x=year, ymin=jack.mean-2*jack.se, 
-                    ymax=jack.mean+2*jack.se),
+    geom_ribbon(aes(x=year, 
+                  ymin=mean-2*se, 
+                  ymax=mean+2*se),
                 fill='blue', alpha = .20)+
     # line + xlab + ylab + limits to include 0 +
     geom_line(colour='red') + xlab('Year') + ylab('') + expand_limits(y=0) +

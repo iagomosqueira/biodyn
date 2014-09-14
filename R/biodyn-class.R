@@ -22,13 +22,15 @@
 #' @slot objFn   {\code{FLPar} with objective function} 
 #' @slot ll      {\code{FLPar} with negative log likelihood by data component}
 #' @slot profile {\code{data.frame} not yet implemented} 
-#' 
+#' @slot hst     {\code{data.frame} not yet implemented} 
 #' 
 #' All slots in the class have accessor and replacement methods that provide validation and protection of their data.
 #' 
 #' @export
 #' 
-#' @importFrom plyr ddply ldply laply
+#' @importFrom plyr ddply ldply laply mdply maply .
+#' @import reshape 
+#' @importFrom stringr str_trim
 #' @import FLCore
 #' @import methods
 #' 
@@ -49,7 +51,8 @@
     ll            ='FLPar',
     mng           ='FLPar',
     mngVcov       ='FLPar',
-    profile       ='data.frame'
+    profile       ='data.frame',
+    hst           ='data.frame'
     ),
   prototype(
     range       =unlist(list(minyear=as.numeric(NA), maxyear=as.numeric(NA))),

@@ -11,21 +11,20 @@ setControl(object, ...) <- value
 \arguments{
 \item{object}{an object of class \code{biodyn}}
 
-\item{value}{CPUE as \code{FLQuant} or \code{FLQuants}}
+\item{value}{\code{params} object}
 
 \item{...}{any other parameter}
 }
 \description{
-Sets up the control slot in a biodyn object given the values in the \code{params}
-slot. The starting values are set to the values in \code{params} and the min and
-max bounds to .1 and 10 times of these.
+Sets the control slot in a biodyn object given the parameters in the \code{params}
+slot. The starting values \code{val} are set to those in \code{params} and the \code{min} and
+\code{max} bounds to .1 and 10 times these.
 }
 \examples{
 \dontrun{
-data(bd)
-setControl(bd) <-params(bd)
-params(bd)
-control(bd)}
+bd=simBiodyn()
+setControl(bd)=params(bd)
+}
 }
 \seealso{
 \code{\link{controlFn}}

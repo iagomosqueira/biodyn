@@ -18,6 +18,7 @@ utils::globalVariables(c('ldply','melt','variable'))
 #' 
 #' @aliases setParams<-,biodyn,FLPar-method  setParams<-,biodyn,FLQuant-method setParams<-,biodyn,FLQuants-method  setParams<-,biodyn,data.frame-method
 #'
+#' 
 #' @examples
 #' \dontrun{
 #' bd=simBiodyn()
@@ -90,27 +91,21 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(o
 setGeneric('setControl<-',  function(object,...,value) standardGeneric('setControl<-'))
 setMethod('setControl<-', signature(object='biodyn',value='FLPar'), function(object,value,min=0.1,max=10.0) {
   
-  phase=NULL
-  
   if (dims(value)$iter>1 & dims(object@control)$iter==1)
     object@control=propagate(control(object),dims(value)$iter)
 
+  ctr=object@control
   nms=dimnames(object@params)$params
-  phs=object@control[nms,"phase"]
   
   object@control=FLPar(array(rep(c(1,NA,NA,NA),each=length(nms)), dim=c(length(nms),4,dims(value)$iter), dimnames=list(params=nms,option=c('phase','min','val','max'),iter=seq(dims(value)$iter))))
+  nms.=nms[nms %in% dimnames(ctr)$params]
+  
+  object@control[nms.,'phase']=ctr[nms.,"phase"]
+  nms.=nms[nms %in% dimnames(object@params)$params]
 
-  object@control[nms,'val']=value
-  
-  object@control[nms,'min']=value[nms]*min
-  object@control[nms,'max']=value[nms]*max
-  
-  object@control[nms,'phase']=phs
-  
-  if (!is.null(phase)){
-     nms.=nms[nms %in% dimnames(object@params)$phase]
-     object@control[nms.,'phase']=phase[nms.]
-     }
+  object@control[,"val"]=object@params[nms.]
+  object@control[,"min"]=object@params[nms.]*min
+  object@control[,"max"]=object@params[nms.]*max
   
   if (!is.na(any(value[nms]<0)) & any(value[nms]<0))
     object@control[nms[value[nms]<0],c('min','max')]=object@control[nms[value[nms]<0],c('max','min')]

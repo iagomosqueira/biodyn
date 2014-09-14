@@ -23,9 +23,25 @@ The basic object can then be modified by adding ggpot2 layers.
 }
 \examples{
 \dontrun{
+#simulate an object with known properties
+bd=simBiodyn()
+bd=window(bd,end=49)
+
+#simulate a proxy for stock abundance
+cpue=(stock(bd)[,-dims(bd)$year]+stock(bd)[,-1])/2
+cpue=rlnorm(1,log(cpue),.2)
+
+#set parameters
+setParams(bd) =cpue
+setControl(bd)=params(bd)
+control(bd)[3:4,"phase"]=-1
+
+#fit
 bd=fit(bd,cpue)
-jk=fit(bd,jacknife(cpue))
-plotJack(jk,bd)
+
+bdJK=fit(bd,jackknife(cpue))
+plotJack(bdJK)
+bd  =randJack(100,bd)
 }
 }
 

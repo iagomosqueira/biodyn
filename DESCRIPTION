@@ -6,9 +6,9 @@ Description: implements a biomass dynamic model class
 Depends:
     R(>= 3.0.1),
     methods,
-    ggplot2,
     FLCore(>= 2.2),
 Imports:
+    ggplot2,
     plyr,
     reshape
 Suggests:

@@ -18,10 +18,10 @@ fmsy(object, params, ...)
 \item{...}{any other parameters}
 }
 \value{
-an \code{FLPar} object with value(s) of $F_{MSY}$
+an \code{FLPar} object with value(s) of FMSY
 }
 \description{
-Calculates $F_{MSY}$ given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
+Calculates FMSY given the model parameters, can be done for a biodyn class, or by specifying the model and parameters
 }
 \examples{
 \dontrun{

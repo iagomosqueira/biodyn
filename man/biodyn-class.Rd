@@ -44,8 +44,9 @@ The Class is intended to be used as part of an MSE and includes methods for diag
 
 \item{\code{ll}}{{\code{FLPar} with negative log likelihood by data component}}
 
-\item{\code{profile}}{{\code{data.frame} not yet implemented}
+\item{\code{profile}}{{\code{data.frame} not yet implemented}}
 
+\item{\code{hst}}{{\code{data.frame} not yet implemented}
 
 All slots in the class have accessor and replacement methods that provide validation and protection of their data.}
 }}

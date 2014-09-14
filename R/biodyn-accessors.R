@@ -122,9 +122,31 @@ prototype(
   objFn       =FLPar(array(as.numeric(NA),dim=c(2,1),dimnames=list("value"=c("ll","rss"),iter=1)))),
 validity=validity) 
 
+#' control
+#' @description sets initial guess and lower and upper bounds
+#'
+#' @return FLPar
+#' @export
+#' @examples
+#' \dontrun{control(biodyn())}
 setGeneric("control",     function(object,method,...) standardGeneric("control"))
+setMethod("control",   signature(object="biodyn"),function(object, ...)   object@control)
+   
+#' control<-
+#'
+#' @description sets in \code{biodyn} initial guess and lower and upper bounds
+#' 
+#' @return \code{biodyn} with new control slot
+#' @export
+#' @examples
+#'  
+#' \dontrun{control(biodyn())}
 setGeneric("control<-",   function(object,value)      standardGeneric("control<-"))
-
+setMethod("control<-", signature(object="biodyn", value="FLPar"),
+             function(object, value){
+               updateFLComp(object, "control", value)
+               return(object)})   
+   
 setGeneric("diags",       function(object,method,...) standardGeneric("diags"))
 setGeneric("diags<-",     function(object,value)      standardGeneric("diags<-"))
 

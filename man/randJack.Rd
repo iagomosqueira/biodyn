@@ -5,7 +5,7 @@
 \alias{randJack-method}
 \title{randJack}
 \usage{
-randJack(n, object)
+randJack(n, object, sim, ...)
 }
 \arguments{
 \item{n}{\code{numeric} with number of simulations}
@@ -24,14 +24,28 @@ http://young.physics.ucsc.edu/jackboot.pdf
 }
 \examples{
 \dontrun{
+#simulate an object with known properties
 bd=simBiodyn()
+bd=window(bd,end=49)
+
+#simulate a proxy for stock abundance
 cpue=(stock(bd)[,-dims(bd)$year]+stock(bd)[,-1])/2
-setParams(bd)=cpue
-setControl(bd)=params(bd)
 cpue=rlnorm(1,log(cpue),.2)
-bd  =fit(bd,cpue)
-bd  =fit(bd,jackknife(cpue))
-bd  =randJack(100,bd)
+
+#set parameters
+setParams(bd) =cpue
+setControl(bd)=params(bd)
+control(bd)[3:4,"phase"]=-1
+
+#fit
+bd=fit(bd,cpue)
+
+bdJK=fit(bd,jackknife(cpue))
+
+
+bdRnd  =randJack(100,bd,bdJK)
+
+plot(randJack(100,stock(bd)[,40:45],stock(bdJK)[,40:45]))
 }
 }
 

@@ -12,10 +12,10 @@ library(knitr)
 options(max.print="75")
 opts_chunk$set(fig.path="out/",
                echo =TRUE,
-               cache=TRUE,
+               cache=FALSE,
                cache.path="cache/",
                prompt=FALSE,
-               tidy=TRUE,
+               tidy=FALSE,
                comment=NA,
                message=FALSE,
                warning=FALSE)
@@ -23,22 +23,25 @@ opts_chunk$set(fig.path="out/",
 opts_knit$set(width=75)
 
 
+## ----,eval=FALSE---------------------------------------------------------
+## library(knitr)
+## purl(    "/home/laurie/Desktop/flr/git/biodyn/stuff/vignettes/biodyn.Rmd",
+##      out="/home/laurie/Desktop/flr/git/biodyn/vignettes/biodyn.R")
+## 
+
+
 ## ------------------------------------------------------------------------
 library(biodyn)
-
-
-## ----,echo=FALSE---------------------------------------------------------
-library(ggplotFL)
+library(ggplot2)
 library(plyr)
-library(diags)
 
 
-## ----,eval=FALSE---------------------------------------------------------
-## bd =biodyn()
+## ------------------------------------------------------------------------
+bd =biodyn()
 
 
-## ----,eval=FALSE---------------------------------------------------------
-## bd=biodyn(catch=FLQuant(100,dimnames=list(year=1990:2010)))
+## ------------------------------------------------------------------------
+bd=biodyn(catch=FLQuant(100,dimnames=list(year=1990:2010)))
 
 
 ## ----,eval=FALSE---------------------------------------------------------
@@ -56,33 +59,37 @@ library(diags)
 bd=simBiodyn()
 
 
-## ----, fig.margin=TRUE, figure.width=4, figure.height=6, fig.cap="Simulated CPUE series"----
+## ----, fig.margin=TRUE, fig.width=4, fig.height=8, fig.cap="Simulated time series"----
 bd=simBiodyn()
 bd=window(bd,end=49)
-
-
 plot(bd)
 
 
-## ----, fig.margin=TRUE, echo=FALSE, eval=FALSE, figure.height=4, fig.cap="Simulated CPUE series"----
-## x=fwd(x,harvest=rlnorm(200,log(harvest(x)[,-1]),.2))
-## plot(x,worm=3)
-
-
-## ----, fig.margin=TRUE, echo=FALSE, eval=FALSE, fig.cap="Simulated CPUE series"----
-## plotEql(x)
+## ----, fig.margin=TRUE, eval=FALSE, fig.height=6, fig.width=4, echo=FALSE, fig.cap="Simulated CPUE series"----
+## biodyn:::plotEql(bd)
 
 
 ## ----, fig.margin=TRUE, fig.cap="Simulated CPUE series"------------------
 library(reshape)
 x=simBiodyn()
 plotPrd(x)+
-  geom_path( aes(stock,catch),model.frame(FLQuants(x,"stock","catch")))+
-  geom_point(aes(stock,catch),model.frame(FLQuants(x,"stock","catch")))
+  geom_path( aes(stock,catch),
+             model.frame(FLQuants(x,"stock","catch")))+
+  geom_point(aes(stock,catch),
+             model.frame(FLQuants(x,"stock","catch")))
 
 
 ## ----, fig.margin=TRUE, eval=FALSE, fig.cap="Simulated CPUE series"------
 ## plotMSE()
+
+
+## ----, fig.margin=TRUE, fig.height=6, fig.width=4,fig.cap="Monte Carlo simuation time series with confidence intervals and a worm (single simulation)."----
+harvest=rlnorm(200,log(harvest(bd)[,-1]),.2)
+
+bd=fwd(bd,harvest=harvest)
+
+plot(bd,worm=3)+
+  theme(legend.position="bottom")
 
 
 ## ----, echo=TRUE, fig.margin=TRUE, fig.height=4, fig.cap="Simulated stock"----
@@ -103,12 +110,12 @@ ggplot(as.data.frame(cpue))+
 ## bd=biodyn(catch=catch(bd),msy=mean(catch(bd)))
 
 
-## ----,fig.margin=TRUE----------------------------------------------------
+## ----,fig.margin=TRUE,fig.width=4,fig.height=6---------------------------
 setParams( bd)=cpue
 params(bd)
 
 
-## ----,fig.margin=TRUE----------------------------------------------------
+## ----,fig.margin=TRUE,fig.width=4,fig.height=6---------------------------
 setControl(bd)=params(bd)
   
 bd@control
@@ -120,21 +127,19 @@ bdHat=fit(bd,cpue)
 
 # plot(biodyns("True"=bd,"Hat"=bdHat))+
 #   theme(legend.position="bottom")
-save(bdHat,cpue,file="/home/laurie/Desktop/bdHat.RData")
 
 
-## ------------------------------------------------------------------------
+## ----,fig.margin=TRUE,fig.width=4,fig.height=6---------------------------
 params(bdHat)
 params(bdHat)/params(bd)
 
 
 ## ----,echo=TRUE----------------------------------------------------------
-rsdl=bdHat@diags
-
-head(rsdl)
+head(bdHat@diags)
 
 
 ## -----rsdl5, fig.width=4,fig.height=4,fig.margin=TRUE, fig.cap="Quantile-quantile plot to compare residual distribution with the normal distribution."----
+rsdl=bdHat@diags
 ggplot(rsdl)                                           +
   geom_point( aes(qqx,qqy))                            +
   stat_smooth(aes(qqx,qqHat),method="lm",se=T,fill="blue", alpha=0.1)         +
@@ -142,28 +147,31 @@ ggplot(rsdl)                                           +
 
 
 ## -----rsdl2, fig.margin=TRUE, fig.height=4, figwidth=4, fig.cap="Observed CPUE verses fitted, blue line is a linear resgression fitted to points, black the y=x line."----
-ggplot(with(rsdl, data.frame(obs=stdz(index),hat=stdz(hat))))+
-          geom_abline(aes(0,1))                         +
-          geom_point( aes(obs,hat))                     +
-          stat_smooth(aes(obs,hat),method="lm", se=F)    +
-          theme_ms(14,legend.position="bottom")            +
-          xlab("Fitted") + ylab("Observed")
+ggplot(with(rsdl, data.frame(obs=stdz(index),hat=stdz(hat)))) +
+    geom_abline(aes(0,1))                                     +
+    geom_point( aes(obs,hat))                                 +
+    stat_smooth(aes(obs,hat),method="lm", se=F)               +
+    theme_ms(14,legend.position="bottom")                     +
+    xlab("Fitted") + ylab("Observed")
 
 
-## -----rsdl3,fig.height=2, fig.margin=TRUE, fig.cap="Residuals by year, with lowess smoother"----
-dat=transform(subset(rsdl,!is.na(residual), residual=stdz(residual,na.rm=T)))
+## -----rsdl3,fig.height=3, fig.margin=TRUE, fig.cap="Residuals by year, with lowess smoother"----
+dat=transform(subset(rsdl,!is.na(residual), 
+                     residual=stdz(residual,na.rm=T)))
+
 ggplot(aes(year,residual),data=dat)  +
   geom_hline(aes(yintercept=0))      +
   geom_point()                       +
-  stat_smooth(method="loess",se=F)  +
+  stat_smooth(method="loess",se=F)   +
   theme_ms(14,legend.position="bottom") 
 
 
-## -----rsdl6,fig.height=2, fig.margin=TRUE, fig.cap="Plot of residuals against fitted value, to check variance relationship."----
-ggplot(aes(hat, residual),data=subset(rsdl,!is.na(hat) & !is.na(residual)))   +
+## -----rsdl6,fig.height=3, fig.margin=TRUE, fig.cap="Plot of residuals against fitted value, to check variance relationship."----
+ggplot(aes(hat, residual),
+       data=subset(rsdl,!is.na(hat) & !is.na(residual)))   +
   geom_hline(aes(yintercept=0))         +
   geom_point()                          +
-  stat_smooth(method="loess",se=F)   +
+  stat_smooth(method="loess",se=F)      +
   theme_ms(14,legend.position="bottom")
 
 
@@ -171,47 +179,66 @@ ggplot(aes(hat, residual),data=subset(rsdl,!is.na(hat) & !is.na(residual)))   +
 ggplot(rsdl)                                              +
   geom_point( aes(residual,residualLag))                  +
   stat_smooth(aes(residual,residualLag),method="lm",se=F) +
-  geom_hline(aes(yintercept=0))                           +
-  xlab(expression(Residual[t])) + 
-  ylab(expression(Residual[t+1])) +
+  geom_hline(aes(yintercept=0))     +
+  xlab(expression(Residual[t]))     + 
+  ylab(expression(Residual[t+1]))   +
   theme_ms(14,legend.position="bottom")  
 
 
-## ----,eval=FALSE---------------------------------------------------------
-## res=profile(bdHat,which='r',fixed=c('b0','p'),cpue,range=seq(0.97,1.03,.002))
-## ggplot(res)+geom_line(aes(r,ll))
+## ----1d, fig.margin=TRUE, fig.cap="Likelihood profile for r"-------------
+load("/home/laurie/Desktop/bdHat.RData")
+
+bdHat=fit(bdHat,cpue)
+setControl(bdHat)=params(bdHat)
+res=profile(bdHat,which='r',fixed=c('b0','p'),
+            cpue,range=seq(0.95,1.03,.002))
+ggplot(subset(res,ll.u1<0))+geom_line(aes(r,ll.u1))
 
 
-## ----,eval=FALSE---------------------------------------------------------
-## res=profile(bdHat,which=c('r','k'),fixed=c('b0','p'),cpue,range=seq(0.97,1.03,.002))
-## ggplot(res, aes(r, k, z=ll))+
+## ----2d, eval=FALSE, fig.margin=TRUE, fig.cap="Likelihood profile for r"----
+## res=profile(bdHat,which=c('r','k'),fixed=c('b0','p'),
+##             cpue,range=seq(0.97,1.03,.02))
+## ggplot(res, aes(r, k, z=ll.u1))+
 ##   stat_contour(aes(colour = ..level..), size = 1)
 
 
-## ----,eval=FALSE---------------------------------------------------------
-## library(biodyn)
-## library(ggplot2)
-## library(plyr)
-## library(reshape)
-## 
-## bd=simBiodyn()
-## bd=window(bd,end=49)
-## cpue =(stock(bd)[,-dims(bd)$year]+
-##       stock(bd)[,-1])/2
-## cpue1=rlnorm(1,log(cpue),.2)
-## cpue2=rlnorm(1,log(cpue),.2)
-## setParams(bd) =FLQuants("1"=cpue1,"2"=cpue2)
-## setControl(bd)=params(bd)
-## 
-## bd@control[3:4,"phase"]=-1
-## 
-## bd=fit(bd,index=FLQuants("1"=cpue,"2"=cpue2))
-## 
-## prfl=profile(bd,which='r',fixed=c('b0','p'),index=FLQuants("1"=cpue,"2"=cpue2),range=seq(0.97,1.03,.002))
-## ggplot(res)+geom_line(aes(r,ll))
+## ----like, fig.margin=TRUE, fig.height=6, fig.width=4, fig.cap="Likelihood profile by data conmponent, i.e. CPUE series"----
+
+bd=simBiodyn()
+
+Us  =FLQuants("Unbiased"     =
+                rlnorm(1,log((stock(bd)[,-dims(bd)$year]+
+                              stock(bd)[,-1])/2),0.2),
+              "Increase in q"=
+                rlnorm(1,log((stock(bd)[,-dims(bd)$year]+
+                              stock(bd)[,-1])/2),0.2))
+
+bds=bd
+
+setParams( bds)=Us
+setControl(bds)=params(bds)
+
+bds@control[3:4,"phase"]=-1
+bds=fit(bds,index=Us)
+bds@control[,c("min")]=bds@params*0.1
+bds@control[,c("val")]=bds@params
+bds@control[,c("max")]=bds@params*10
+
+fn=function(x) cbind(model.frame(params(x)["r"]),
+                     ll=model.frame(x@ll)[,-3],
+                     ll=apply(x@ll,2,sum))
+
+prfl=profile(bds,which='r',index=Us,
+             range=seq(0.70,1.05,.001),fn=fn)
+
+ggplot(subset(melt(prfl[,c("r","ll.u1","ll.u2","1")],id="r"),
+              value<10))+
+  geom_line(aes(r,value,group=variable,col=variable))+
+  facet_wrap(~variable,scale="free",ncol=1)          +
+  theme(legend.position="bottom")
 
 
-## ----,eval=FALSE,echo=FALSE----------------------------------------------
+## ----,echo=FALSE,eval=FALSE----------------------------------------------
 ## bd2=fit(bdHat,cpue,cmdOps="-lprof")
 ## save(bd2,bdHat,cpue,file="/home/laurie/Desktop/bd2.RData")
 ## prf=subset(bd@profile, param %in% c("bbmsy","ffmsy"))
@@ -223,269 +250,166 @@ ggplot(rsdl)                                              +
 sims=biodyns("Best Fit"=bd)
 
 
-## ----,figure.height=6, fig.margin=TRUE-----------------------------------
+## ----,fig.height=6, fig.margin=TRUE--------------------------------------
 save(bdHat,cpue,file="/home/laurie/Desktop/bdHat.RData")
 sims[["Vcov"]]=mvn(bdHat,500,nms=c("r","k"),fwd=TRUE)
 
-plot(sims[["Vcov"]])
 
-save(sims, file="/home/laurie/Desktop/sims.RData")
+## ----boot, fig.height=4, fig.margin=TRUE, fig.cap="Bootstrapped CPUE series"----
+cpueSim=bdHat@diags[,c("year","hat")]
+names(cpueSim)[2]="data"
+cpueSim=as.FLQuant(cpueSim)
 
+#cv(diags["residuals"])
 
-## ----, eval=FALSE, fig.height=4------------------------------------------
-## cpueSim=bdHat@diags[,c("year","hat")]
-## names(cpueSim)[2]="data"
-## cpueSim=as.FLQuant(cpueSim)
-## 
-## #cv(diags["residuals"])
-## 
-## cpueSim=rlnorm(100,log(cpueSim),0.25)
-## 
-## cpueSim[cpueSim==0]=NA
-## 
-## plot(sims[["CPUE"]])
-## 
-## sims[["CPUE"]]=fit(propagate(bdHat,100),cpueSim)
+cpueSim=rlnorm(100,log(cpueSim),0.25)
+
+cpueSim[cpueSim==0]=NA
+
+plot(cpueSim)
+
+sims[["CPUE"]]=fit(propagate(bdHat,100),cpueSim)
 
 
-## ----,fig.height=4,fig.margin=TRUE, fig.cap="Plot predicted stock trend by index"----
-sims[["Jack Knife"]]=fit(bdHat,jackknife(cpue))
+## ----jackknife,fig.height=4,fig.margin=TRUE, fig.cap="Plot predicted stock trend by index"----
+bdJK=fit(bdHat,jackknife(cpue))
+save(bdJK,file="/home/laurie/Desktop/bdJK.RData")
 
 
-## ----,fig.height=4,fig.margin=TRUE, fig.cap="Plot predicted stock trend by index"----
-plotJack(sims[["Jack Knife"]],bdHat)
+## ----jackknife2,fig.height=4,fig.margin=TRUE, fig.cap="Predicted stock trend by index"----
+source('~/Desktop/flr/git/biodyn/R/biodyn-jackRand.R')
+sims[["Jack Knife"]]=randJack(500,bdJK)
 
 
-## ----, fig.height=4, fig.margin=TRUE, fig.cap="Plot predicted stock trend by index"----
-sims[["MCMC"]]=fit(bdHat,cpue,cmdOps=c("-mcmc 100000, -mcsave 50000"))
-
-plot(sims[["MCMC"]])
+## ------------------------------------------------------------------------
+sims[["MCMC"]]=fit(bdHat,cpue,cmdOps=c("-mcmc 1000000, -mcsave 5000"))
 
 
 ## ----,fig.height=4,fig.margin=TRUE,--------------------------------------
 acf(c(params(sims[["MCMC"]])["r"]))
 
 
-## ----,fig.margin=TRUE----------------------------------------------------
-
-
-## ------------------------------------------------------------------------
-head(bdHat@mng)
+## ----,eval=FALSE---------------------------------------------------------
+## bdHat@mng
 
 
 ## ----,eval=FALSE---------------------------------------------------------
 ## bdHat@mngVcov
 
 
-## ----,fig.margin=TRUE----------------------------------------------------
-currentState   =bdHat@mng[c("bbmsy","ffmsy"),"hat",drop=T]
-currentStateVar=bdHat@mngVcov[c("bbmsy","ffmsy"),
-                           c("bbmsy","ffmsy"),drop=T]
-
-mvrnorm(10,currentState,currentStateVar)
-
-ggplot(data=as.data.frame(mvrnorm(100,currentState,currentStateVar)),
-       aes(bbmsy,ffmsy))+geom_point()+
-  geom_hline(aes(yintercept=1))+
-  geom_vline(aes(xintercept=1))+
-  xlab(expression(B:B[MSY]))+
-  ylab(expression(F:F[MSY]))
+## ----,eval=FALSE,fig.margin=TRUE,fig.width=4,fig.height=6----------------
+## currentState   =bdHat@mng[c("bbmsy","ffmsy"),"hat",drop=T]
+## currentStateVar=bdHat@mngVcov[c("bbmsy","ffmsy"),
+##                            c("bbmsy","ffmsy"),drop=T]
+## 
+## refs=mvrnorm(100,currentState,currentStateVar)
+## 
+## ggplot(data=as.data.frame(refs))+
+##    geom_density(aes(x=bbmsy,y = ..count..))
 
 
-## ----,fig.margin=TRUE----------------------------------------------------
-library(kobe)
- setGeneric('kobe',          function(object,method,...)    standardGeneric('kobe'))
-
-source('~/Desktop/flr/pkgs/biodyn/R/biodyn-kobe.R')
-
-
-## -----7------------------------------------------------------------------
-df=kobe(sims)
-ggplot(subset(df,year==49)) + 
-  geom_density(aes(x=stock, y=..count..), position = "stack",fill="red") +
-  geom_vline(aes(xintercept=1))          +
-  facet_wrap(~.id,scales="free_y",ncol=1)
+## -----7,fig.fullwidth=TRUE, fig.width=4, fig.height=6,fig.cap="Densities of Stock/BMSY from different methods for estimating uncertainty."----
+source('~/Desktop/flr/git/biodyn/R/biodyn-kobe.R')
+df=kobe(sims[-1])
+ggplot(subset(df,year==49))+ 
+  geom_density(aes(x=stock, y=..count..), position = "stack",fill="red")+
+  facet_wrap(~.id,scale="free_y",ncol=1)+
+  geom_vline(aes(xintercept=c(stock(sims[[1]])[,"49"]%/%bmsy(sims[[1]]))))
   #scale_x_continuous(limits=c(0.5,1.5))
 
 
-## -----8------------------------------------------------------------------
-ggplot(subset(df,year==49)) + 
-  geom_density(aes(x=harvest, y=..count..), position = "stack",fill="red") +
-  geom_vline(aes(xintercept=1))          +
-  facet_wrap(~.id,scales="free_y",ncol=1)+
-  scale_x_continuous(limits=c(0,1.5))
+## -----8,fig.fullwidth=TRUE, fig.width=6, fig.height=8,fig.cap="Densities of Harvest/FMSY from different methods for estimating uncertainty."----
+
+ggplot(subset(df,year==49))+ 
+  geom_density(aes(x=harvest, y=..count..), position = "stack",fill="red")+
+  facet_wrap(~.id,scale="free_y",ncol=1)+
+  scale_x_continuous(limits=c(0,2.0))+
+  geom_vline(aes(xintercept=c(harvest(sims[[1]])[,"48"]%/%fmsy(sims[[1]]))))
 
 
-## -----9------------------------------------------------------------------
-library(kobe)
+## -----9,fig.margin=TRUE,fig.width=4,fig.height=4,fig.caption="Kobe Phase Plots"----
 kobePhase()+
   geom_point(aes(stock,harvest),data=subset(df,year==49))+
   facet_wrap(~.id,ncol=2)
 
 
-## ----, fig.margin=TRUE, fig.cap=""---------------------------------------
-harvest=rlnorm(1,log(harvest(bdHat))[,-dims(bdHat)$year],.1)
-bdHat     =fwd(bdHat,harvest=harvest)
+## ----, fig.margin=TRUE,fig.width=4, fig.height=6,fig.cap="Projection"----
+harvest=rlnorm(100,log(harvest(bdHat))[,-dims(bdHat)$year],.1)
+bdHat =fwd(bdHat,harvest=harvest)
 
-plot(bdHat)
+plot(bdHat,worm=c(2,8))+    
+  theme(legend.position="bottom")
 
 
-## -----9b-----------------------------------------------------------------
+## ------------------------------------------------------------------------
 bd   =simBiodyn()
 
-
-## ----,fig.margin=TRUE----------------------------------------------------
-## simulate HCRs, annual, tri-annula, F bound, TAC bound
 bd=window(bd,end=29)
 for (i in seq(29,49,1))
   bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1)$hvt)
 simHCR=biodyns("1"=bd)
 
-plot(bd)
 
-
-## ----,fig.margin=TRUE----------------------------------------------------
+## ------------------------------------------------------------------------
 bd=window(bd,end=29)
 for (i in seq(29,49,3))
   bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1:3)$hvt)
 simHCR[["3"]]=bd
-save(simHCR,file="/home/laurie/Desktop/sims.RData")
-plot(simHCR)
 
 
-## ----,fig.margin=TRUE----------------------------------------------------
+## ------------------------------------------------------------------------
 bd=window(bd,end=29)
 for (i in seq(29,49,1))
   bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1,bndF=c(0.9,1.1))$hvt)
 simHCR[["bound F"]]=bd
 
-plot(simHCR)
 
-
-## ----,fig.margin=TRUE----------------------------------------------------
+## ------------------------------------------------------------------------
 bd=window(bd,end=30)
 for (i in seq(29,49,1))
   bd=fwd(bd,catch=hcr(bd,refYrs=i,yrs=i+1,tac=T,bndTac=c(0.9,1.1))$tac)
 simHCR[["bound TAC"]]=bd
 
-plot(simHCR)
+
+## ----,fig.fullwidth=TRUE,fig.width=6,fig.height=6,fig.cap="Plots of projections"----
+plot(simHCR)+
+  theme(legend.position="bottom")
 
 
-## ----hcr-ts,fig.width=6,fig.height=8-------------------------------------
-p.=plot(simHCR[c(1,3)])+
-  theme(legend.position="bottom")+
-  scale_colour_manual(values=c("cyan4","grey10"),
-                      labels=c("HCR","10% Constraint on Effort"))+
-  guides(col=guide_legend(title=NULL))+
-  scale_x_continuous(limits=c(27,50),breaks=c(30,40,50),labels=c(1,11,21))+
-  scale_y_continuous(breaks=NULL)
+## -----hcrII,fig.margin=TRUE,fig.width=6,fig.height=6---------------------
+pe=rlnorm(500,FLQuant(0,dimnames=list(year=1:50)),0.5)
 
-p.$data=transform(p.$data,qname=factor(qname,levels=c("Harvest","Yield","Stock")))
-p.+geom_hline(aes(yintercept=X1),data=
-                cbind("qname"=c("Yield","Harvest","Stock"),
-                      data.frame(refpts(bd))),col="red")
+bd=window(simBiodyn(),end=30)
+bd.=bd
+bd@stock =propagate(bd@stock, 500)
+bd=fwd(bd,harvest=harvest(bd)[,2:30],pe=pe)
 
+for (i in seq(30,48,1))
+  bd=fwd(bd,
+         catch=hcr(bd,refYrs=i,yrs=i+1,tac=T,bndTac=c(0.9,1.1))$tac,
+         pe   =pe)
 
-## ----hcrI,fig.width=5,fig.height=5---------------------------------------
-
-kb=ldply(simHCR[c(1)],function(x,sd=.1)
-  model.frame(mcf(FLQuants(stock  =rlnorm(100,log(stock(  x)%/%bmsy(x)),sd),
-                           harvest=rlnorm(100,log(harvest(x)%/%fmsy(x)),sd)))))
-kb=subset(kb,year%in% 29:50)
-
-pt=ldply(simHCR[c(1)],function(x)
-  model.frame(mcf(FLQuants(stock  =stock(  x)%/%bmsy(x),
-                           harvest=harvest(x)%/%fmsy(x)))))
-pt =subset(pt,year%in% 1:50)
-pt.=ddply(pt,.(year,.id),with,data.frame(stock=median(stock),harvest=median(harvest)))
-
-i=40
-print(kobePhase(subset(kb,year%in%i))+
-        geom_line(aes(stock,harvest),data=biodyn:::hcrPlot(bd),col="brown",size=1.5)+
-        ggtitle(paste("Year",i-29)) +
-        theme(legend.position="none",plot.background=element_rect(fill="transparent",colour=NA),
-              plot.title = element_text(lineheight=.8, face="italic"))+
-        xlim(0,2)+ylim(0,2)+
-        geom_point(aes(stock,harvest,col=.id,fill=.id), shape=21, size = 3) + 
-        geom_point(aes(stock,harvest,group=.id,fill=.id),col="black", data=subset(pt.,year==i),shape=21,size=5)+
-        geom_path( aes(stock,harvest,col=.id,group=.id) ,data=subset(pt, year<=i),size=1)+
-        scale_fill_manual(  values=c("cyan1","green","red","yellow")) + 
-        scale_colour_manual(values=c("cyan4","green","red","yellow"))+
-        coord_cartesian(xlim=c(0,2),ylim=c(0,2)))
+plot(bd)
 
 
-## ----hcrII,fig.width=5,fig.height=5,cache=FALSE--------------------------
-library(FLCore)
-library(plyr)
-library(kobe)
-library(ggplot2)
+## -----hcrKobe,fig.margin=TRUE,fig.width=6,fig.height=6-------------------
+trks=biodyn::kobe(bd,what="trks")
+trks=mdply(data.frame(Year=seq(33,49,3)), 
+           function(Year) subset(trks,year<=Year))
 
-kb=ldply(simHCR[1:2],function(x,sd=.1)
-  model.frame(mcf(FLQuants(stock  =stock(  x)%/%bmsy(x),
-                           harvest=harvest(x)%/%fmsy(x)))))
-kb=subset(kb,year%in% 29:50)
+pts =transform(biodyn::kobe(bd,what="pts",year=seq(33,49,3)),
+                 Year=year)[,c("stock","harvest","Year")]
 
-pt=ldply(simHCR,function(x)
-  model.frame(mcf(FLQuants(stock  =stock(  x)%/%bmsy(x),
-                           harvest=harvest(x)%/%fmsy(x)))))
-pt =subset(pt,year%in% 1:50)
-pt.=ddply(pt,.(year,.id),with,data.frame(stock=median(stock),harvest=median(harvest)))
-
-i=40
-kobePhase(subset(kb,year%in%i))+
-  # geom_line(aes(stock,harvest),data=hcrPlot(bd),col="brown",size=1.5)+
-  ggtitle(paste("Year",i-29)) +
-  theme(legend.position="none",plot.background=element_rect(fill="transparent",colour=NA),
-        plot.title = element_text(lineheight=.8, face="italic"))+
-  xlim(0,2)+ylim(0,2)+
-  geom_point(aes(stock,harvest,col=.id,fill=.id,size=.id), shape=21) + 
-  geom_point(aes(stock,harvest,fill=.id,group=.id),data=subset(pt.,year==i),shape=21,col="black",size=5)+
-  geom_path( aes(stock,harvest,col=.id,group=.id) ,data=subset(pt, year<=i),size=1)+
-  scale_fill_manual(  values=c("cyan1","cyan1","grey90","green","red","yellow")) + 
-  scale_size_manual(  values=c(1,3)) + 
-  scale_colour_manual(values=c("cyan4","cyan4","grey20","green","red","yellow"))+
-  coord_cartesian(xlim=c(0,2),ylim=c(0,2))
-
-
-## ----hcr-ts-mc,fig.width=8,fig.height=8----------------------------------
-pe=rlnorm(100,FLQuant(0,dimnames=list(year=1:50)),0.5)
-simHCR[[1]]=fwd(simHCR[[1]],harvest=harvest(simHCR[[1]])[,ac(1:50)],pe=pe)
-simHCR[[3]]=fwd(simHCR[[3]],harvest=harvest(simHCR[[3]])[,ac(1:50)],pe=pe)
-p.=plot(simHCR[c(1,3)])+
-  theme(legend.position="bottom")+
-  scale_colour_manual(values=c("cyan4","grey10"),
-                      labels=c("HCR","10% Constraint on Effort"))+
-  guides(col=guide_legend(title=NULL))+
-  scale_x_continuous(limits=c(27,50),breaks=c(30,40,50),labels=c(1,11,21))+
-  scale_y_continuous(breaks=NULL)
-
-p.$data=transform(p.$data,qname=factor(qname,levels=c("Harvest","Yield","Stock")))
-p.+geom_hline(aes(yintercept=X1),data=
-                cbind("qname"=c("Yield","Harvest","Stock"),data.frame(refpts(bd))),col="red")
+kobePhase()+    
+    geom_line(aes(stock,harvest),data=biodyn:::hcrPlot(bd.),
+              col="brown",size=1.5)                             +    
+    geom_path( aes(stock,harvest),data=subset(trks,pctl=="50%"))+
+    geom_point(aes(stock,harvest),data=subset(pts,Year>=33))    +
+    facet_wrap(~Year)
 
 
 ## ----,eval=FALSE---------------------------------------------------------
 ## biodyn:::mseBiodyn
-
-
-## ----, fig.width = 10, fig.height = 2, fig.fullwidth = TRUE, fig.cap = "Full width figure"----
-qplot(wt, mpg, data=mtcars, colour=factor(cyl))
-
-
-## ----, fig.cap = "Another figure"----------------------------------------
-qplot(factor(cyl), mpg, data = mtcars, geom = "boxplot")
-
-
-## ----,eval=FALSE---------------------------------------------------------
-## biodyn:::mseBiodyn
-
-
-## ----, fig.width = 10, fig.height = 2, fig.fullwidth = TRUE, fig.cap = "Full width figure"----
-qplot(wt, mpg, data=mtcars, colour=factor(cyl))
-
-
-## ----, fig.cap = "Another figure"----------------------------------------
-qplot(factor(cyl), mpg, data = mtcars, geom = "boxplot")
 
 
 ## ----, results='asis'----------------------------------------------------

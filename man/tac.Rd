@@ -19,11 +19,12 @@
 FLQuant object with TAC value(s)
 }
 \description{
-Calculates the Total Allowable Catch for a given harvest rate and stock biomass
+Calculates the Total Allowable Catch for a \code{biodyn} object and target harvest rate
+by projecting the last year.
 }
 \examples{
 \dontrun{
-tac('logistic',FLPar(msy=100,k=500))
+tac(bd,FLQuant(0.1,dimnames=list(year=dims(bd)$maxyear)))
 }
 }
 \seealso{

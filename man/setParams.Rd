@@ -15,12 +15,14 @@ setParams(object) <- value
 \item{value}{\code{params}}
 }
 \description{
-Sets up the param slot in a biodyn object given an index
+Add parameters for catchability and sigma in the param slot given an index or indices
+of stock abundance as \code{FLQuant} or \code{FLQuants}.
 }
 \examples{
 \dontrun{
-data(bd)
-setParams(bd) <-swonIndex
+bd=simBiodyn()
+cpue=stock(bd)
+setParams(bd) <-cpue
 setParams(bd)}
 }
 

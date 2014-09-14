@@ -6,7 +6,7 @@
 K(msy, r = 0.6, p = 1, params = FLPar(r = r, p = p))
 }
 \arguments{
-\item{msy}{a guess for $MSY$}
+\item{msy}{a guess for MSY}
 
 \item{r}{a guess for $r$ the population growth rate}
 

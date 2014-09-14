@@ -17,31 +17,35 @@
 #'
 #' @examples
 #' \dontrun{
+#' #simulate an object with known properties
 #' bd=simBiodyn()
+#' bd=window(bd,end=49)
+#' 
+#' #simulate a proxy for stock abundance
 #' cpue=(stock(bd)[,-dims(bd)$year]+stock(bd)[,-1])/2
-#' setParams(bd)=cpue
-#' setControl(bd)=params(bd)
 #' cpue=rlnorm(1,log(cpue),.2)
-#' bd  =fit(bd,cpue)
-#' bd  =fit(bd,jackknife(cpue))
-#' bd  =randJack(100,bd)
+#' 
+#' #set parameters
+#' setParams(bd) =cpue
+#' setControl(bd)=params(bd)
+#' control(bd)[3:4,"phase"]=-1
+#' 
+#' #fit
+#' bd=fit(bd,cpue)
+#' 
+#' bdJK=fit(bd,jackknife(cpue))
+#' 
+#' 
+#' bdRnd  =randJack(100,bd,bdJK)
+#' 
+#' plot(randJack(100,stock(bd)[,40:45],stock(bdJK)[,40:45]))
 #' }
-setGeneric('randJack',   function(n,object,...)    standardGeneric('randJack'))
+setGeneric('randJack',   function(n,object,sim,...)    standardGeneric('randJack'))
 
-randJack<-function(n,object){
-  res=jackSummary(params(object))
+randJackFn<-function(n,object,sim){
+  res=jackSummary(params(object),params(sim))
   
-  vcov=as.matrix(vcov(object)[,,1,drop=T])
-  
-  object     =iter(object,1)
-  vcov[]=0
-  diag(vcov)=res$se^2
-  
-  object@vcov=FLPar(vcov)
-  catch=catch(object)
-  cov  =vcov(object)[biodyn:::modelParams(model(object)),
-                     biodyn:::modelParams(model(object))]
-
+  cov=res$cov[biodyn:::modelParams(model(object)),biodyn:::modelParams(model(object))]
   object@params=propagate(object@params,n)
   object@catch =propagate(object@catch, n)
   object@catch[]=object@catch[,,,,,1]
@@ -53,11 +57,31 @@ randJack<-function(n,object){
   #FLParBug in drop so need c()
   params(object)[nms]=
     t(maply(seq(n),function(x) 
-         mvrnorm(1,c(params(object)[nms,x,1]),cov[nms,nms,1,drop=T])))
+         mvrnorm(1,c(params(object)[nms,x,1]),cov[nms,nms,drop=T])))
   
-  object=fwd(object,catch=catch)
+  rtn=biodyn:::fwd(object,catch=object@catch)
   
-  return(object)}
+  return(rtn)}
 
-setMethod('randJack', signature(n="numeric",object='biodyn'),  
-          function(n,object) randJack(n,object))
+setMethod('randJack', signature(n="numeric",object='biodyn',sim="biodyn"),  
+           function(n,object,sim) randJackFn(n,object,sim))
+
+setMethod('randJack', signature(n="numeric",object='FLQuant',sim="FLQuant"),  
+          function(n,object,sim){ 
+              res=jackSummary(object,sim)
+               
+              if (is.null(res$cov))
+                rnorm(n,res$mean,res$se)
+              else
+                mvrnorm(n,res$hat,res$cov)
+              })
+          
+setMethod('randJack', signature(n="numeric",object='FLPar',sim="FLPar"),  
+          function(n,object,sim){ 
+            res=jackSummary(object,sim)
+            
+            if (sum(dim(res$cov))>0)
+              mvrnorm(n,res$hat,res$cov)
+            else  
+              rlnorm(n,res$hat,res$se)
+          })

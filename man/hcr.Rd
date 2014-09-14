@@ -25,7 +25,11 @@ Harvest Control Rule, calculates F, or Total Allowable Catch (TAC) based on a ho
 }
 \examples{
 \dontrun{
-hcr('logistic',FLPar(msy=100,k=500))
+bd   =simBiodyn()
+
+bd=window(bd,end=29)
+for (i in seq(29,49,1))
+bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1)$hvt)
 }
 }
 \seealso{

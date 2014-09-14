@@ -212,7 +212,7 @@ activeParams=function(obj) dimnames(obj@control)$params[c(obj@control[,'phase']>
 #'    #set parameters
 #'    setParams(bd) =cpue
 #'    setControl(bd)=params(bd)
-#'    bd@control[3:4,"phase"]=-1
+#'    control(bd)[3:4,"phase"]=-1
 #'    
 #'    #fit
 #'    bd=fit(bd,cpue)
@@ -360,15 +360,26 @@ fitPella=function(object,index=index,exeNm='pella',package='biodyn',
        print(file.exists(paste(dir,'admodel.cov',sep='/')))
        if (file.exists(paste(dir,'admodel.cov',sep='/')))
          try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- cv(paste(dir,'admodel.hes',sep='/')), silent=TRUE) 
+      
        #if (file.exists(paste(dir,'admodel.cov',sep='/'))){
        #   x<-file(paste(dir,'admodel.cov',sep='/'),'rb')
        #   nopar<-readBin(x,'integer',1)
        #   H<-matrix(readBin(x,'numeric',nopar*nopar),nopar)
        #   try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- H, silent=TRUE)
        #close(x)}
-       
+
        if (file.exists(paste(dir,'pella.hst',sep='/')))
-         try(bd@profile<-admbProfile(paste(dir,'pella.hst',sep='/'))$profile)
+          bd@hst=admbProfile(paste(dir,'pella.hst',sep='/'))$profile
+       if (file.exists(paste(dir,'lpr.plt',sep='/')))
+          bd@profile=mdply(data.frame(var=c("r", "k","bnow","fnow",
+                                             "msy","bmsy","fmsy","cmsy",
+                                             "bmsy","ffmsy","bk","fr",
+                                             "bratio","fratio","slopeb","slopef")),
+                                function(var){
+                                    #print(var)
+                                    fl=paste("lp",var,".plt",sep="")
+                                    if (file.exists(fl))
+                                      admbPlt(fl)})
        }
      
      bd@params@.Data[  ,i] = object[[1]]@params
