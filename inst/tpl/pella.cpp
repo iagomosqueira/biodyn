@@ -163,7 +163,22 @@ model_parameters::model_parameters(int sz,int argc,char * argv[]) :
   #ifndef NO_AD_INITIALIZE
     summary.initialize();
   #endif
+  lpbnow.allocate("lpbnow");
+  lpfnow.allocate("lpfnow");
+  lpmsy.allocate("lpmsy");
+  lpbmsy.allocate("lpbmsy");
+  lpfmsy.allocate("lpfmsy");
+  lpcmsy.allocate("lpcmsy");
+  lpbbmsy.allocate("lpbbmsy");
+  lpffmsy.allocate("lpffmsy");
+  lpbratio.allocate("lpbratio");
+  lpfratio.allocate("lpfratio");
+  lpslopeb.allocate("lpslopeb");
+  lpslopef.allocate("lpslopef");
   lpr.allocate("lpr");
+  lpk.allocate("lpk");
+  lpfr.allocate("lpfr");
+  lpbk.allocate("lpbk");
   neglogL.allocate("neglogL");
   prior_function_value.allocate("prior_function_value");
   likelihood_function_value.allocate("likelihood_function_value");
@@ -175,6 +190,8 @@ void model_parameters::preliminary_calculations(void)
   admaster_slave_variable_interface(*this);
   halfnlog2pi = 0.5*ni*log(2*pi);
   nReg=5;
+  stepN =50;
+  stepSz=0.05;
   // Data
   Cyear = (ivector) row(Cdata,1);
   C     =           row(Cdata,2);
@@ -198,8 +215,59 @@ void model_parameters::preliminary_calculations(void)
     _s(j) = sPr[j];
     }
   // likelihood profile 
-  lpr   =_r;
-  
+  lpbnow  =bnow;
+  lpfnow  =fnow;
+  if (1!=2){
+  lpmsy   =msy;
+  lpbmsy  =bmsy;
+  lpfmsy  =fmsy;
+  lpcmsy  =cmsy;
+  lpbbmsy =bbmsy;
+  lpffmsy =ffmsy;
+  lpbratio=bratio;
+  lpfratio=fratio;
+  lpslopeb=slopeb;
+  lpslopef=slopef;
+  lpr     =_r;
+  lpk     =_k;
+  lpfr    =fr;
+  lpbk    =bk;
+  }
+  lpbnow.set_stepnumber(stepN);
+  lpbnow.set_stepsize(stepSz);
+  lpfnow.set_stepnumber(stepN);
+  lpfnow.set_stepsize(stepSz);
+  if (1!=2){
+  lpmsy.set_stepnumber(stepN);
+  lpmsy.set_stepsize(stepSz);
+  lpfmsy.set_stepnumber(stepN);
+  lpfmsy.set_stepsize(stepSz);
+  lpbmsy.set_stepnumber(stepN);
+  lpbmsy.set_stepsize(stepSz);
+  lpcmsy.set_stepnumber(stepN);
+  lpcmsy.set_stepsize(stepSz);
+  lpbbmsy.set_stepnumber(stepN);
+  lpbbmsy.set_stepsize(stepSz);
+  lpffmsy.set_stepnumber(stepN);
+  lpffmsy.set_stepsize(stepSz);
+  lpbratio.set_stepnumber(stepN);
+  lpbratio.set_stepsize(stepSz);
+  lpfratio.set_stepnumber(stepN);
+  lpfratio.set_stepsize(stepSz);
+  lpslopeb.set_stepnumber(stepN);
+  lpslopeb.set_stepsize(stepSz);
+  lpslopef.set_stepnumber(stepN);
+  lpslopef.set_stepsize(stepSz);
+  lpr.set_stepnumber(stepN);
+  lpr.set_stepsize(stepSz);
+  lpk.set_stepnumber(stepN);
+  lpk.set_stepsize(stepSz);
+  lpfr.set_stepnumber(stepN);
+  lpfr.set_stepsize(stepSz);
+  lpbk.set_stepnumber(stepN);
+  lpbk.set_stepsize(stepSz);
+  }
+ 
 }
 
 void model_parameters::userfunction(void)
@@ -210,7 +278,24 @@ void model_parameters::userfunction(void)
   if(mceval_phase())
     write_mcmc();
   // likelihood profile 
-  lpr=_r;
+  lpbnow  =bnow;
+  lpfnow  =fnow;
+  if (1!=2){
+  lpmsy   =msy;
+  lpbmsy  =bmsy;
+  lpfmsy  =fmsy;
+  lpcmsy  =cmsy;
+  lpbbmsy =bbmsy;
+  lpffmsy =ffmsy;
+  lpbratio=bratio;
+  lpfratio=fratio;
+  lpslopeb=slopeb;
+  lpslopef=slopef;
+  lpr     =_r;
+  lpk     =_k;
+  lpfr    =fr;
+  lpbk    =bk;
+  }
 }
 
 void model_parameters::report()

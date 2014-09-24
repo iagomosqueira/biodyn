@@ -12,7 +12,7 @@ setMethod("jackSummary", signature(object="FLQuant"),
             
     SS  <- apply(sweep(u, 1:5, mnU,"-")^2, 1:5, sum)
             
-    bias<- (n - 1) * (mnU - mn)
+    bias<- (n-1)*(mn-mnU)
     se  <- sqrt(((n-1)/n)*SS)
             
    return(FLQuants(mean=mn, se=se, bias=bias))
@@ -31,7 +31,7 @@ setMethod("jackSummary", signature(object="FLPar"),
             
    SS <-apply(sweep(u, idx, mnU,"-")^2, idx, sum)
             
-   bias <- (n - 1) * (mnU - mn)
+   bias <- (n-1)*(mn-mnU)
    se   <- sqrt(((n-1)/n)*SS)
    
    cov  <-FLPar(cov(model.frame(u)[,dimnames(u)$params])*(n-1)*(n-1)/n)

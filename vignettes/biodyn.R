@@ -401,7 +401,7 @@ pts =transform(biodyn::kobe(bd,what="pts",year=seq(33,49,3)),
                  Year=year)[,c("stock","harvest","Year")]
 
 kobePhase()+    
-    geom_line(aes(stock,harvest),data=biodyn:::hcrPlot(bd.),
+    geom_line(aes(stock,harvest),data=hcrPlot(bd.),
               col="brown",size=1.5)                             +    
     geom_path( aes(stock,harvest),data=subset(trks,pctl=="50%"))+
     geom_point(aes(stock,harvest),data=subset(pts,Year>=33))    +

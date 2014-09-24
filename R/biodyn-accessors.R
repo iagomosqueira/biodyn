@@ -1,3 +1,5 @@
+udms=function(x) unlist(dims(x))
+
 #if (!isGeneric('biodyn')) 
    setGeneric('biodyn', function(model,params,...)  standardGeneric('biodyn'))
 

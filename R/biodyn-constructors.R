@@ -30,8 +30,8 @@ setMethod('biodyn', signature(),
       
       if (!("params" %in% names(args))){
         params=FLPar(array(as.numeric(NA),
-                     dim=c(length(biodyn:::modelParams("pellat"))+1,1),
-                     dimnames=list(params=c(biodyn:::modelParams("pellat"),"b0"),iters=1)))
+                     dim=c(length(modelParams("pellat"))+1,1),
+                     dimnames=list(params=c(modelParams("pellat"),"b0"),iters=1)))
         res@params=params
       }else{
         res@params=args[["params"]]    

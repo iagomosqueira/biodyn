@@ -493,45 +493,79 @@ ggplot(data=as.data.frame(refs))+
    geom_histogram(aes(x=bbmsy))
 ```
 
-## Marginal Density for Stock/BMSY
-```{rrefBmsy,fig.fullwidth=TRUE, fig.width=4, fig.height=6,fig.cap="Densities of Stock/BMSY from different methods for estimating uncertainty."}
+## Marginal Density for Stock
+```{rrefBmsy,fig.fullwidth=TRUE, fig.width=4, fig.height=6,fig.cap="Densities of Stock from different methods for estimating uncertainty."}
 load("/home/laurie/Desktop/flr/git/biodyn/stuff/data/sims.RData")
 sims[["Jack Knife"]]=bdJK
-source('~/Desktop/flr/git/biodyn/R/biodyn-kobe.R')
 
 c("Best Fit","CPUE","Jack Knife","MCMC")
 
-rnorm(500,sims[["Best Fit"]]@mng["bnow","hat"],sims[["Best Fit"]]@mng["bnow","sd"])
-stock(sims[["CPUE"]])[,39]
-stock(sims[["MCMC"]])[,39]
-randJack(500,stock(sims[["Best Fit"]])[,39],stock(sims[["Jack Knife"]])[,39])
+boot=stock(sims[["CPUE"]])[,39]
+# ggplot(as.data.frame(boot))+ 
+#   geom_density(aes(x=data, y=..count..), position = "stack",fill="red")+
+#   scale_x_continuous(limits=c(0,700))
 
+mcmc=stock(sims[["MCMC"]])[,39]
+# ggplot(as.data.frame(mcmc))+ 
+#   geom_density(aes(x=data, y=..count..), position = "stack",fill="red")+
+#   scale_x_continuous(limits=c(0,700))
 
-df=kobe(sims[-c(1:2)])
-ggplot(subset(df,year==39))+ 
+vcov=rnorm(500,sims[["Best Fit"]]@mng["bnow","hat"],
+               sims[["Best Fit"]]@mng["bnow", "sd"])
+# ggplot(as.data.frame(vcov))+ 
+#   geom_density(aes(x=data, y=..count..), position = "stack",fill="red")+
+#   scale_x_continuous(limits=c(0,1000))
+  
+jack=randJack(500,stock(sims[[  "Best Fit"]])[,39],
+                  stock(sims[["Jack Knife"]])[,39])
+# ggplot(as.data.frame(jack))+ 
+#   geom_density(aes(x=data, y=..count..), position = "stack",fill="red")+
+#   scale_x_continuous(limits=c(0,700))
+         
+bnow=rbind(data.frame(Method="boot",stock=c(boot)),
+           data.frame(Method="mcmc",stock=c(mcmc)),
+           data.frame(Method="vcov",stock=c(vcov)),
+           data.frame(Method="jack",stock=c(jack)))
+  
+ggplot(bnow)+ 
   geom_density(aes(x=stock, y=..count..), position = "stack",fill="red")+
-  facet_wrap(~.id,scale="free_y",ncol=1)+
-  geom_vline(aes(xintercept=c(stock(sims[["Best Fit"]])[,"38"]%/%bmsy(sims[["Best Fit"]]))))
-
-  #scale_x_continuous(limits=c(0.5,1.5))
+  facet_wrap(~Method,scale="free_y",ncol=1)+
+  geom_vline(aes(xintercept=c(stock(sims[["Best Fit"]])[,"39"])))
 ```
 
 ## Marginal Density for Harvest/FMSY
-```{rrefFMSY,fig.fullwidth=TRUE, fig.width=6, fig.height=8,fig.cap="Densities of Harvest/FMSY from different methods for estimating uncertainty."}
-ggplot(subset(df,year==39))+ 
-  geom_density(aes(x=harvest, y=..count..), position = "stack",fill="red")+
-  facet_wrap(~.id,scale="free_y",ncol=1)+
-  scale_x_continuous(limits=c(0,2.0))+
-  geom_vline(aes(xintercept=c(harvest(sims[["Best Fit"]])[,"38"]%/%fmsy(sims[["Best Fit"]]))))
-
+```{rrefFMSY,fig.fullwidth=TRUE, fig.width=6, fig.height=8,fig.cap="Densities of Stock/BMSY from different methods for estimating uncertainty."}
+boot=boot%/%bmsy(sims[["CPUE"]])
+mcmc=mcmc%/%bmsy(sims[["MCMC"]])
+vcov=rnorm(500,sims[["Best Fit"]]@mng["bbmsy","hat"],
+               sims[["Best Fit"]]@mng["bbmsy", "sd"])
+jack=randJack(500,stock(sims[[  "Best Fit"]])[,39]%/%bmsy(sims[[  "Best Fit"]]),
+                  stock(sims[["Jack Knife"]])[,39]%/%bmsy(sims[["Jack Knife"]]))
+         
+bbmsy=rbind(data.frame(Method="boot",stock=c(boot)),
+            data.frame(Method="mcmc",stock=c(mcmc)),
+            data.frame(Method="vcov",stock=c(vcov)),
+            data.frame(Method="jack",stock=c(jack)))
+  
+ggplot(bnow)+ 
+  geom_density(aes(x=stock, y=..count..), position = "stack",fill="red")+
+  facet_wrap(~Method,scale="free_y",ncol=1)+
+  geom_vline(aes(xintercept=c(stock(sims[["Best Fit"]])[,"39"])))+
+  scale_x_continuous(limits=c(0,2.0))
 ```
 
 ## Kobe Phase Plot
-```{rkobe,fig.margin=TRUE,fig.width=4,fig.height=4,fig.caption="Kobe Phase Plots" }
+```{rkobe,fig.margin=TRUE,fig.width=4,fig.height=4,fig.caption="Kobe Phase Plots",eval=FALSE}
 library(kobe)
-kobePhase()+
+
+kb=rbind(data.frame(Method="Boot",kobe(sims[["CPUE"]],      what="pts")),
+         data.frame(Method="MCMC",kobe(sims[["MCMC"]],      what="pts")),
+         data.frame(Method="Vcov",kobe(sims[["Best Fit"]],  what="pts")),
+         data.frame(Method="Jack",kobe(sims[["Jack Knife"]],what="pts")))
+             
+ggplot(kb)+ 
   geom_point(aes(stock,harvest),data=subset(df,year==39))+
-  facet_wrap(~.id,ncol=2)
+  facet_wrap(~Method,scale="free_y",ncol=1)
 ```
 
 # Simulation

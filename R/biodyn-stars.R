@@ -53,7 +53,7 @@ ROregimeSHFT<-function(regLN,sig,series,shift=0){
 }
 
 
-rod=function(val,year=NULL){
+rod=function(val,year=NULL,ggplot=TRUE){
   #==set the assumed minimum regime length==
   rgLN<-10
   
@@ -82,7 +82,7 @@ rod=function(val,year=NULL){
   
   ShiftsVec<-Shift[!is.na(Shift)]
   
-  plot(val,type='l')
+  #plot(val,type='l')
   mn=NULL
   sd=NULL
   ln=NULL
@@ -96,9 +96,9 @@ rod=function(val,year=NULL){
       sd=c(sd,regSD)
       ln=c(ln,Shift[i]+rgLN-1)
       
-      polygon(x=c(1,Shift[i]+rgLN-1,Shift[i]+rgLN-1,1),
-              y=c(regMean+regSD,regMean+regSD,regMean-regSD,regMean-regSD),
-              border=NA,col='#0000ff55')
+#       polygon(x=c(1,Shift[i]+rgLN-1,Shift[i]+rgLN-1,1),
+#               y=c(regMean+regSD,regMean+regSD,regMean-regSD,regMean-regSD),
+#               border=NA,col='#0000ff55')
     }
     
     if(i>1){
@@ -112,15 +112,16 @@ rod=function(val,year=NULL){
       sd=c(sd,regSD)
       ln=c(ln,endInd)
       
-      polygon(x=c(Shift[i-1]+rgLN,
-                  endInd,
-                  endInd,         
-                  Shift[i-1]+rgLN),
-              y=c(regMean+regSD,
-                  regMean+regSD,
-                  regMean-regSD,
-                  regMean-regSD),
-              border=NA,col='#0000ff55')}
+#       polygon(x=c(Shift[i-1]+rgLN,
+#                   endInd,
+#                   endInd,         
+#                   Shift[i-1]+rgLN),
+#               y=c(regMean+regSD,
+#                   regMean+regSD,
+#                   regMean-regSD,
+#                   regMean-regSD),
+#               border=NA,col='#0000ff55')
+    }
   }
   
   #print(ln)
@@ -128,8 +129,17 @@ rod=function(val,year=NULL){
     minyear=c(year[1],year[rev(rev(ln)[-1])]+1)
     maxyear=min(year)+ln-1
     
-    return(data.frame(mn=mn,sd=sd,i=factor(seq(length(mn))),
-                      ln=ln,minyear=minyear,maxyear=maxyear))}
+    rtn=data.frame(mn=mn,sd=sd,i=factor(seq(length(mn))),
+                   ln=ln,minyear=minyear,maxyear=maxyear)
+    
+    if (!ggplot) return(rtn)
+    
+    forGG=function(dat) data.frame(i=dat$i,
+                                   x=with(dat,c(minyear,minyear,maxyear,maxyear)),
+                                   y=with(dat,c(mn+sd,  mn-sd,  mn-sd,  mn+sd)))
+    
+    return(forGG(rtn))
+  }
   else
     return(data.frame(mn=mn,sd=sd,i=factor(seq(length(mn))),
                       ln=ln))

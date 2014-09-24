@@ -28,7 +28,7 @@
 #' 
 #' @export
 #' 
-#' @importFrom plyr ddply ldply laply mdply maply .
+#' @importFrom plyr ddply ldply laply mdply maply alply .
 #' @import reshape 
 #' @importFrom stringr str_trim
 #' @import FLCore

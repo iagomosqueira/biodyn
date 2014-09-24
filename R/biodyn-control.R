@@ -17,7 +17,6 @@ utils::globalVariables(c('ldply','melt','variable'))
 #' @rdname setParams
 #' 
 #' @aliases setParams<-,biodyn,FLPar-method  setParams<-,biodyn,FLQuant-method setParams<-,biodyn,FLQuants-method  setParams<-,biodyn,data.frame-method
-#'
 #' 
 #' @examples
 #' \dontrun{
@@ -81,7 +80,7 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(o
 #' @rdname setControl
 #'
 #' @aliases setControl<-,biodyn,FLPar-method  setControl<-,biodyn,FLQuant-method  setControl<-,biodyn,FLQuants-method
-#'
+#' 
 #' @examples
 #' \dontrun{
 #' bd=simBiodyn()

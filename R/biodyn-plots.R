@@ -2,7 +2,7 @@ utils::globalVariables(c('ggplot','geom_line','aes','yield',
                          'geom_point','cast','xlab','ylab',
                          'jack.mean','facet_wrap','geom_ribbon',
                          'jack.se','expand_limits','jack.bias',
-                         'theme','element_blank','y'))
+                         'theme','element_blank','y','se'))
 
 utils::globalVariables(c('laply','ldply','geom_path','.id',
                          'scale_size_manual','scale_linetype_manual'))

@@ -14,6 +14,9 @@
 #' @rdname randJack
 #'
 #' @aliases randJack-method randJack,numeric,biodyn-method
+#' randJack, numeric,FLPar,FLPar-method
+#' randJack, numeric,FLQuant,FLQuant-method
+#' randJack,numeric,biodyn,biodyn-method
 #'
 #' @examples
 #' \dontrun{
@@ -45,7 +48,7 @@ setGeneric('randJack',   function(n,object,sim,...)    standardGeneric('randJack
 randJackFn<-function(n,object,sim){
   res=jackSummary(params(object),params(sim))
   
-  cov=res$cov[biodyn:::modelParams(model(object)),biodyn:::modelParams(model(object))]
+  cov=res$cov[modelParams(model(object)),modelParams(model(object))]
   object@params=propagate(object@params,n)
   object@catch =propagate(object@catch, n)
   object@catch[]=object@catch[,,,,,1]
@@ -59,7 +62,7 @@ randJackFn<-function(n,object,sim){
     t(maply(seq(n),function(x) 
          mvrnorm(1,c(params(object)[nms,x,1]),cov[nms,nms,drop=T])))
   
-  rtn=biodyn:::fwd(object,catch=object@catch)
+  rtn=fwd(object,catch=object@catch)
   
   return(rtn)}
 

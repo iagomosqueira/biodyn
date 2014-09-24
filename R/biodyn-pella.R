@@ -89,7 +89,7 @@ setPella=function(obj, exeNm='pella', dir=tempdir()) {
  
   nms=c(modelParams('pellat'),'b0')
   if (length(unique(idx$name))>0)
-    nmIdx=paste(c('q','sigma'), rep(unique(idx$name),each=length(unique(idx$name))),sep='')
+    nmIdx=paste(c('q','sigma'), rep(unique(idx$name),each=2),sep='')
   else  
     nmIdx=c('q','sigma')
 
@@ -100,15 +100,14 @@ setPella=function(obj, exeNm='pella', dir=tempdir()) {
   names(ctl) = nms
 
   writeADMB(ctl, paste(dir, '/', exeNm, '.ctl', sep=''),FALSE)
-  
+
   cat('# q ####################\n', file=paste(dir, '/', exeNm, '.ctl', sep=''),append=TRUE)
 
   ctl           = bd.@control[nmIdx[grep('q',nmIdx)],]
-
   ctl[,2:4]     = ctl[,c(2,4,3)]
   ctl           = alply(t(matrix(ctl,dim(ctl))),1)
   names(ctl)    = c('phase','lower','upper','guess')
-  
+
   writeADMB(ctl, paste(dir, '/', exeNm, '.ctl', sep=''),TRUE)
   
   cat('# sigma ################\n', file=paste(dir, '/', exeNm, '.ctl', sep=''),append=TRUE)
