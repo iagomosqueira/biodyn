@@ -27,7 +27,8 @@ FLStock2biodyn=function(from){
   
   res}
 
-setAs('biodyn', 'FLStock',
+
+setAs('FLStock','biodyn',
       function(from) FLStock2biodyn(from))
 
 FLBRP2biodyn=function(from){
@@ -53,7 +54,7 @@ FLBRP2biodyn=function(from){
   
   bd}
 
-setAs('biodyn', 'FLBRP',
+setAs('FLBRP','biodyn', 
       function(from) FLBRP2biodyn(from,to))
 
 setMethod('biodyn', signature(model='FLStock',params='missing'),

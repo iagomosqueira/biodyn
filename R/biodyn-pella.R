@@ -356,7 +356,7 @@ fitPella=function(object,index=index,exeNm='pella',package='biodyn',
        close(x)
    
        ## vcov
-       print(file.exists(paste(dir,'admodel.cov',sep='/')))
+       #print(file.exists(paste(dir,'admodel.cov',sep='/')))
        if (file.exists(paste(dir,'admodel.cov',sep='/')))
          try(bd@vcov@.Data[activeParams(object[[1]]),activeParams(object[[1]]),i] <- cv(paste(dir,'admodel.hes',sep='/')), silent=TRUE) 
       
