@@ -15,7 +15,7 @@
 #' \dontrun{
 #' bd=biodyn(params=FLPar(r=0.6,k=50000,p=1,b0=1))
 #' }
-setGeneric('biodyn',   function(...)  standardGeneric('biodyn'))
+setGeneric('biodyn',   function(object,y,...)  standardGeneric('biodyn'))
 setMethod('biodyn', signature(),
     function(model="pellat",min=.1,max=10,msy=NULL,r=NULL,...){
             
@@ -31,7 +31,7 @@ setMethod('biodyn', signature(),
       if (!("params" %in% names(args))){
         params=FLPar(array(as.numeric(NA),
                      dim=c(length(modelParams("pellat"))+1,1),
-                     dimnames=list(params=c(modelParams("pellat"),"b0"),iters=1)))
+                     dimnames=list(params=c(modelParams("pellat"),"b0"),iter=1)))
         res@params=params
       }else{
         res@params=args[["params"]]    
@@ -53,6 +53,15 @@ setMethod('biodyn', signature(),
                           
       return(res)})
 
+setMethod('biodyn', signature(object="FLBRP",y="FLStock"),
+          function(object,y,model="pellat",min=.1,max=10,msy=NULL,r=NULL,...){
+          
+        res=FLBRP2biodyn(object)
+        res=fwd(res,catch=catch(y)[,-1])
+        
+        res})
+            
+            
 ###########################################
 setGeneric('biodyn.',   function(model,params,...)  standardGeneric('biodyn.'))
 setMethod('biodyn.', signature(model='factor',params='FLPar'),
@@ -180,58 +189,3 @@ setMethod('biodyn.', signature(model='missing',params='missing'),
 #'  }
 is.biodyn = function(x)
   return(inherits(x, 'biodyn'))
-
-#' simBiodyn
-#'
-#' @description Creates a biodyn object with known properties
-#' 
-#' @param model character corresponding to model
-#' @param params surplus production parameters
-#' @param harvest \code{FLQuant} with harvest rate
-#' 
-#' @param bounds on \code{control}
-#' @param ... other arguments
-#' 
-#' @export
-#' @rdname simBiodyn
-#' 
-#' @return biodyn object with simulated time series
-#' 
-#' @export
-#' @examples
-#' \dontrun{
-#'  bd=simBiodyn() 
-#'  }
-simBiodyn<-function(model='pellat', 
-                    params=FLPar(r=0.5, k=1000, p=1, b0=1.0),
-                    harvest=FLQuant(FLQuant(c(seq(0,1.5,length.out=30), rev(seq(0.5,1.5,length.out=15))[-1],rep(0.5,5)))*fmsy(model,params)),
-                    bounds =c(0.1,10), ...) {
-  
-  args <- list(...)
-  
-  nyr <- dims(harvest)$year
-  object = biodyn(model ='pellat',
-                  stock =FLQuant(rep(params['k'], nyr), dimnames=dimnames(harvest)),
-                  params=params)
-
-  object@control['r',     'val']=params['r']
-  object@control['k',     'val']=params['k']
-  object@control['p',     'val']=params['p']
-  object@control['b0',    'val']=params['b0']
-  
-  object@control[,'min']=object@control[,'val']*bounds[1]
-  object@control[,'max']=object@control[,'val']*bounds[2]
-  
-  object@control['p', 'phase']=-1
-  object@control['b0','phase']=-1
-  object@priors[,1]=-1
-  
-  # Load given slots
-  for(i in names(args))
-    slot(object, i) <- args[[i]]
-  
-  object <- fwd(object, harvest=harvest)
-    
-  return(object)
-  } 
-

@@ -25,7 +25,7 @@ utils::globalVariables(c('ldply','melt','variable'))
 #' setParams(bd) <-cpue
 #' setParams(bd)}
 #' 
-setGeneric('setParams<-', function(object,value)  standardGeneric('setParams<-'))
+setGeneric('setParams<-', function(object,value,...)  standardGeneric('setParams<-'))
 
 setMethod('setParams<-', signature(object='biodyn',value='data.frame'), function(object,value) {
   nms=c(modelParams(as.character(object@model)),'b0')
@@ -48,7 +48,7 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuant'), function(ob
   
   return(object)})
 
-setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(object,value) {
+setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(object,value,msy=TRUE) {
   nms=c(modelParams(as.character(object@model)),'b0')
   object@params=object@params[nms]
     
@@ -62,6 +62,39 @@ setMethod('setParams<-', signature(object='biodyn',value='FLQuants'), function(o
   dimnames(params(object))$params=nms
   
   return(object)})
+
+getP<-function(bmsy,k,p=c(0.001,5)){
+  optimise(function(p,bmsy,k) 
+    (bmsy-k*(1/(1+p))^(1/p))^2, p, bmsy=bmsy,k=k)$minimum}
+
+getRK<-function(msy,bmsy,k,p=c(0.0001,5)){
+  p=getP(bmsy,k,p)
+  k=bmsy/((1/(1+p))^(1/p))
+  r=msy/(k*(1/(1+p))^(1/p+1))
+  
+  FLPar(c(r=r,k=k,p=p))}
+
+#getRK(100,1000,2000)
+
+setMethod('setParams<-', signature(object='biodyn',value='FLBRP'), function(object,value,msy=TRUE) {
+  
+  if (msy){
+    params(object)[c("r","k","p")]=getRK(value@refpts["msy",   "yield"],
+                                         value@refpts["msy",   "biomass"],
+                                         value@refpts["virgin","biomass"])
+    object@priors[c("r","k","p"),"a"]=params(object)[c("r","k","p")]
+  }else{
+    require(popbio)
+    params(object)["k"]=value@refpts["virgin","biomass"]
+    params(object)["p"]=getP(c(value@refpts["msy","biomass"]),
+                             c(params(object)["k"]),c(0.001,5))
+    params(object)["r"]=log(lambda(leslie(eql,fbar=c(value@refpts["crash","harvest"]))))
+    }
+      
+  object=fwd(object,catch=catch(object)[,-1])
+  
+  return(object)})
+
 
 #' setControl<-
 #'
@@ -160,23 +193,23 @@ calcQ<-function(stock,index,error='log',na.rm=T){
   
   return(res)}
 
-setQ=function(object,index,error='log'){
-  fn=function(index,stock){
-    if (dims(index)$iter==1)
-      dimnames(index)$iter=1
+setQ=function(object,value,error='log'){
+  fn=function(value,stock){
+    if (dims(value)$iter==1)
+      dimnames(value)$iter=1
     if (dims(stock)$iter==1)
       dimnames(stock)$iter=1
     
-    if (dims(stock)$iter==1 & dims(index)$iter>1)
-      stock=propagate(stock,dims(index)$iter)
+    if (dims(stock)$iter==1 & dims(value)$iter>1)
+      stock=propagate(stock,dims(value)$iter)
     
-    model.frame(mcf(FLQuants(stock=stock,index=index)))}
+    model.frame(mcf(FLQuants(stock=stock,value=value)))}
 
-  res=switch(is(index)[1],
-             FLQuant   ={res=fn(index,stock(object));data.frame(name=1,res)},
-             #FLQuants  =ldply(index, fn, model.frame(mcf(FLQuants(stock=stock,index=x))),stock=stock(object)),
-             FLQuants  =ldply(index, function(x,stock) fn(x,stock), stock=stock(object)),
-             data.frame=merge(model.frame(FLQuants('stock'=stock(object))),index,by='year',all=T))
+  res=switch(is(value)[1],
+             FLQuant   ={res=fn(value,stock(object));data.frame(name=1,res)},
+             #FLQuants  =ldply(value, fn, model.frame(mcf(FLQuants(stock=stock,value=x))),stock=stock(object)),
+             FLQuants  =ldply(value, function(x,stock) fn(x,stock), stock=stock(object)),
+             data.frame=merge(model.frame(FLQuants('stock'=stock(object))),value,by='year',all=T))
 
   res=res[!is.na(res$iter),]
 
@@ -184,7 +217,7 @@ setQ=function(object,index,error='log'){
     names(res)[1]='name'
 
   res=res[!is.na(res$name),]
-  res=ddply(res, .(name,iter), function(x,log) data.frame(calcQ(x$stock,x$index)),log='log')
+  res=ddply(res, .(name,iter), function(x,log) data.frame(calcQ(x$stock,x$value)),log='log')
   its=max(as.numeric(ac(res$iter)))
 
   res.=transform(melt(res,id=c('name','iter')),params=paste(variable,name,sep=''))[,c('params','value','iter')]
@@ -198,8 +231,7 @@ setQ=function(object,index,error='log'){
   
   if (dims(object@params)$iter==1)
     object@params=propagate(object@params,its)
-
-  t.=rbind(object@params,FLPar(as.FLQuant(cbind(res,year=1))[,1,drop=T]))
+  t.=rbind(object@params,FLPar(as.FLQuant(res)[,1,drop=T]))
   dmns=dimnames(t.)
   names(dmns)=c('params','iter')
   t.=FLPar(array(t.,dim=unlist(lapply(dmns,length)),dimnames=dmns))

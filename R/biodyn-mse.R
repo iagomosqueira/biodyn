@@ -1,18 +1,5 @@
 utils::globalVariables(c('br','srDev'))
 
-## Observation Error Model
-oem=function(om,cv,fishDepend=FALSE){
-  
-  nits=max(dims(stock(om))$iter,dims(catch(om))$iter)
-  rnd=rlnorm(nits,FLQuant(0,dimnames=list(year=dims(om)$minyear:dims(om)$maxyear)),cv)
-  
-  if (fishDepend) 
-    cpue=rnd*catch(om)/fbar(om)
-  else 
-    cpue=rnd*computeStock(om)
-  
-  cpue}
-
 ## MSE function
 mseBiodyn<-function(om,br,srDev,ctrl,prrs,
                     start,          end,         interval=3,
@@ -62,11 +49,11 @@ mseBiodyn<-function(om,br,srDev,ctrl,prrs,
     
     #### Management Procedure
     ## Set up assessment parameter options
-    bd=biodyn::biodyn(window(om,end=iYr-1))
+    bd=FLStock2biodyn(window(om,end=iYr-1))
     params(bd)[dimnames(ctrl)$param]=ctrl[dimnames(ctrl)$param,'val']
     
     bd@priors=prrs
-    setParams( bd)=cpue
+    setParams( bd)=cpue 
     setControl(bd)=params(bd)
     bd@control[dimnames(ctrl)$params,'phase'][]=ctrl[dimnames(ctrl)$params,'phase']
     bd@control['q1','phase']=phaseQ
@@ -91,7 +78,7 @@ mseBiodyn<-function(om,br,srDev,ctrl,prrs,
     TAC[]=rep(apply(TAC,6,mean)[drop=T],each=interval)
     
     #### Operating Model Projectionfor TAC
-    om =fwd(om,catch=TAC,maxF=maxF,sr=br,sr.residuals=srDev)  
+    om =FLash:::fwd(om,catch=TAC,maxF=maxF,sr=br,sr.residuals=srDev)  
 
     #### Summary Statistics
     ## HCR actions, i.e. is biomass<Btrig?, what is F?, ..
@@ -136,4 +123,4 @@ hcrFn=function(om,btrig,blim,ftar,fmin,start,end,interval,lag=seq(interval)){
   
   return(om)}
 
-
+  
