@@ -13,6 +13,7 @@ importFrom(plyr,mdply)
 importFrom(reshape,cast)
 importFrom(FLash,fwd)
 importFrom(FLBRP,refpts)
+importFrom(stringr,str_trim)
 
 export("control<-")
 export("setControl<-")
