@@ -28,7 +28,7 @@ utils::globalVariables(c('calcR','fwdWindow','interval', 'nits',
 #' 
 #' @examples
 #' \dontrun{
-#' simBiodyn()
+#' sim()
 #'    }
 runMSE=function(om,brp,srDev,uDev,
                 range=c(min=range(om)[max],max=range(om)[max]+30,interval=3),

@@ -401,7 +401,7 @@ kobePhase()+
 
 Use simulated data
 ```{r-9b}
-bd   =biodyn:::simBiodyn()
+bd   =biodyn:::sim()
 ```
 
 

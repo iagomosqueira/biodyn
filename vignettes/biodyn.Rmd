@@ -124,7 +124,7 @@ bd =as(asp,"biodyn")
 
 Simulated objects can also be created 
 ```{rclassSim,eval=FALSE}
-bd=simBiodyn()
+bd=simdyn()
 ```
 
 \newpage
@@ -135,7 +135,7 @@ Plotting can be used to examine an object, explore data, check outputs, diagnose
 
 ## Time Series
 ```{rplot, fig.margin=TRUE, fig.width=4, fig.height=8, fig.cap="Simulated time series"}
-bd=simBiodyn()
+bd=simdyn()
 bd=window(bd,end=49)
 plot(bd)
 ```
@@ -147,7 +147,7 @@ biodyn:::plotEql(bd)
 ## Production Function
 ```{rplotPrd, fig.margin=TRUE, fig.cap="Simulated CPUE series"}
 library(reshape)
-x=simBiodyn()
+x=simdyn()
 plotPrd(x)+
   geom_path( aes(stock,catch),
              model.frame(FLQuants(x,"stock","catch")))+
@@ -187,7 +187,7 @@ plot(bd,worm=3)+
 When first using a stock assessment it helps to be able to check estimated values with the true ones. Therefore we simulate a stock with know parameters and exploitation history 
 
 ```{rfit, echo=TRUE, fig.margin=TRUE, fig.height=4, fig.cap="Simulated stock"}
-bd=simBiodyn()
+bd=simdyn()
 ```
 
 A CPUE series is also needed for fitting and can be simulated that by taking the mid year biomass and adding error.
@@ -351,7 +351,7 @@ ggplot(res, aes(r, k, z=ll.u1))+
 likelihood components
 ```{rprflLike, fig.margin=TRUE, fig.height=6, fig.width=4, fig.cap="Likelihood profile by data conmponent, i.e. CPUE series"}
 
-bd=simBiodyn()
+bd=simdyn()
 
 Us  =FLQuants("Unbiased"     =
                 rlnorm(1,log((stock(bd)[,-dims(bd)$year]+
@@ -399,7 +399,7 @@ names(prf)[2:3]=c("Stock","Harvest")
 A main objective of stock assessment is to estimate uncertainly in stock status. This requires estimates of distributions as well as point estimates. 
 
 ```{runcertainty, fig.margin=TRUE}
-bd   =window(simBiodyn(),end=39)
+bd   =window(simdyn(),end=39)
 cpue=(stock(bd)[,-dims(bd)$year]+
       stock(bd)[,-1])/2
 cpue=rlnorm(1,log(cpue),.2)
@@ -605,7 +605,7 @@ Use simulated data to run annual, tri-annual, F bound and TAC bounded HCRs
 
 Annual
 ```{rhcr1}
-bd   =simBiodyn()
+bd   =simdyn()
 
 bd=window(bd,end=29)
 for (i in seq(29,49,1))
@@ -650,7 +650,7 @@ Process Error and Harvest Control Rule
 ```{rMC,fig.margin=TRUE,fig.width=6,fig.height=6}
 pe=rlnorm(500,FLQuant(0,dimnames=list(year=1:50)),0.5)
 
-bd=window(simBiodyn(),end=30)
+bd=window(simdyn(),end=30)
 bd.=bd
 bd@stock =propagate(bd@stock, 500)
 bd=fwd(bd,harvest=harvest(bd)[,2:30],pe=pe)

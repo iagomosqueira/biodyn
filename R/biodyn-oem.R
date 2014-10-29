@@ -1,6 +1,6 @@
 ## Observation Error Model
 
-#' simBiodyn
+#' sim
 #'
 #' @description Creates a biodyn object with known properties
 #' 
@@ -12,14 +12,14 @@
 #' @param ... other arguments
 #' 
 #' @export
-#' @rdname simBiodyn
+#' @rdname sim
 #' 
 #' @return biodyn object with simulated time series
 #' 
 #' @export
 #' @examples
 #' \dontrun{
-#'  bd=simBiodyn() 
+#'  bd=sim() 
 #'  }
 setGeneric('sim',   function(stock,brp,...)     standardGeneric('sim'))
 setMethod( 'sim',   signature(stock='missing',brp='missing'),

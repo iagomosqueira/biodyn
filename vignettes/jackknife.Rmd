@@ -47,7 +47,7 @@ The jack knife can be used to estimate standard errors and bias for parameter in
 
 When using the jack knife the $i^{th}$ observation is omitted in turn from the sample data set and the parameter re-estimated and its mean calculated $\overline{\theta}_i$.
 
-$$f(X)\simeq\overline{f^Ĵ}\equiv\frac{1}{N}\sum_{i=1}^{N}f_i^J$$
+$$f(X)\simeq\overline{f^??}\equiv\frac{1}{N}\sum_{i=1}^{N}f_i^J$$
 
 ## Variance
 
@@ -86,7 +86,7 @@ We simulate an object with known properties using the biodyn package then conduc
 library(plyr)
 library(biodyn)
 
-bd=simBiodyn()
+bd=sim()
 bd=window(bd,end=49)
 ```
 
