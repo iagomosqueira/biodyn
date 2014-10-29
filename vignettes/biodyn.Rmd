@@ -663,7 +663,7 @@ for (i in seq(30,48,1))
 plot(bd)
 ```
 
-```{rMCkobe,fig.margin=TRUE,fig.width=6,fig.height=6}
+```{rMCkobe,eval=FALSE,fig.margin=TRUE,fig.width=6,fig.height=6}
 trks=biodyn::kobe(bd,what="trks")
 trks=mdply(data.frame(Year=seq(33,49,3)), 
            function(Year) subset(trks,year<=Year))
@@ -700,7 +700,7 @@ Note also that the two footnote references (`tufte_latex` and `books_be`, both d
 
 You can use the **xtable** package to format \LaTeX\ tables that integrate well with the rest of the Tufte handout style. Note that it's important to set the `xtable.comment` and `xtable.booktabs` options as shown below to ensure the table is formatted correctly for inclusion in the document.
 
-```{r, results='asis'}
+```{r,eval=FALSE, results='asis'}
 library(xtable)
 options(xtable.comment = FALSE)
 options(xtable.booktabs = TRUE)
