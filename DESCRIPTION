@@ -13,7 +13,8 @@ Depends:
 Imports:
     ggplot2,
     plyr,
-    reshape
+    reshape,
+    stringr
 Suggests:
     diags,
     kobe,
