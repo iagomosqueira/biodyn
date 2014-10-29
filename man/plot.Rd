@@ -67,7 +67,7 @@ Creates a \code{ggplot2} object that plots time series of biomass, harvest rate 
 \examples{
 \dontrun{
 
-x =simBiodyn()
+x =sim()
 x =window(x,end=49)
 bd1=fwd(x,harvest=rlnorm(200,log(harvest(x)[,-1]),.2))
 bd2=fwd(x,harvest=rlnorm(200,log(harvest(x)[,-1])*1.5,.2))

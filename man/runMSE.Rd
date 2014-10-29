@@ -36,7 +36,7 @@ Runs a full MSE using an \code{FLStock} object as the Operating Model and \code{
 }
 \examples{
 \dontrun{
-simBiodyn()
+sim()
    }
 }
 \seealso{

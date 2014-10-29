@@ -22,7 +22,7 @@ slot. The starting values \code{val} are set to those in \code{params} and the \
 }
 \examples{
 \dontrun{
-bd=simBiodyn()
+bd=sim()
 setControl(bd)=params(bd)
 }
 }

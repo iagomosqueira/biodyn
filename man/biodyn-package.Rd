@@ -52,7 +52,7 @@ biodyn-package      Implements a Biomass Dynamic Stock Assessment Model
 biodyns             List of biodyn objects
 is.biodyn   
     
-simBiodyn   
+sim   
 
 msy                 Maximum Sustainable Yield.
 fmsy                Fishing Mortality at Maximum Sustainable Yield.

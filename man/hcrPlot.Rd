@@ -25,7 +25,7 @@ Calculates break pointts for a hockey stick HCR
 }
 \examples{
 \dontrun{
-simBiodyn()
+sim()
 }
 }
 \seealso{

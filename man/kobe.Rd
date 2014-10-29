@@ -24,7 +24,7 @@ to FMSY
 }
 \examples{
 \dontrun{
-simBiodyn()
+sim()
 }
 }
 

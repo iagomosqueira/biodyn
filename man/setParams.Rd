@@ -20,7 +20,7 @@ of stock abundance as \code{FLQuant} or \code{FLQuants}.
 }
 \examples{
 \dontrun{
-bd=simBiodyn()
+bd=sim()
 cpue=stock(bd)
 setParams(bd) <-cpue
 setParams(bd)}

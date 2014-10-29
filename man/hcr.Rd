@@ -25,7 +25,7 @@ Harvest Control Rule, calculates F, or Total Allowable Catch (TAC) based on a ho
 }
 \examples{
 \dontrun{
-bd   =simBiodyn()
+bd   =simn()
 
 bd=window(bd,end=29)
 for (i in seq(29,49,1))

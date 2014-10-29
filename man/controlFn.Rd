@@ -35,7 +35,7 @@ A utility function to help set up the \code{control} slot in \code{biodyn}
 }
 \examples{
 \dontrun{
-simBiodyn()
+sim()
    }
 }
 \seealso{
