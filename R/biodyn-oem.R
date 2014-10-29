@@ -24,7 +24,9 @@
 setGeneric('sim',   function(stock,brp,...)     standardGeneric('sim'))
 setMethod( 'sim',   signature(stock='missing',brp='missing'),
            function(params=FLPar(r=0.5, k=1000, p=1, b0=1.0),
-                    harvest=FLQuant(FLQuant(c(seq(0,1.5,length.out=30), rev(seq(0.5,1.5,length.out=15))[-1],rep(0.5,5)))*fmsy(model,params)),
+                    harvest=FLQuant(FLQuant(c(seq(0,1.5,length.out=30), 
+                                              rev(seq(0.5,1.5,length.out=15))[-1],
+                                              rep(0.5,5)))*biodyn:::fmsy(biodyn(params=params))),
                     bounds =c(0.1,10), ...) {
 
   args <- list(...)
