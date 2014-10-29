@@ -6,7 +6,7 @@ source('~/Desktop/flr/git/biodyn/R/biodyn-jackRand.R')
 source('~/Desktop/flr/git/biodyn/R/biodyn-jackSummary.R')
 
 set.seed(987)
-bd  =window(simBiodyn(),end=40)
+bd  =window(sim(),end=40)
 cpue=rlnorm(1,log((stock(bd)[,-40]+stock(bd)[,-1])/2),0.2)
 
 setParams( bd)=cpue

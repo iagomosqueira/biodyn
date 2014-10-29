@@ -109,7 +109,7 @@ hcrParam=function(ftar,btrig,fmin,blim){
 #'
 #' @examples
 #' \dontrun{
-#' bd   =simBiodyn()
+#' bd   =sim()
 #' 
 #' bd=window(bd,end=29)
 #' for (i in seq(29,49,1))

@@ -20,7 +20,7 @@ utils::globalVariables(c('ldply','melt','variable'))
 #' 
 #' @examples
 #' \dontrun{
-#' bd=simBiodyn()
+#' bd=sim()
 #' cpue=stock(bd)
 #' setParams(bd) <-cpue
 #' setParams(bd)}
@@ -116,7 +116,7 @@ setMethod('setParams<-', signature(object='biodyn',value='FLBRP'), function(obje
 #' 
 #' @examples
 #' \dontrun{
-#' bd=simBiodyn()
+#' bd=sim()
 #' setControl(bd)=params(bd)
 #' }
 #'  
@@ -290,7 +290,7 @@ setMethod('control', signature(object='biodyn'), function(object) {
 #'   
 #' @examples
 #' \dontrun{
-#' simBiodyn()
+#' sim()
 #'    }
 ## utility function for setting control object
 controlFn=function(r,       k,       p=1,      b0=1,

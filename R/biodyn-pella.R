@@ -201,7 +201,7 @@ activeParams=function(obj) dimnames(obj@control)$params[c(obj@control[,'phase']>
 #' @examples
 #' \dontrun{
 #'    #simulate an object with known properties
-#'    bd=simBiodyn()
+#'    bd=sim()
 #'    bd=window(bd,end=49)
 #'    
 #'    #simulate a proxy for stock abundance

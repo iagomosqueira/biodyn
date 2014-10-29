@@ -123,7 +123,7 @@ bd =as(asp,"biodyn")
 ```
 
 Simulated objects can also be created 
-```{rclassSim}
+```{rclassSim,eval=FALSE}
 bd=simBiodyn()
 ```
 

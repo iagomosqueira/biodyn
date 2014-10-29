@@ -46,7 +46,7 @@ whooow  =function(x,fn,probs)
 #' @examples
 #' \dontrun{
 #' 
-#' x =simBiodyn()
+#' x =sim()
 #' x =window(x,end=49)
 #' bd1=fwd(x,harvest=rlnorm(200,log(harvest(x)[,-1]),.2))
 #' bd2=fwd(x,harvest=rlnorm(200,log(harvest(x)[,-1])*1.5,.2))
@@ -337,7 +337,7 @@ plotMSEfn=function(mp,om,brp){
 #' @examples
 #' \dontrun{
 #' #simulate an object with known properties
-#' bd=simBiodyn()
+#' bd=sim()
 #' bd=window(bd,end=49)
 #' 
 #' #simulate a proxy for stock abundance

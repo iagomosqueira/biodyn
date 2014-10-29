@@ -21,7 +21,7 @@ utils::globalVariables(c('ddply','.','year','pctl','cast','kobeP','sims'))
 #' 
 #' @examples 
 #' \dontrun{
-#' simBiodyn()
+#' sim()
 #' }
 
 #if (!isGeneric('kobe')) 

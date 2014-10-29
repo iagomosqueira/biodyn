@@ -14,7 +14,7 @@
 # #' 
 # #' @examples
 # #' \dontrun{
-# #'   bd=simBiodyn()
+# #'   bd=sim()
 # #'   bd=fwd(bd,harvest=rlnorm(100,harvest(bd)[,-1]))
 # #'   plot(bd)
 # #'   }

@@ -56,11 +56,11 @@ bd=biodyn(catch=FLQuant(100,dimnames=list(year=1990:2010)))
 
 
 ## ------------------------------------------------------------------------
-bd=simBiodyn()
+bd=sim()
 
 
 ## ----, fig.margin=TRUE, fig.width=4, fig.height=8, fig.cap="Simulated time series"----
-bd=simBiodyn()
+bd=sim()
 bd=window(bd,end=49)
 plot(bd)
 
@@ -71,7 +71,7 @@ plot(bd)
 
 ## ----, fig.margin=TRUE, fig.cap="Simulated CPUE series"------------------
 library(reshape)
-x=simBiodyn()
+x=sim()
 plotPrd(x)+
   geom_path( aes(stock,catch),
              model.frame(FLQuants(x,"stock","catch")))+
@@ -93,7 +93,7 @@ plot(bd,worm=3)+
 
 
 ## ----, echo=TRUE, fig.margin=TRUE, fig.height=4, fig.cap="Simulated stock"----
-bd=simBiodyn()
+bd=sim()
 
 
 ## ----, fig.margin=TRUE, fig.cap="Simulated CPUE series"------------------
@@ -204,7 +204,7 @@ ggplot(subset(res,ll.u1<0))+geom_line(aes(r,ll.u1))
 
 ## ----like, fig.margin=TRUE, fig.height=6, fig.width=4, fig.cap="Likelihood profile by data conmponent, i.e. CPUE series"----
 
-bd=simBiodyn()
+bd=sim()
 
 Us  =FLQuants("Unbiased"     =
                 rlnorm(1,log((stock(bd)[,-dims(bd)$year]+
@@ -342,7 +342,7 @@ plot(bdHat,worm=c(2,8))+
 
 
 ## ------------------------------------------------------------------------
-bd   =simBiodyn()
+bd   =sim()
 
 bd=window(bd,end=29)
 for (i in seq(29,49,1))
@@ -379,7 +379,7 @@ plot(simHCR)+
 ## -----hcrII,fig.margin=TRUE,fig.width=6,fig.height=6---------------------
 pe=rlnorm(500,FLQuant(0,dimnames=list(year=1:50)),0.5)
 
-bd=window(simBiodyn(),end=30)
+bd=window(sim(),end=30)
 bd.=bd
 bd@stock =propagate(bd@stock, 500)
 bd=fwd(bd,harvest=harvest(bd)[,2:30],pe=pe)

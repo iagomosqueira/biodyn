@@ -33,7 +33,7 @@ opts_knit$set(width=75)
 library(plyr)
 library(biodyn)
 
-bd=simBiodyn()
+bd=sim()
 bd=window(bd,end=49)
 
 

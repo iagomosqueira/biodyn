@@ -2,7 +2,7 @@ library(biodyn)
 library(ggplotFL)
 library(plyr)
 
-bd=simBiodyn()
+bd=sim()
 
 Us  =FLQuants("Unbiased"     =rlnorm(1,log((stock(bd)[,-dims(bd)$year]+
                                               stock(bd)[,-1])/2),0.2),

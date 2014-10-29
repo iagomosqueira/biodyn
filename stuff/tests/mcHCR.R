@@ -4,7 +4,7 @@ library(ggplot2)
 
 pe=rlnorm(500,FLQuant(0,dimnames=list(year=1:50)),0.5)
 
-bd=window(simBiodyn(),end=30)
+bd=window(sim(),end=30)
 bd.=bd
 bd@stock =propagate(bd@stock, 500)
 bd=fwd(bd,harvest=harvest(bd)[,2:30],pe=pe)
