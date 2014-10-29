@@ -1,0 +1,177 @@
+---
+title: "The Jack Knife"
+author: "Laurence Kell"
+date: "August 13th, 2014"
+output: rmarkdown::tufte_handout
+---
+
+<!--
+%% \VignetteEngine{knitr::knitr}
+-->
+
+```{rinitKnitr, echo=FALSE, results="asis"}
+library(knitr)
+
+#output: rmarkdown::tufte_handout
+
+# output:
+#   rmdformats::html_clean:
+#     fig_width: 6
+#     fig_height: 6
+#     highlight: pygments
+
+## Global options
+options(max.print="75")
+opts_chunk$set(fig.path="out/",
+               echo =TRUE,
+               eval=TRUE,
+               cache=TRUE,
+               cache.path="cache/",
+               prompt=FALSE,
+               tidy=FALSE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE,
+               fig.margin=TRUE, 
+               fig.height=6, 
+               fig.width=4)
+
+opts_knit$set(width=75)
+```
+
+# Introduction
+
+The jack knife can be used to estimate standard errors and bias for parameter in non-linear estimation and quantities derived from theme.
+
+# Estimation
+
+When using the jack knife the $i^{th}$ observation is omitted in turn from the sample data set and the parameter re-estimated and its mean calculated $\overline{\theta}_i$.
+
+$$f(X)\simeq\overline{f^Ĵ}\equiv\frac{1}{N}\sum_{i=1}^{N}f_i^J$$
+
+## Variance
+
+The variance can is then calculated by 
+
+$$\sigma_{f(\bar{x})} = \sqrt{N-1}\sigma_{f^J}$$
+
+where
+
+$$ \sigma^2_{f^J} \equiv \overline{(f^J)^2} -(\overline{f^J)}^2$$
+
+The covariance between two parameters $\alpha$ and $\beta$ parameters is given by
+
+$$ COV_{\alpha,\beta}=\frac{N-1}{N}\sum_{i=1}^N [\theta_{i}^J-\overline{\theta^J}]_a 
+                                                [\theta_{i}^J-\overline{\theta^J}]_b$$
+                                       
+where
+$$\overline{\theta_\alpha^J}=\frac{1}{N}\sum{i=1}{N} \theta_J^{i,\alpha}$$
+
+$\textstyle N-1$ is used as the denominator rather than $\textstyle N$ since the population mean is unknown. 
+
+## Bias estimation and correction
+
+The bias of the estimator, calculated over the entire sample, can be estimated by
+
+$$f(X)\simeq N f(\bar{x})-(N-1)\overline{f^J}$$
+
+and reduces bias by an order of magnitude from $O(N^{-1})$ to $O(N^{-2})$. 
+\newpage
+
+# Simulation
+
+We simulate an object with known properties using the biodyn package then conduct an assessment. 
+
+```{r,fig.caption="Simulated stock"}
+library(plyr)
+library(biodyn)
+
+bd=simBiodyn()
+bd=window(bd,end=49)
+```
+
+A proxy for stock abundance is also required to estimate the stock parameters,  Therefore an unbiased catch per effort (CPUE) series is generated from mid year stock biomass.
+
+```{r, fig,caption="Simulated CPUE series",fig.height=2}
+cpue=(stock(bd)[,-dims(bd)$year]+stock(bd)[,-1])/2
+cpue=rlnorm(1,log(cpue),.2)
+
+ggplot(cpue)+geom_point(aes(year,data))
+```
+
+Before performing an assessment we have to provide initial guesses and bounds for the parameters
+
+```{r, fig.cap="Fitted compared to actual time series"}
+#set parameters
+setParams(bd) =cpue
+setControl(bd)=params(bd)
+control(bd)[3:4,"phase"]=-1
+```
+
+The stock assessment can now be fitted
+```{r, fig.cap="Fitted compared to actual time series"}
+#fit
+bdHat=fit(bd,cpue)
+
+plot(biodyns("Estimate"=bdHat,"Actual"=bd))+
+  theme(legend.position="bottom")
+```
+\newpage
+
+## Jack knife procedure
+
+The CPUE index is jack knifed and the model refitted for each resampled data set, which are held in the iter dim.
+```{r, fig.cap="Jack knife error bars"}
+bdJK=fit(bdHat,jackknife(cpue))
+```
+
+The normal plot method can not be used as the iter does not hold samples from a probability distribution. Instead plotJack is used which estimates the error bars.
+
+```{r, fig.cap="Jack knife error bars"}
+plotJack(bdHat,bdJK)
+```
+
+## Estimates
+
+Estimates of the bias and SEs can now be calculated, these can be done for FLQuant and FLPar objects, e.g. for current stock biomass
+
+
+```{r}
+#FLQuant
+library(ggplotFL)
+
+true=stock(bd   )[,49]
+hat =stock(bdHat)[,49]
+jack=stock(bdJK )[,49]
+
+
+n   =dims(jack)$iter
+mn  =apply(jack, 1:5, mean)   
+rsdl=sweep(jack,1:5,mn,"-")
+ss  =apply(rsdl^2,1:5,sum)
+            
+bias         =(n-1)*(hat-mn)
+biasCorrected=n*hat-(n-1)*mn
+
+se  =sqrt(((n-1)/n)*ss)
+```
+
+Reference points
+```{r}
+# FLPar
+true=refpts(bd   )
+hat =refpts(bdHat)
+jack=refpts(bdJK )
+
+n   =dims(jack)$iter
+mn  =apply(jack,  seq(length(dim(jack))-1), mean)   
+rsdl=sweep(jack,  seq(length(dim(jack))-1), mn,"-")
+ss  =apply(rsdl^2,seq(length(dim(jack))-1),sum)
+            
+bias         =(n-1)*(hat-mn)
+biasCorrected=n*hat-(n-1)*mn
+
+se  =sqrt(((n-1)/n)*ss)
+```
+\newpage
+

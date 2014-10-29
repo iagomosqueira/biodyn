@@ -1,0 +1,712 @@
+---
+title: "biodyn"
+author: "Laurence Kell"
+date: "August 13th, 2014"
+output: rmarkdown::tufte_handout
+---
+
+<!--
+%% \VignetteEngine{knitr::knitr}
+-->
+
+```{rinitKnitr, echo=FALSE, results="asis"}
+library(knitr)
+
+#output: rmarkdown::tufte_handout
+
+# output:
+#   rmdformats::html_clean:
+#     fig_width: 6
+#     fig_height: 6
+#     highlight: pygments
+
+## Global options
+options(max.print="75")
+opts_chunk$set(fig.path="out/",
+               echo =TRUE,
+               cache=TRUE,
+               cache.path="cache/",
+               prompt=FALSE,
+               tidy=FALSE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+
+opts_knit$set(width=75)
+```
+
+```{rinitPurl,eval=FALSE,echo=FALSE}
+library(knitr)
+purl(    "/home/laurie/Desktop/flr/git/biodyn/stuff/vignettes/biodyn.Rmd",
+     out="/home/laurie/Desktop/flr/git/biodyn/vignettes/biodyn.R")
+
+```
+
+```{rinitLib}
+library(biodyn)
+library(ggplot2)
+library(plyr)
+library(diags)
+library(kobe)
+library(ggplotFL)
+```
+
+# Introduction
+
+\newthought{biomass dynamic} stock assessment models have been criticised as being too simplistic to capture the actual population dynamics. However, if a simple model can provide advice on stock status relative to reference points and predict the response of a stock to management why use anything more complicated? 
+
+The biodyn package is intended to help answer this question by being simulation tested using Managment Strategy Evaluation (MSE) using [FLR](http://www.flr-project.org/).
+
+# The Class
+
+The biodyn class includes methods for fitting,  examining goodness of fit diagnostics, estimating uncertainly in stock status relative to reference points, deriving quantities used in management, running projections, simulating Harvest Control Rules (HCRs), conducting Management Strategy Evaluation (MSE) and for plotting.
+
+The class includes data (i.e. slots) for catch,  parameter estimates, fitted stock biomass and residuals from the fits of the CPUE used as proxies for stock trends. 
+
+# Stock assessment 
+Russell \cite{russell1931some} summarised the key processes influencing the dynamics of exploited populations in a single equation, where the biomass $B_t$ this year is a function of the biomass last year ($B_{t-1}$) plus gains due to growth (G) and recruitment (R) and losses due to fishing (F) and natural mortality (M).
+ 
+\begin{marginfigure}
+\begin{equation}B_{t} = B_{t-1} + (G + R) - (F+M)\end{equation}
+\caption{The Russell equation}
+\end{marginfigure}
+
+Recognising that there may be a mismatch between the stock assumptions and the population the equation can be expanded to include gains due to immigration (I) and losses due to emigration (E).
+
+\begin{marginfigure}
+\begin{equation}f(B_2) = B_1 + (G+R+I) - (F+M+H)\end{equation}
+\caption{Russell equation with migration}
+\end{marginfigure}
+
+In a biomass dynamic stock assessment production function the dynamics of recruitment, growth and natural mortality are simplified into a single production function $P$ which can be modelled by a variety of surplus production functions such as that of  Pella-Tomlinson  \citet{pella1969generalized}.
+
+
+\begin{marginfigure}
+\begin{equation}  B_{t+1}=B_{t}-C_{t}+P_{t}\end{equation}  
+\caption{Biomass dynamic}
+\end{marginfigure}
+
+\begin{marginfigure}
+\begin{equation}\frac{r}{p}\cdot~B(1-(\frac{B}{K})^p)\end{equation}  
+\caption{An equation}
+\end{marginfigure}
+
+The dynamics i.e. productivity and reference points are determined by $r$ and the shape of the production function $p$. if $p=1$ then MSY is found halfway between 0 and K; as p increases MSY shifts to the right.
+
+Since there is insuffcient infomation in the catch data to estimate the few parameters of the production function additional data, e.g. time series of relative abundance from catch per unit effort (CPUE) or surveys are required for calibration.
+
+# Creating an object
+
+First a biodyn object has to be created. There are various ways of creating a new object, the first way is to use the class creator
+
+```{rclassCreate}
+bd =biodyn()
+```
+
+Supplying the catch helps to set the dimensions
+```{rclassCreate2}
+bd=biodyn(catch=FLQuant(100,dimnames=list(year=1990:2010)))
+```
+
+Perhaps the easist way is to create an new object from an existing one, i.e. coercion from an FLStock
+
+```{rclassCoerce,eval=FALSE}
+data(ple4)
+bd =as(ple4,"biodyn")
+```
+
+or aspic
+```{rclassCoerce2,eval=FALSE}
+library(aspic)
+asp=aspic("http://http://rscloud.iccat.int/kobe/swon/2013/aspic/run2/")
+bd =as(asp,"biodyn")
+```
+
+Simulated objects can also be created 
+```{rclassSim}
+bd=simBiodyn()
+```
+
+\newpage
+
+# Plotting
+
+Plotting can be used to examine an object, explore data, check outputs, diagnose problems, and summarise results. biodyn uses ggplot2 as this allows a variety of basic plots to be provided as part of the package and these to be modified and new plots developed as required.
+
+## Time Series
+```{rplot, fig.margin=TRUE, fig.width=4, fig.height=8, fig.cap="Simulated time series"}
+bd=simBiodyn()
+bd=window(bd,end=49)
+plot(bd)
+```
+
+```{rplotEql, fig.margin=TRUE, eval=FALSE, fig.height=6, fig.width=4, echo=FALSE, fig.cap="Simulated CPUE series"}
+biodyn:::plotEql(bd)
+```
+
+## Production Function
+```{rplotPrd, fig.margin=TRUE, fig.cap="Simulated CPUE series"}
+library(reshape)
+x=simBiodyn()
+plotPrd(x)+
+  geom_path( aes(stock,catch),
+             model.frame(FLQuants(x,"stock","catch")))+
+  geom_point(aes(stock,catch),
+             model.frame(FLQuants(x,"stock","catch")))
+```
+
+## Diagnostics
+See below  
+
+## Advice  
+See below
+
+## Comparisons with other classes
+
+```{rplotMSE, fig.margin=TRUE, eval=FALSE, fig.cap="Simulated CPUE series"}
+plotMSE()
+```
+\newpage
+
+## Monte Carlo Simulation
+
+```{rplotMC, fig.margin=TRUE, fig.height=6, fig.width=4,fig.cap="Monte Carlo simuation time series with confidence intervals and a worm (single simulation)."}
+harvest=rlnorm(200,log(harvest(bd)[,-1]),.2)
+
+bd=fwd(bd,harvest=harvest)
+
+plot(bd,worm=3)+
+  theme(legend.position="bottom")
+```
+\newpage 
+
+# Estimation
+
+\newthought{Fitting to data} can be done using either maximum likelihood or by running Monte Carlo Markov Chain (MCMC) simulations. 
+
+When first using a stock assessment it helps to be able to check estimated values with the true ones. Therefore we simulate a stock with know parameters and exploitation history 
+
+```{rfit, echo=TRUE, fig.margin=TRUE, fig.height=4, fig.cap="Simulated stock"}
+bd=simBiodyn()
+```
+
+A CPUE series is also needed for fitting and can be simulated that by taking the mid year biomass and adding error.
+
+```{rfitU, fig.margin=TRUE, fig.cap="Simulated CPUE series"}
+cpue=(stock(bd)[,-dims(bd)$year]+
+      stock(bd)[,-1])/2
+cpue=rlnorm(1,log(cpue),.2)
+
+ggplot(as.data.frame(cpue))+
+  geom_point(aes(year,data))+
+  geom_line(aes(year,data),data=as.data.frame(stock(bd)),col="salmon")
+```
+
+Starting values for parameters are also required. These can be set by informed guesses. If you know the catch then MSY should be somewhere close and if you can provide a guess for r (the default is 0.5) then carrying capacity (k) can be calculated; by default is assummed to be symetric (i.e. p=1) and $B_0$ (the ratio of the initial biomass to carrying capacity) can be set to 1 if data are available from the start of the fishery. The robustness of fixing any parameters should be checked.
+
+```{rfitGuess,eval=FALSE}
+bd=biodyn(catch=catch(bd),msy=mean(catch(bd)))
+```
+
+The constructor also calculates the stock based on the initial parameters and catch and this allows catchability and the CV of the fit of the CPUE index to be calculated.
+```{rfitParams,fig.margin=TRUE,fig.width=4,fig.height=6}
+setParams( bd)=cpue
+params(bd)
+```
+
+The params slot holds the fitted parameters. But before fitting the control slot has to be provided with initial guesses, upper and lower bounds (min and max) and any difficult to estimate parameters to be fixed, i.e. setting the phase of $B_0$ and p to be 1. Parameters can be estimated sequentially by setting phase >0. 
+
+```{rfitControl,fig.margin=TRUE,fig.width=4,fig.height=6}
+setControl(bd)=params(bd)
+  
+bd@control
+```
+
+## Maximum Likelihood
+
+Estimation can be performed using maximum likelihood
+```{rfitRun, eval=TRUE, fig.margin=TRUE, fig.height=6,fig.cap="A comparison of the true and fitted time series"}
+bd@control[3:4,"phase"]=-1
+bdHat=fit(bd,cpue)
+
+# plot(biodyns("True"=bd,"Hat"=bdHat))+
+#   theme(legend.position="bottom")
+```
+
+Since the true parameters are known then we can check the fits. 
+```{rfitCheck,fig.margin=TRUE,fig.width=4,fig.height=6}
+params(bdHat)
+params(bdHat)/params(bd)
+```
+\newpage
+
+# Diagnostics
+
+\newthought{Goodness of fit} diagnostics are important for transparency, replicability and ensuring that a global solution has actually been found, i.e. that when the assessment is repeated that you get the same solution.
+
+## Residual Patterns
+Patterns in residuals of the fits to the CPUE and stock abundance may indicate a violation of models assumptions. Which in turn may result in biased estimates of parameters, reference points and stock trends. In addition variance estimates obtained from bootstrapping assume that residuals are Independently and Identically Distributed (i.i.d.).
+
+Residuals are found in the diags slot.
+
+```{rdiag,echo=TRUE}
+head(bdHat@diags)
+```
+
+## Normally Distributed
+
+Checking the distribution of residuals can be done by plotting the obsevered quantiles against the predicted quantiles from the assumed distribution.
+
+Q-Q plots compare a sample of data on the vertical axis to a statistical population on the horizontal axis, in this case a normal distribution. If the points follow a strongly nonlinear pattern this will suggest that the data are not distributed as a standard normal i.e. $X ~ N(0,1)$. Any systematic departure from a straight line may indicate skewness or over or under dispersion. 
+
+```{rdiagQQ, fig.width=4,fig.height=4,fig.margin=TRUE, fig.cap="Quantile-quantile plot to compare residual distribution with the normal distribution."}
+rsdl=bdHat@diags
+ggplot(rsdl)                                           +
+  geom_point( aes(qqx,qqy))                            +
+  stat_smooth(aes(qqx,qqHat),method="lm",se=T,fill="blue", alpha=0.1)         +
+  theme_ms(14,legend.position="bottom")               
+```
+
+
+## Observed against Fitted
+
+It is assumed that an index is proportional to the stock so when plotting the observed against the fitted values the points should fall around the $y=x$ line, if they do not then the index may not be a good proxy for the stock trend.
+
+```{rdiagHat, fig.margin=TRUE, fig.height=4, figwidth=4, fig.cap="Observed CPUE verses fitted, blue line is a linear resgression fitted to points, black the y=x line."}
+ggplot(with(rsdl, data.frame(obs=stdz(index),hat=stdz(hat)))) +
+    geom_abline(aes(0,1))                                     +
+    geom_point( aes(obs,hat))                                 +
+    stat_smooth(aes(obs,hat),method="lm", se=F)               +
+    theme_ms(14,legend.position="bottom")                     +
+    xlab("Fitted") + ylab("Observed")
+```
+
+## Year Patterns
+
+The residuals are plotted against year along with a lowess smoother to see if the proxy for the stock doesnt agree with the estimated stock trend,
+
+```{rdiagYr,fig.height=3, fig.margin=TRUE, fig.cap="Residuals by year, with lowess smoother"}
+dat=transform(subset(rsdl,!is.na(residual), 
+                     residual=stdz(residual,na.rm=T)))
+
+ggplot(aes(year,residual),data=dat)  +
+  geom_hline(aes(yintercept=0))      +
+  geom_point()                       +
+  stat_smooth(method="loess",se=F)   +
+  theme_ms(14,legend.position="bottom") 
+```
+
+## Variance
+
+It is also assumed that variance does not vary with the mean, this assumption can be checked by plotting the residuals against the fitted values. 
+
+```{rdiagVar,fig.height=3, fig.margin=TRUE, fig.cap="Plot of residuals against fitted value, to check variance relationship."}
+ggplot(aes(hat, residual),
+       data=subset(rsdl,!is.na(hat) & !is.na(residual)))   +
+  geom_hline(aes(yintercept=0))         +
+  geom_point()                          +
+  stat_smooth(method="loess",se=F)      +
+  theme_ms(14,legend.position="bottom")
+```
+
+## Autocorrelation
+
+It is assumed that the residuals are not autocorrelated. Plots of the residuals against each other with a lag of 1 to identify autocorrelation. Significant autocorrelations could be due to an increase in catchability with time; which may result in a more optimistic estimate of current stock status as any decline in the stock is masked by an increase in catchability.
+
+```{rdiagAR, fig.width=4,fig.width=4,fig.margin=TRUE, fig.cap="Plot of autocorrelation, i.e. $residual_{t+1}$ verses $residual_{t}$."}
+ggplot(rsdl)                                              +
+  geom_point( aes(residual,residualLag))                  +
+  stat_smooth(aes(residual,residualLag),method="lm",se=F) +
+  geom_hline(aes(yintercept=0))     +
+  xlab(expression(Residual[t]))     + 
+  ylab(expression(Residual[t+1]))   +
+  theme_ms(14,legend.position="bottom")  
+```
+\newpage
+
+
+## Profiles
+
+Likelihood profiles are useful to check that you are actually at a global solution and not stuck on a small hill with your back to the mountain. They are also useful for evaluating the infomation content of the data and whether different data sets are telling you different things and you need to ask more questions to determine the truth.
+
+The control slot can be used to produce a profile, i.e. fix a parameter or parameters for a range of values and then find the maximum likelihood by estimating the other parameters.
+
+1D
+```{rprfl, fig.margin=TRUE, fig.cap="Likelihood profile for r"}
+bdHat=fit(bdHat,cpue)
+setControl(bdHat)=params(bdHat)
+res=profile(bdHat,which='r',fixed=c('b0','p'),
+            cpue,range=seq(0.95,1.03,.002))
+ggplot(subset(res,ll.u1<0))+geom_line(aes(r,ll.u1))
+```
+
+2D
+```{rprfl2, eval=FALSE, fig.margin=TRUE, fig.cap="Likelihood profile for r"}
+res=profile(bdHat,which=c('r','k'),fixed=c('b0','p'),
+            cpue,range=seq(0.97,1.03,.02))
+ggplot(res, aes(r, k, z=ll.u1))+ 
+  stat_contour(aes(colour = ..level..), size = 1)
+```
+
+likelihood components
+```{rprflLike, fig.margin=TRUE, fig.height=6, fig.width=4, fig.cap="Likelihood profile by data conmponent, i.e. CPUE series"}
+
+bd=simBiodyn()
+
+Us  =FLQuants("Unbiased"     =
+                rlnorm(1,log((stock(bd)[,-dims(bd)$year]+
+                              stock(bd)[,-1])/2),0.2),
+              "Increase in q"=
+                rlnorm(1,log((stock(bd)[,-dims(bd)$year]+
+                              stock(bd)[,-1])/2),0.2))
+
+bds=bd
+
+setParams( bds)=Us
+setControl(bds)=params(bds)
+
+bds@control[3:4,"phase"]=-1
+bds=fit(bds,index=Us)
+bds@control[,c("min")]=bds@params*0.1
+bds@control[,c("val")]=bds@params
+bds@control[,c("max")]=bds@params*10
+
+fn=function(x) cbind(model.frame(params(x)["r"]),
+                     ll=model.frame(x@ll)[,-3],
+                     ll=apply(x@ll,2,sum))
+
+prfl=profile(bds,which='r',index=Us,
+             range=seq(0.70,1.05,.001),fn=fn)
+
+ggplot(subset(melt(prfl[,c("r","ll.u1","ll.u2","1")],id="r"),
+              value<10))+
+  geom_line(aes(r,value,group=variable,col=variable))+
+  facet_wrap(~variable,scale="free",ncol=1)          +
+  theme(legend.position="bottom")
+```
+
+Profile Slot
+```{rprflADMB,echo=FALSE,eval=FALSE}
+bd2=fit(bdHat,cpue,cmdOps="-lprof")
+prf=subset(bd@profile, param %in% c("bbmsy","ffmsy"))
+prf=data.frame(What="Profile",t(daply(prf, .(param), with, sample(value,500,prob=p,replace=T))))
+names(prf)[2:3]=c("Stock","Harvest")
+```
+
+
+# Stock status
+
+A main objective of stock assessment is to estimate uncertainly in stock status. This requires estimates of distributions as well as point estimates. 
+
+```{runcertainty, fig.margin=TRUE}
+bd   =window(simBiodyn(),end=39)
+cpue=(stock(bd)[,-dims(bd)$year]+
+      stock(bd)[,-1])/2
+cpue=rlnorm(1,log(cpue),.2)
+bdHat=bd
+
+setParams( bdHat)=cpue
+setControl(bdHat)=params(bdHat)
+bdHat@control[3:4,"phase"]=-1
+bdHat=fit(bdHat,cpue)
+
+sims=biodyns("True"=bd,"Best Fit"=bdHat)
+```
+There are various ways to estimate undercertainty in parameter estimates and quantities derived from them, i.e. use the covariance matrix provided by a maximum likelihood fit, bootstrapping, the jack knife or Bayesian methods such as Monte Carlo Markov Chain,
+
+## Variance/Covariance Matrix
+
+Fitting using maximum likelihood provides the covariance matrix for the parameters. We can use this to conduct a Monte Carlo simulation of the parameter estimates to derive uncertainty in derived quantities.
+
+```{runcertaintyCov,fig.height=6, fig.margin=TRUE}
+vcov(bdHat)
+```
+
+## The Bootstrap 
+
+The Bootstrap can be used to simulate CPUE series replicates and the model refitted.
+
+```{runcertaintyBoot, fig.height=4, fig.margin=TRUE, fig.cap="Bootstrapped CPUE series"}
+cpueSim=bdHat@diags[,c("year","hat")]
+names(cpueSim)[2]="data"
+cpueSim=as.FLQuant(cpueSim)
+
+cv=sd(sims[["Best Fit"]]@diags[,"residual"])
+
+cpueSim=rlnorm(100,log(cpueSim),cv)
+
+cpueSim[cpueSim==0]=NA
+
+plot(cpueSim)
+
+sims[["CPUE"]]=fit(propagate(bdHat,100),cpueSim)
+```
+
+
+## Jack knife
+
+The Jack knife is a relatively quick procedure and so suitable for simulation testing
+```{runcertaintyJackknife,fig.height=4,fig.margin=TRUE, fig.cap="Plot predicted stock trend by index"}
+
+bdJK =fit(bdHat,jackknife(cpue))
+
+sims[["Jack Knife"]]=bdJK
+
+#plotJack(bdJK)
+```
+
+## MCMC
+
+Monte Carlo Markov Chain
+```{runcertaintyMCMC}
+sims[["MCMC"]]=fit(bdHat,cpue,cmdOps=c("-mcmc 1000000, -mcsave 5000"))
+```
+
+Diagnostics need to be run to make sure that the results have actually estimated a stationary distribution.
+
+```{runcertaintyMCMC2,fig.height=4,fig.margin=TRUE}
+acf(c(params(sims[["MCMC"]])["r"]))
+```
+
+```{runcertaintySave}
+save(sims,cpue,bdJK,bdHat,file="/home/laurie/Desktop/flr/git/biodyn/stuff/data/sims.RData")
+```
+
+\newpage
+
+# Stock Status Reference Points
+
+The Precautionary Approach requires stock status to be estimated relative to reference points. The covariance matrix can be used to estimate uncertainty in derived quantities, i.e. those used for management such as $F:F_{MSY}$. 
+
+```{rref,eval=FALSE}
+bdHat@mng
+```
+
+```{rref2,eval=FALSE}
+bdHat@mngVcov
+```
+
+```{rref3,eval=FALSE,fig.margin=TRUE,fig.width=4,fig.height=6,fig.cap=""}
+currentState   =bdHat@mng[c("bbmsy","ffmsy"),"hat",drop=T]
+currentStateVar=bdHat@mngVcov[c("bbmsy","ffmsy"),
+                              c("bbmsy","ffmsy"),drop=T]
+
+refs=mvrnorm(100,currentState,currentStateVar)
+
+ggplot(data=as.data.frame(refs))+
+   geom_histogram(aes(x=bbmsy))
+```
+
+## Marginal Density for Stock
+```{rrefBmsy,fig.fullwidth=TRUE, fig.width=4, fig.height=6,fig.cap="Densities of Stock from different methods for estimating uncertainty."}
+load("/home/laurie/Desktop/flr/git/biodyn/stuff/data/sims.RData")
+sims[["Jack Knife"]]=bdJK
+
+c("Best Fit","CPUE","Jack Knife","MCMC")
+
+boot=stock(sims[["CPUE"]])[,39]
+# ggplot(as.data.frame(boot))+ 
+#   geom_density(aes(x=data, y=..count..), position = "stack",fill="red")+
+#   scale_x_continuous(limits=c(0,700))
+
+mcmc=stock(sims[["MCMC"]])[,39]
+# ggplot(as.data.frame(mcmc))+ 
+#   geom_density(aes(x=data, y=..count..), position = "stack",fill="red")+
+#   scale_x_continuous(limits=c(0,700))
+
+vcov=rnorm(500,sims[["Best Fit"]]@mng["bnow","hat"],
+               sims[["Best Fit"]]@mng["bnow", "sd"])
+# ggplot(as.data.frame(vcov))+ 
+#   geom_density(aes(x=data, y=..count..), position = "stack",fill="red")+
+#   scale_x_continuous(limits=c(0,1000))
+  
+jack=randJack(500,stock(sims[[  "Best Fit"]])[,39],
+                  stock(sims[["Jack Knife"]])[,39])
+# ggplot(as.data.frame(jack))+ 
+#   geom_density(aes(x=data, y=..count..), position = "stack",fill="red")+
+#   scale_x_continuous(limits=c(0,700))
+         
+bnow=rbind(data.frame(Method="boot",stock=c(boot)),
+           data.frame(Method="mcmc",stock=c(mcmc)),
+           data.frame(Method="vcov",stock=c(vcov)),
+           data.frame(Method="jack",stock=c(jack)))
+  
+ggplot(bnow)+ 
+  geom_density(aes(x=stock, y=..count..), position = "stack",fill="red")+
+  facet_wrap(~Method,scale="free_y",ncol=1)+
+  geom_vline(aes(xintercept=c(stock(sims[["Best Fit"]])[,"39"])))
+```
+
+## Marginal Density for Harvest/FMSY
+```{rrefFMSY,fig.fullwidth=TRUE, fig.width=6, fig.height=8,fig.cap="Densities of Stock/BMSY from different methods for estimating uncertainty."}
+boot=boot%/%bmsy(sims[["CPUE"]])
+mcmc=mcmc%/%bmsy(sims[["MCMC"]])
+vcov=rnorm(500,sims[["Best Fit"]]@mng["bbmsy","hat"],
+               sims[["Best Fit"]]@mng["bbmsy", "sd"])
+jack=randJack(500,stock(sims[[  "Best Fit"]])[,39]%/%bmsy(sims[[  "Best Fit"]]),
+                  stock(sims[["Jack Knife"]])[,39]%/%bmsy(sims[["Jack Knife"]]))
+         
+bbmsy=rbind(data.frame(Method="boot",stock=c(boot)),
+            data.frame(Method="mcmc",stock=c(mcmc)),
+            data.frame(Method="vcov",stock=c(vcov)),
+            data.frame(Method="jack",stock=c(jack)))
+  
+ggplot(bnow)+ 
+  geom_density(aes(x=stock, y=..count..), position = "stack",fill="red")+
+  facet_wrap(~Method,scale="free_y",ncol=1)+
+  geom_vline(aes(xintercept=c(stock(sims[["Best Fit"]])[,"39"])))+
+  scale_x_continuous(limits=c(0,2.0))
+```
+
+## Kobe Phase Plot
+```{rkobe,fig.margin=TRUE,fig.width=4,fig.height=4,fig.caption="Kobe Phase Plots",eval=FALSE}
+library(kobe)
+
+kb=rbind(data.frame(Method="Boot",kobe(sims[["CPUE"]],      what="pts")),
+         data.frame(Method="MCMC",kobe(sims[["MCMC"]],      what="pts")),
+         data.frame(Method="Vcov",kobe(sims[["Best Fit"]],  what="pts")),
+         data.frame(Method="Jack",kobe(sims[["Jack Knife"]],what="pts")))
+             
+ggplot(kb)+ 
+  geom_point(aes(stock,harvest),data=subset(df,year==39))+
+  facet_wrap(~Method,scale="free_y",ncol=1)
+```
+
+# Simulation
+```{runcertaintyJackknife2,fig.height=4,fig.margin=TRUE,eval=FALSE}
+source('~/Desktop/flr/git/biodyn/R/biodyn-jackRand.R')
+source('~/Desktop/flr/git/biodyn/R/biodyn-jackSummary.R')
+
+sims[["Jack Knife"]]=randJack(500,bdHat,bdJK)
+```
+
+```{runcertaintyCov2,fig.height=6, fig.margin=TRUE,eval=FALSE}
+sims[["Vcov"]]=bdHat
+sims[["Vcov"]]=mvn(bdHat,500,nms=c("r","k"),fwd=TRUE)
+```
+
+# Projections
+
+Once stock parameters and status has been estimated then projections need to be conducted to inform management.
+
+```{rfdwd, fig.margin=TRUE,fig.width=4, fig.height=6,fig.cap="Projection"}
+harvest=rlnorm(100,log(harvest(bdHat))[,-dims(bdHat)$year],.1)
+bdHat =fwd(bdHat,harvest=harvest)
+
+plot(bdHat,worm=c(2,8))+    
+  theme(legend.position="bottom")
+```
+
+
+## Harvest Control Rules
+
+
+Use simulated data to run annual, tri-annual, F bound and TAC bounded HCRs
+
+Annual
+```{rhcr1}
+bd   =simBiodyn()
+
+bd=window(bd,end=29)
+for (i in seq(29,49,1))
+  bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1)$hvt)
+simHCR=biodyns("1"=bd)
+```
+
+Tri-annual
+```{rhcr3}
+bd=window(bd,end=29)
+for (i in seq(29,49,3))
+  bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1:3)$hvt)
+simHCR[["3"]]=bd
+```
+
+Bound on F
+```{rhcrF}
+bd=window(bd,end=29)
+for (i in seq(29,49,1))
+  bd=fwd(bd,harvest=hcr(bd,refYrs=i,yrs=i+1,bndF=c(0.9,1.1))$hvt)
+simHCR[["bound F"]]=bd
+```
+
+Bound on catch
+```{rhcrY}
+bd=window(bd,end=30)
+for (i in seq(29,49,1))
+  bd=fwd(bd,catch=hcr(bd,refYrs=i,yrs=i+1,tac=T,bndTac=c(0.9,1.1))$tac)
+simHCR[["bound TAC"]]=bd
+```
+
+```{rhcrPlot,fig.fullwidth=TRUE,fig.width=6,fig.height=6,fig.cap="Plots of projections"}
+plot(simHCR)+
+  theme(legend.position="bottom")
+
+```
+
+
+# Stochasticity
+
+Process Error and Harvest Control Rule
+```{rMC,fig.margin=TRUE,fig.width=6,fig.height=6}
+pe=rlnorm(500,FLQuant(0,dimnames=list(year=1:50)),0.5)
+
+bd=window(simBiodyn(),end=30)
+bd.=bd
+bd@stock =propagate(bd@stock, 500)
+bd=fwd(bd,harvest=harvest(bd)[,2:30],pe=pe)
+
+for (i in seq(30,48,1))
+  bd=fwd(bd,
+         catch=hcr(bd,refYrs=i,yrs=i+1,tac=T,bndTac=c(0.9,1.1))$tac,
+         pe   =pe)
+
+plot(bd)
+```
+
+```{rMCkobe,fig.margin=TRUE,fig.width=6,fig.height=6}
+trks=biodyn::kobe(bd,what="trks")
+trks=mdply(data.frame(Year=seq(33,49,3)), 
+           function(Year) subset(trks,year<=Year))
+
+pts =transform(biodyn::kobe(bd,what="pts",year=seq(33,49,3)),
+                 Year=year)[,c("stock","harvest","Year")]
+
+kobePhase()+    
+    geom_line(aes(stock,harvest),data=biodyn:::hcrPlot(bd.),
+              col="brown",size=1.5)                             +    
+    geom_path( aes(stock,harvest),data=subset(trks,pctl=="50%"))+
+    geom_point(aes(stock,harvest),data=subset(pts,Year>=33))    +
+    facet_wrap(~Year)
+```
+\newpage
+
+# MSE
+
+```{rmse,eval=FALSE}
+biodyn:::mseBiodyn
+```
+\newpage
+
+
+# Sidenotes
+
+One of the most prominent and distinctive features of this style is the extensive use of sidenotes. There is a wide margin to provide ample room for sidenotes and small figures. Any use of a footnote will automatically be converted to a sidenote. ^[This is a sidenote that was entered using a footnote.] 
+
+If you'd like to place ancillary information in the margin without the sidenote mark (the superscript number), you can use the `\marginnote` command. \marginnote{This is a margin note.  Notice that there isn't a number preceding the note.}
+
+Note also that the two footnote references (`tufte_latex` and `books_be`, both defined below) were also included in the margin on the first page of this document.
+
+# Tables
+
+You can use the **xtable** package to format \LaTeX\ tables that integrate well with the rest of the Tufte handout style. Note that it's important to set the `xtable.comment` and `xtable.booktabs` options as shown below to ensure the table is formatted correctly for inclusion in the document.
+
+```{r, results='asis'}
+library(xtable)
+options(xtable.comment = FALSE)
+options(xtable.booktabs = TRUE)
+xtable(head(mtcars[,1:6]), caption = "First rows of mtcars")
+```
+
+[^tufte_latex]: https://code.google.com/p/tufte-latex/
+[^books_be]: http://www.edwardtufte.com/tufte/books_be
+
