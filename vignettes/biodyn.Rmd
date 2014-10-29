@@ -538,7 +538,7 @@ ggplot(bnow)+
 ```
 
 ## Marginal Density for Harvest/FMSY
-```{rrefFMSY,fig.fullwidth=TRUE, fig.width=6, fig.height=8,fig.cap="Densities of Stock/BMSY from different methods for estimating uncertainty."}
+```{rrefFMSY,eval=FALSE,fig.fullwidth=TRUE, fig.width=6, fig.height=8,fig.cap="Densities of Stock/BMSY from different methods for estimating uncertainty."}
 boot=boot%/%bmsy(sims[["CPUE"]])
 mcmc=mcmc%/%bmsy(sims[["MCMC"]])
 vcov=rnorm(500,sims[["Best Fit"]]@mng["bbmsy","hat"],
@@ -573,7 +573,7 @@ ggplot(kb)+
 ```
 
 # Simulation
-```{runcertaintyJackknife2,fig.height=4,fig.margin=TRUE,eval=FALSE}
+```{runcertaintyJackknife2,,eval=FALSE,fig.height=4,fig.margin=TRUE,eval=FALSE}
 source('~/Desktop/flr/git/biodyn/R/biodyn-jackRand.R')
 source('~/Desktop/flr/git/biodyn/R/biodyn-jackSummary.R')
 
