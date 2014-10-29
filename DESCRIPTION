@@ -3,6 +3,8 @@ Title: Biomass Dynamic Model
 Version: 0.0.2
 Author: Laurence Kell
 Description: implements a biomass dynamic model class
+VignetteBuilder: knitr
+Suggests:  knitr
 Depends:
     R(>= 3.0.1),
     methods,
@@ -14,7 +16,8 @@ Imports:
     reshape
 Suggests:
     diags,
-    kobe
+    kobe,
+    knitr
 Maintainer: Laurence Kell <laurie.kell@iccat.int>
 License: GPL-2
 LazyLoad: Yes

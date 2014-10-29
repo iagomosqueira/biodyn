@@ -1,4 +1,0 @@
-%\VignetteIndexEntry{Biodyn}
-\documentclass{article}
-\begin{document}
-\end{document}
